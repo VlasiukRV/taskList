@@ -1,0 +1,26 @@
+
+<button ng-click="updateErrorDescription()" type="button" size="sm" title="refresh report">
+    <span class="glyphicon glyphicon-refresh"></span>
+</button>
+<br>
+<table width="900" class="dataTable">
+    <tr ng-repeat="errorDescription in errorDescriptions track by $index">
+        <td width="800" align="left">
+            <div class="alert alert-danger">
+                Error
+                <br>
+                {{errorDescription.status}}
+                <br>
+                {{errorDescription.statusText}}
+            </div>
+        </td>
+        <td align="center">
+            <button ng-click="deleteErrorDescription($index)" type="button" size="sm" title="dell">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </td>
+    </tr>
+</table>
+
+
+

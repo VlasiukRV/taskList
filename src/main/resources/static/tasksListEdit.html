@@ -1,0 +1,15 @@
+<div ng-controller="taskController">
+
+    <div ng-controller="editTaskController" ng-show="showEditForm">
+        <entity-edit-form
+                entity-edit-form="entityEditForm">
+        </entity-edit-form>
+    </div>
+
+    <div ng-controller="taskListController" ng-show="showListForm">
+        <entity-list-form
+                entity-list-form="entityListForm">
+        </entity-list-form>
+    </div>
+
+</div>

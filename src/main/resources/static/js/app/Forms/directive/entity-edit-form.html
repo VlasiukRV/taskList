@@ -1,0 +1,34 @@
+
+<div class = "col-lg-6">
+
+<div class="tableName">
+    <button ng-click="closeForm()" type="button" size="sm" title="close form">
+        <span class="glyphicon glyphicon-remove"></span>
+    </button>
+    <button ng-click="updateForm()" type="button" size="sm" title="refresh form">
+        <span class="glyphicon glyphicon-refresh"></span>
+    </button>
+    <button ng-click="createEntity()" type="button" size="sm" title="save form">
+        <span class="glyphicon glyphicon-floppy-save"></span>
+    </button>
+
+    <b> {{entityEditForm.editFormName}} </b>
+</div>
+
+<div class="window">
+
+    <table width="900" class="dataTable">
+        <tr class="tableHeader" ng-repeat="entityProperty in entityEditForm.formProperties track by $index">
+            <td width="800" align="left">
+                <entity-property
+                        entity="entityEditForm.currentEntity"
+                        property="entityProperty">
+                </entity-property>
+            </td>
+            <td align="center"></td>
+        </tr>
+    </table>
+
+</div>
+
+</div>
