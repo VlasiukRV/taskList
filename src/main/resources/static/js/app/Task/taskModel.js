@@ -8,6 +8,7 @@ function Task(dataStorage){
     this.author = new User(dataStorage);
     this.executor = [];
     this.project = new Project(dataStorage);
+    this.state = 0;
 
     Object.defineProperty(this, "representation", {
         enumerable: true,

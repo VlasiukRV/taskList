@@ -1,6 +1,5 @@
 package com.tasklist.app;
 
-import com.tasklist.app.user.User;
 import com.tasklist.web.AjaxResponse;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public abstract class BaseEntityController {
             return AjaxResponse.errorResponse("entity '" + entityName + "' not found");
         }
 
-        List<User> entityList = entityService.getAll();
+        List<BaseEntity> entityList = entityService.getAll();
 /*
         if (entityList.size() == 0){
             return AjaxResponse.errorResponse( "List of '" +entityName+ "' is empty ");
@@ -63,7 +62,7 @@ public abstract class BaseEntityController {
         try {
             entity = entityService.saveEntity(strJSONEntity);
         }catch (Exception e){
-
+            e.printStackTrace();
         }
 
         if (entity == null || (Integer)entity.getId() == 0){

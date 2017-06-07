@@ -4,6 +4,37 @@
 
     <div ng-switch on="property.inputType">
 
+        <!--enum-->
+        <div ng-switch-when="enum">
+
+            <div class="input-group">
+
+                <select class="form-control"
+                        ng-model="entity[property.name]"
+                        ng-options="el for el in selectList"
+                        ng-change="propertyChanged()"
+                        title="{{property.label}}">
+
+                    <option value="" selected="">--Chose {{property.label}}--</option>
+
+                </select>
+
+                        <span class="input-group-btn">
+                           <button
+                                   class="btn btn-default"
+                                   ng-click="refreshSelectList(property, selectList)"
+                                   type="button"
+                                   title="refresh report">
+
+                               <span class="glyphicon glyphicon-refresh"></span>
+
+                           </button>
+                       </span>
+
+            </div>
+
+        </div>
+
         <!--select-->
         <div ng-switch-when="select">
 

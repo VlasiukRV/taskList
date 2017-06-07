@@ -50,7 +50,7 @@ function directiveDatePicker(dateFilter){
     };
 }
 
-function directiveEntityProperty(resourceService){
+function directiveEntityProperty(resourceService, dataStorage){
     return{
         restrict: 'E',
         require: '',
@@ -64,9 +64,13 @@ function directiveEntityProperty(resourceService){
         },
         controller: ['$scope', function ($scope) {
             $scope.refreshSelectList = function () {
-                $scope.property.entityList.update(resourceService, function (data) {
-                    $scope.selectList = data.list;
-                })
+                if($scope.property.inputType == "enum"){
+                    $scope.selectList = $scope.property.entityList.list;
+                }else {
+                    $scope.property.entityList.update(resourceService, function (data) {
+                        $scope.selectList = data.list;
+                    })
+                }
             };
             $scope.propertyChanged = function(){
 

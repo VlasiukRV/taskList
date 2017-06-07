@@ -26,6 +26,5 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/tasksList").setViewName("tasksListEdit.html");
 
         registry.addViewController("/errorPage").setViewName("errorPage.html");
-        registry.addViewController("/404").setViewName("errorPage.html");
     }
 }

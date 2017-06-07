@@ -67,7 +67,6 @@
 
                     </li>
 
-
                     <li class = "active">
                         <a href = "#/login">
                             login
@@ -80,9 +79,43 @@
                         </a>
                     </li>
 
+                    <li class = "dropdown">
+                        <a href = "#" class = "dropdown-toggle" data-toggle = "dropdown">
+                            System
+                            <b class = "caret"></b>
+                        </a>
+
+                        <ul class = "dropdown-menu">
+                            <li>
+                                <a href = "#" ng-click="initDataBase()">
+                                    <span>initDataBase</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href = "#" ng-click="runArchiveService()">
+                                    <span>runArchiveService</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href = "#" ng-click="stopArchiveService()">
+                                    <span>stopArchiveService</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href = "#" ng-click="interruptTaskExecutor()">
+                                    <span>interruptTaskExecutor</span>
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li>
+
                     <li class = "active">
                         <a href = "#"> <updatable-text f-call-back="getCurrentTime"></updatable-text> </a>
                     </li>
+
+
 
                 </ul>
 

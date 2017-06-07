@@ -33,6 +33,7 @@ public class TaskController extends BaseEntityController {
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json; charset=utf-8", produces = "application/json; charset=utf-8")
     public Map<String, Object> createEntityStrJSON(@RequestBody String strJSONEntity) {
+
         return super.createEntityStrJSON(strJSONEntity);
     }
 }

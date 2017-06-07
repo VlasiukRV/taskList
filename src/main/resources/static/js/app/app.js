@@ -1,120 +1,44 @@
-var appAddress = "http://localhost:8080";
+
 var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.select'])
-
-
-        .config(['$httpProvider', function ($httpProvider) {
-            $httpProvider.interceptors.push('myHttpResponseInterceptor');
-        }])
-        .factory('myHttpResponseInterceptor',['$q','$location', 'dataStorage',function($q, $location, dataStorage){
-            return {
-                'request': function(config) {
-                    return config;
-                },
-
-                'response': function (response) {
-                    var errorDescription = new ErrorDescription();
-                        errorDescription.SetNoError();
-                        if (response.status = 200) {
-                            if (response.data instanceof Object) {
-                                if ("message" in response.data && "result" in response.data) { //ToDo
-                                    if (response.data.result != "success") {
-                                        errorDescription.SetAppError(response.data.message);
-                                    }
-                                }
-                            }
-                        }
-                        if (errorDescription.error) {
-                            dataStorage.getErrorDescriptions().addErrorDescription(errorDescription);
-                            /*$location.path("/error");*/
-                        }
-                    return response;
-                },
-
-                'responseError': function(response) {
-                    var errorDescription = new ErrorDescription();
-                        errorDescription.SetNoError();
-                        if (response.status = 200) {
-                            if (response.data instanceof Object) {
-                                if ("message" in response.data && "result" in response.data) { //ToDo
-                                    if (response.data.result != "success") {
-                                        errorDescription.SetAppError(response.data.message);
-                                    }
-                                }
-                            }
-                        } else {
-                            errorDescription.SetHTTPError(response.statusText, response.status);
-                        }
-                        if (errorDescription.error) {
-                            dataStorage.getErrorDescriptions().addErrorDescription(errorDescription);
-                            /*$location.path("/error");*/
-                        }
-                    return $q.reject(response);
-                }
-            };
-        }])
 
         .config(['$controllerProvider', function ($controllerProvider) {
             $controllerProvider.allowGlobals();
         }])
-        .config(function ($routeProvider) {
-            $routeProvider
-                /*.when("/", {
-                    templateUrl: "/"
-                })*/
+        .config(['$locationProvider', function($locationProvider) {
+            $locationProvider.hashPrefix('');
+        }])
+        .config(['$httpProvider', function ($httpProvider) {
+                $httpProvider.interceptors.push('myHttpResponseInterceptor');
+        }])
+        .config(['$routeProvider', function ($routeProvider) {
+            setRoute($routeProvider);
+        }])
+        .config(['$provide', function ($provide) {
+            $provide.decorator('$locale', ['$delegate', function ($delegate) {
+                $delegate.NUMBER_FORMATS.PATTERNS[1].negPre = '-\u00A4';
+                $delegate.NUMBER_FORMATS.PATTERNS[1].negSuf = '';
+                return $delegate;
+            }]);
 
-                .when('/login', {
-                    templateUrl : 'login.html',
-                    controller: 'workPlaceController'
-                })
+        }])
 
-                .when("/user", {
-                    templateUrl: "/usersList"
-                })
-                .when("/project", {
-                    templateUrl: "/projectsList"
-                })
-                .when("/task", {
-                    templateUrl: "/tasksList"
-                })
-                .when("/error", {
-                    templateUrl: "/errorPage"
-                });
+        .factory('myHttpResponseInterceptor',['$q','$location', 'dataStorage',function($q, $location, dataStorage){
+            return appHttpResponseInterceptor($q, $location, dataStorage);
+        }])
+        .factory('entityEditService', function ($location, $resource) {
+           return entityEditService($location, $resource);
         })
-        .factory('entityEditService', function ($resource) {
-            return $resource(appAddress + '/entity/:entityName/:entityId', {
-                    entityName: "@entityName",
-                    entityId: "@entityId"
-                },
-                {
-                    getEntity: {
-                        method: "GET"
-                    },
-                    createEntity: {
-                        method: "POST"
-                    },
-                    deleteEntity: {
-                        method: "DELETE"
-                    }
-                });
+        .factory('systemService', function ($location, $resource) {
+            return systemService($location, $resource);
         })
-        .factory('systemService', function ($resource) {
-            return $resource(appAddress + '/system/:command', {
-                    command: "@command"
-                },
-                {
-                    getCurrentAuthentication: {
-                        method: "GET"
-                    }
-                });
-        })
-        .service('resourceService', function ($window, entityEditService, systemService) {
+        .factory('resourceService', function ($window, entityEditService, systemService) {
             return resourceService($window, entityEditService, systemService)
         })
-        .service('dataStorage', function () {
+        .service('dataStorage', function (){
             return dataStorage();
         })
-        .service('objectProperties', function (dataStorage) {
-            return objectProperties(dataStorage);
+        .service('objectProperties', function (resourceService, dataStorage) {
+            return objectProperties(resourceService, dataStorage);
         })
 
         .directive('smDatepicker', ['dateFilter', function (dateFilter) {
@@ -123,8 +47,8 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.se
         .directive('button', function () {
             return directiveButton();
         })
-        .directive('entityProperty', ['resourceService', function (resourceService) {
-            return directiveEntityProperty(resourceService);
+        .directive('entityProperty', ['resourceService', 'dataStorage', function (resourceService, dataStorage) {
+            return directiveEntityProperty(resourceService, dataStorage);
         }])
         .directive('entityEditForm', ['resourceService', function (resourceService) {
             return directiveEntityEditForm(resourceService);
@@ -151,15 +75,6 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.se
                 return _date.toUpperCase();
 
             };
-        }])
-
-        .config(['$provide', function ($provide) {
-            $provide.decorator('$locale', ['$delegate', function ($delegate) {
-                $delegate.NUMBER_FORMATS.PATTERNS[1].negPre = '-\u00A4';
-                $delegate.NUMBER_FORMATS.PATTERNS[1].negSuf = '';
-                return $delegate;
-            }]);
-
         }])
     ;
 

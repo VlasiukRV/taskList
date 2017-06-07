@@ -2,15 +2,17 @@
 package com.tasklist.config;
 
 import com.tasklist.web.CsrfHeaderFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
@@ -21,64 +23,61 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Bean
+    public UserDetailsService userDetailsService() {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User.withUsername("user").password("password").roles("USER").build());
+        manager.createUser(User.withUsername("admin").password("password").roles("USER","ADMIN").build());
+        return manager;
+    }
+
+/*
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("admin1").password("1").roles("ADMIN").and()
-                .withUser("user1").password("1").roles("USER");
-
 /*
         auth.jdbcAuthentication()
                 .dataSource(dataSource)
                 .usersByUsernameQuery("select str_login as principal, str_password as credentials, true from t_user where str_login = ?")
                 .authoritiesByUsernameQuery("select str_login as principal, ln_type as role from t_user where str_login = ?")
                 .rolePrefix("ROLE_");
-*/
+*//*
+
 
 
     }
+*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .httpBasic().and()
                 .authorizeRequests() /*.httpBasic().and()*/
-                    .antMatchers(
-                                    "/js/**", "/css/**", "/index.html", "/index",
-                                    "/login.html", "/", "/login", "/login-error",
-                                    "/error", "/errorPage"
-                                ).permitAll()
-                    .antMatchers("/usersList").access("hasRole('ADMIN')")
-                    .anyRequest().authenticated()/*.access("hasRole('USER') or hasRole('ADMIN')")*/ /*.authenticated()*/
-                .and().formLogin().loginPage("/login").failureUrl("/login-error")
+                .antMatchers(
+                        "/js/**", "/css/**", "/index.html", "/index",
+                        "/login.html", "/", "/login",
+                        "/error", "/errorPage"
+                ).permitAll()
+                .antMatchers("/usersList/**").access("hasRole('ADMIN')")
+                    .antMatchers("/system/task/**").access("hasRole('ADMIN')")
+                .anyRequest().authenticated()
+                .and()
+                .formLogin().loginPage("/login")
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/index")
+                    .invalidateHttpSession(true)
 /*
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()*/
-/*.permitAll()*/
+                    .logoutSuccessHandler(logoutSuccessHandler)
 
-                .and()
+                    .addLogoutHandler(logoutHandler)
+                    .deleteCookies(cookieNamesToClear)
+*/
+                    .and()
                 .addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
-                .csrf()
-                    /*.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());*/
-                    .csrfTokenRepository(csrfTokenRepository());
-
-
-        /*
-                .antMatchers("/index.html", "/public", "/login").permitAll() */
-/*").denyAll()  *//*
-
-                .antMatchers("/taskList").access("hasRole('USER') or hasRole('ADMIN')") //"/resources*//*
-*/
-/* ",
-                .antMatchers("/taskList/usersList").access(" hasRole('ADMIN')")
-*/
-/*               .and().formLogin().loginPage("/login").permitAll() *//*.loginPage("/login")*/
-                /*.and().logout()*/
-/*                .and().exceptionHandling().accessDeniedPage("/403")*/
-
+                    .csrf()
+                    .csrfTokenRepository(csrfTokenRepository())/*.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());*/
+                    .and()
+                .httpBasic();
     }
 
     private CsrfTokenRepository csrfTokenRepository() {

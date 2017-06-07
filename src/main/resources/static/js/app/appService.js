@@ -2,6 +2,123 @@
 // SERVICEs
 ////////////////////////////////////
 
+function getAppHttpUrl($location, urlSufix){
+    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
+
+    return appAddress + urlSufix;
+}
+
+function appHttpResponseInterceptor($q, $location, dataStorage){
+    return {
+        'request': function(config) {
+            config.url = config.url.split('%2F').join('/')
+            return config;
+        },
+
+        'response': function (response) {
+            var errorDescription = new ErrorDescription();
+            errorDescription.SetNoError();
+            if (response.status = 200){
+                var objectResponse = response.data;
+                /*if (!(response.data instanceof Object)){
+                    var objectResponse=eval("("+response.data+")");
+                }*/
+                if (objectResponse instanceof Object){
+                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
+                        if (response.data.status != 200) {
+                            errorDescription.SetAppError(objectResponse.message);
+                        }
+                    }
+                }
+            } else {
+                errorDescription.SetHTTPError(response.statusText, response.status);
+            }
+            if (errorDescription.error) {
+                dataStorage.getErrorDescriptions().addErrorDescription(errorDescription);
+                /*$location.path("/error");*/
+            }
+            return response;
+        },
+
+        'responseError': function(response) {
+            var errorDescription = new ErrorDescription();
+            errorDescription.SetNoError();
+            if (response.status = 200){
+                var objectResponse = response.data;
+                if (!(response.data instanceof Object)){
+                    var objectResponse=eval("("+response.data+")");
+                }
+                if (objectResponse instanceof Object){
+                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
+                        if (response.data.status != 200) {
+                            errorDescription.SetAppError(objectResponse.message);
+                        }
+                    }
+                }
+            } else {
+                errorDescription.SetHTTPError(response.statusText, response.status);
+            }
+            if (errorDescription.error) {
+                dataStorage.getErrorDescriptions().addErrorDescription(errorDescription);
+                /*$location.path("/error");*/
+            }
+            return $q.reject(response);
+        }
+    };
+};
+
+function setRoute(routeProvider){
+    routeProvider
+        .when('/login', {
+            templateUrl : 'login.html',
+            controller: 'workPlaceController'
+        })
+
+        .when("/user", {
+            templateUrl: "/usersList"
+        })
+        .when("/project", {
+            templateUrl: "/projectsList"
+        })
+        .when("/task", {
+            templateUrl: "/tasksList"
+        })
+        .when("/error", {
+            templateUrl: "/errorPage"
+        });
+
+    return routeProvider;
+};
+
+function entityEditService($location, resource){
+    return resource(getAppHttpUrl($location, '/entity/:entityName/:entityId'), {
+            entityName: "@entityName",
+            entityId: "@entityId"
+        },
+        {
+            getEntity: {
+                method: "GET"
+            },
+            createEntity: {
+                method: "POST"
+            },
+            deleteEntity: {
+                method: "DELETE"
+            }
+        });
+}
+
+function systemService($location, resource){
+    return resource(getAppHttpUrl($location, '/system/:command'), {
+            command: "@command"
+        },
+        {
+            executeCommand: {
+                method: "GET"
+            }
+        });
+}
+
 function resourceService($window, _entityEditService, _systemService) {
 
     var entityEditService = _entityEditService;
@@ -13,9 +130,6 @@ function resourceService($window, _entityEditService, _systemService) {
         },
         getSystemService: function(){
             return _systemService;
-        },
-        collError: function (httpResponse) {
-            $window.location.href = 'http://localhost:8080/error';
         }
     };
 }
@@ -30,8 +144,18 @@ function dataStorage() {
     var currentUser = {};
     var currentProject = {};
     var currentTask = {};
+    var appEnums = [];
 
     return {
+
+        getEnumValues: function(resourceService, _entityId){
+            if(appEnums[_entityId] == undefined) {
+                var appEnum = new AppEnum(_entityId);
+                appEnums[_entityId] = appEnum;
+                appEnum.update(resourceService);
+            }
+            return appEnums[_entityId];
+        },
 
         getErrorDescriptions: function(){
             if (!(errorDescriptions instanceof ErrorDescriptions)) {
@@ -81,7 +205,7 @@ function dataStorage() {
             currentProject = _data;
         },
         getCurrentProject: function () {
-            if (!(currentProject instanceof Task)) {
+            if (!(currentProject instanceof Project)) {
                 currentProject = this.getNewEntityByName('project');
             }
             return currentProject;
@@ -114,7 +238,7 @@ function dataStorage() {
     };
 }
 
-function objectProperties(dataStorage){
+function objectProperties(resourceService, dataStorage){
 
     var user_formProperties;
     var user_listProperties;
@@ -129,15 +253,17 @@ function objectProperties(dataStorage){
 
     function fillPropertiesDescriptions() {
 
-        var propertyId          = buildEntityProperty('id',             'text', 'id', false);
+        var propertyId          = buildEntityProperty('id',             'text', 'id',                   false);
         var propertyDescription = buildEntityProperty('description',    'textarea');
         var propertyName        = buildEntityProperty('name',           'text');
         var propertyPassword    = buildEntityProperty('password',       'text');
         var propertyDate        = buildEntityProperty('date',           'date');
         var propertyTitle       = buildEntityProperty('title',          'text');
-        var propertyAuthor      = buildEntityProperty('author',         'select','author',      true, dataStorage.getUserList());
-        var propertyExecutor    = buildEntityProperty('executor',       'multiselect','executor',    true, dataStorage.getUserList());
-        var propertyProject     = buildEntityProperty('project',        'select','project',     true, dataStorage.getProjectList());
+        var propertyAuthor      = buildEntityProperty('author',         'select','author',              true, dataStorage.getUserList());
+        var propertyExecutor    = buildEntityProperty('executor',       'multiselect','executor',       true, dataStorage.getUserList());
+        var propertyProject     = buildEntityProperty('project',        'select','project',             true, dataStorage.getProjectList());
+        var propertyTaskState   = buildEntityProperty('state',          'enum','state',                 true, undefined);
+        propertyTaskState.entityList = dataStorage.getEnumValues(resourceService, "TaskState");
 
         user_formProperties = [];
         user_formProperties.push(propertyId);
@@ -168,6 +294,7 @@ function objectProperties(dataStorage){
         task_formProperties.push(propertyAuthor);
         task_formProperties.push(propertyExecutor);
         task_formProperties.push(propertyDescription);
+        task_formProperties.push(propertyTaskState);
 
         task_listProperties = [];
         task_listProperties.push(propertyId);
@@ -177,6 +304,7 @@ function objectProperties(dataStorage){
         task_listProperties.push(propertyAuthor);
         task_listProperties.push(propertyExecutor);
         task_listProperties.push(propertyDescription);
+        task_listProperties.push(propertyTaskState);
 
     }
 
@@ -212,12 +340,12 @@ function ErrorDescription(){
         this.error = false;
         this.status = 200;
         this.statusText = "";
-    }
+    };
     this.SetHTTPError = function(statusText, status){
         this.error = true;
         this.status = status;
         this.statusText = "HTTP error: "+statusText;
-    }
+    };
     this.SetAppError = function(statusText){
         this.error = true;
         this.status = 0;
@@ -257,6 +385,25 @@ fReplacerForEntityParser = function (key, value) {
 // BASE_MODEL
 ////////////////////////////////////
 
+function AppEnum(enumName){
+    this.enumName = enumName;
+    this.list = {};
+
+    this.update = function(resourceService){
+        var source = this;
+        resourceService.getEntityEditService()
+            .getEntity({entityName: "enum", entityId: this.enumName}, {},
+            function (data) {
+                source.list = data.data;
+            },
+            function (httpResponse) {
+                /*resourceService.collError(httpResponse)*/
+            }
+        );
+    }
+
+}
+
 function BaseEntity(dataStorage) {
     this._entityName = '';
     this.dataStorage = dataStorage;
@@ -275,7 +422,7 @@ function BaseEntity(dataStorage) {
             .createEntity({entityName: this._entityName}, entityJSON,
             baseCreateEntity.bind(this, fCallBack),
             function (httpResponse) {
-                resourceService.collError(httpResponse)
+                /*resourceService.collError(httpResponse)*/
             }
         )
     };
@@ -284,7 +431,7 @@ function BaseEntity(dataStorage) {
         var fCallBack = arguments[0];
         var data = arguments[1];
 
-        if (data.result == "success") {
+        if (data.result = 200) {
             var originalEntity = data.data;
             fillValuesProperty(originalEntity, this);
             fCallBack(this);
@@ -329,9 +476,9 @@ function BaseEntityList(dataStorage) {
         resourceService.getEntityEditService()
             .getEntity({entityName: this._entityName}, {},
             update.bind(this, fCallBack),
-            function (httpResponse) {
-                resourceService.collError(httpResponse)
-            }
+                function (httpResponse) {
+                    /*resourceService.collError(httpResponse)*/
+                }
         );
     };
 
@@ -346,7 +493,6 @@ function BaseEntityList(dataStorage) {
         fillValuesProperty(template, entity);
         entity.createEntity(resourceService, function (data) {
             entityList.addEntity(data);
-            /*clearProperties(template);*/
             fCallBack();
         });
     };
@@ -356,7 +502,7 @@ function BaseEntityList(dataStorage) {
             .deleteEntity({entityName: this._entityName, entityId: id}, {},
             deleteEntity.bind(this, id, fCallBack),
             function (httpResponse) {
-                resourceService.collError(httpResponse)
+                /*resourceService.collError(httpResponse)*/
             }
         )
     };
@@ -365,7 +511,7 @@ function BaseEntityList(dataStorage) {
         var fCallBack = arguments[0];
         var data = arguments[1];
 
-        if (data.result == "success") {
+        if (data.result = 200) {
             var originalUserList = data.data;
 
             originalUserList.forEach(function (item, i, arr) {
@@ -383,7 +529,7 @@ function BaseEntityList(dataStorage) {
         var fCallBack = arguments[1];
         var data = arguments[2];
 
-        if (data.result == "success") {
+        if (data.result = 200) {
             this.list.forEach(function (item, i, arr) {
                 if (item.id == id) {
                     this.list.splice(i, 1);

@@ -56,7 +56,7 @@ workPlaceController = function($window, $http, $rootScope, $scope, $location, da
     $scope.getCurrentAuthentication = function() {
         if($rootScope.authenticated){
             var systemService = resourceService.getSystemService();
-            systemService.getCurrentAuthentication({command: 'getCurrentAuthentication'}, {},
+            systemService.executeCommand({command: 'getCurrentAuthentication'}, {},
                 setCurrentAuthentication.bind(self));
         }else{
             setCurrentAuthentication();
@@ -71,4 +71,22 @@ workPlaceController = function($window, $http, $rootScope, $scope, $location, da
     authenticate();
     $scope.getCurrentAuthentication();
     $scope.errorDescriptions = dataStorage.getErrorDescriptions();
+
+    $scope.initDataBase = function() {
+        var systemService = resourceService.getSystemService();
+        systemService.executeCommand({command: "jdbc/initDataBase"}, {});
+    };
+    $scope.runArchiveService = function(){
+        var systemService = resourceService.getSystemService();
+        systemService.executeCommand({command: "task/runArchiveService"}, {});
+    };
+    $scope.stopArchiveService = function(){
+        var systemService = resourceService.getSystemService();
+        systemService.executeCommand({command: "task/stopArchiveService"}, {});
+    }
+    $scope.interruptTaskExecutor = function(){
+        var systemService = resourceService.getSystemService();
+        systemService.executeCommand({command: "task/interruptTaskExecutor"}, {});
+    }
+
 };

@@ -58,4 +58,3 @@ function EntityListForm(){
     this.eventDeleteEntity = function(id){};
     this.eventEditEntity = function(id){};
 }
-
