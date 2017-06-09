@@ -39,11 +39,6 @@
                         </span>
                         <span ng-switch-when="multiselect">
                             {{entity[entityProperty.name].representationList()}};
-<!--
-                            <div  ng-repeat="el in entity[entityProperty.name] track by $index">
-
-                            </div>
--->
                         </span>
                         <span ng-switch-when="date">
                             {{entity[entityProperty.name] | date:'yyyy-MM-dd'}}

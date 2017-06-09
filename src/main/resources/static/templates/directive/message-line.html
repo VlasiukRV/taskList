@@ -1,0 +1,28 @@
+
+<div class="app-popup" ng-show="errorDescriptions.show">
+    <div class="app-popup-content">
+
+        <button ng-click="errorDescriptions.show=false;" class="btn btn-primary" title="cancel">
+            <span class="glyphicon glyphicon-remove-circle"></span>
+        </button>
+
+        <br>
+        <table>
+            <tr ng-repeat="errorDescription in errorDescriptions.errorDescriptions track by $index">
+                <td width="400" align="left">
+                    <div class="alert alert-danger">
+                        Error
+                        <br>
+                        {{errorDescription.statusText}}
+                    </div>
+                </td>
+                <td align="center">
+                    <button ng-click="deleteErrorDescription($index)" type="button" size="sm" title="dell">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>

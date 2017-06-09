@@ -28,11 +28,14 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.se
         .factory('entityEditService', function ($location, $resource) {
            return entityEditService($location, $resource);
         })
+        .factory('operationService', function ($location, $resource) {
+            return operationService($location, $resource);
+        })
         .factory('systemService', function ($location, $resource) {
             return systemService($location, $resource);
         })
-        .factory('resourceService', function ($window, entityEditService, systemService) {
-            return resourceService($window, entityEditService, systemService)
+        .factory('resourceService', function ($window, entityEditService, systemService, operationService) {
+            return resourceService($window, entityEditService, systemService, operationService)
         })
         .service('dataStorage', function (){
             return dataStorage();
@@ -62,18 +65,27 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.se
         .directive('messageLine', [function(){
             return directiveMessageLine();
         }])
+        .directive('menuBar', [function(){
+            return directiveMenuBar();
+        }])
+        .directive('menuCollection', [function(){
+            return directiveMenuCollection();
+        }])
+        .directive('menuItem', ['$compile', function($compile){
+            return directiveMenuItem($compile);
+        }])
+        .directive('loginPage', [function(){
+            return directiveLoginPage();
+        }])
 
         .filter('myDate', ['dateFilter', function (dateFilter) {
-
             return function (input) {
                 if (input == null) {
                     return "";
                 }
-
                 var _date = dateFilter(new Date(input), 'dd.MM.yyyy');
 
                 return _date.toUpperCase();
-
             };
         }])
     ;

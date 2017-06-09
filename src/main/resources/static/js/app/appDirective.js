@@ -1,4 +1,101 @@
 
+function directiveLoginPage(){
+    return{
+        restrict: 'E',
+        require: '',
+        replace: true,
+        templateUrl: '/templates/directive/login-page.html',
+        scope:{
+            eventAfterLogin: "&"
+        },
+        controller:['$http', '$rootScope', '$scope', 'dataStorage', function($http, $rootScope, $scope, dataStorage){
+            var self = $scope;
+            $scope.credentials = {};
+            $scope.login = function(){
+                var principal = dataStorage.getPrincipal();
+                principal.login($http, $scope.credentials, function(data){
+                    if(data.authenticated){
+                        $scope.eventAfterLogin();
+                    }
+                });
+            };
+       }]
+    }
+}
+
+function directiveMessageLine(){
+    return{
+        restrict: 'E',
+        require: '',
+        templateUrl: '/templates/directive/message-line.html',
+        scope:{
+            errorDescriptions: "="
+        },
+        link: function(scope, element, attrs){
+
+        },
+        controller:['$scope', 'dataStorage', function($scope, dataStorage){
+            $scope.updateErrorDescription = function() {
+                $scope.errorDescriptions = dataStorage.getErrorDescriptions();
+            };
+            $scope.deleteErrorDescription = function(index){
+                $scope.errorDescriptions.delErrorDescription(index)
+            };
+        }]
+    }
+}
+
+function directiveMenuBar(){
+    return{
+        restrict: 'E',
+        require: '',
+        replace: true,
+        templateUrl: '/templates/directive/menu-bar.html',
+        scope:{
+            menuBar: "="
+        }
+    }
+}
+
+function directiveMenuCollection(){
+    return{
+        restrict: 'E',
+        require: '',
+        replace: true,
+        templateUrl: '/templates/directive/menu-collection.html',
+        scope:{
+            menuCollection: "=",
+            command: "="
+        }
+    }
+}
+
+function directiveMenuItem($compile){
+    return{
+        restrict: 'E',
+        require: '',
+        replace: true,
+        templateUrl: '/templates/directive/menu-item.html',
+        scope:{
+            command: "="
+        },
+        link: function(scope, element, attrs){
+            if (scope.command.dropdownMenu) {
+                var e =$compile("<menu-collection command = 'command' menu-collection='command.list'></menu-collection>")(scope);
+                element.replaceWith(e);
+            }
+        },
+        controller:['$scope', '$window', '$location', function($scope, $window, $location){
+            $scope.commandHandler = function(){
+                if (typeof($scope.command.command) == 'string'){
+                    $location.url($scope.command.command);
+                }else{
+                    $scope.command.command();
+                }
+            };
+        }]
+    }
+}
 function directiveUpdatableText($interval){
     return {
         restrict: 'E',
@@ -38,7 +135,7 @@ function directiveCurrentTime($interval, dateFilter) {
 
             var updateTimer = function() {
                 element.text(dateFilter(new Date(), format));
-            }
+            };
 
             scope.$watch(attrs.smCurrentTime, function () {
                 updateTimer();

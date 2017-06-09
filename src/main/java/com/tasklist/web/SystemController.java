@@ -9,9 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -19,26 +16,10 @@ import java.util.Map;
 public class SystemController {
 
     @Autowired
-    IAuthenticationFacade authenticationFacade;
-    @Autowired
     TaskService taskService;
 
     @Autowired
     private TaskExecutor taskExecutor;
-
-    @RequestMapping("/principal")
-    @ResponseBody
-    public Principal user(Principal user) {
-        return user;
-    }
-
-    @RequestMapping("/getCurrentAuthentication")
-    @ResponseBody
-    public Map<String, Object> currentAuthentication(HttpServletRequest request, Principal user) {
-        Map<String, String> currentAuthentication = new HashMap<>();
-        currentAuthentication.put("userName", authenticationFacade.getAuthentication().getName());
-        return AjaxResponse.successResponse(currentAuthentication);
-    }
 
     @RequestMapping("/task/runArchiveService")
     @ResponseBody

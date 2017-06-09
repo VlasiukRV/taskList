@@ -1,241 +1,51 @@
+
 ////////////////////////////////////
-// SERVICEs
+// INTERFACE
 ////////////////////////////////////
 
-function getAppHttpUrl($location, urlSufix){
-    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
+function getMenuBar(resourceService){
 
-    return appAddress + urlSufix;
-}
+    var menuTask = new MenuCommand();
+    menuTask.text = "Task";
+    menuTask.command = "task";
+    var menuProject = new MenuCommand();
+    menuProject.text = "Project";
+    menuProject.command = "project";
+    var menuUser = new MenuCommand();
+    menuUser.text = "User";
+    menuUser.command = "user";
+    var menuModel = new MenuCommand();
+    menuModel.text = "Model";
+    menuModel.dropdownMenu = true;
+    menuModel.addElement(menuTask);
+    menuModel.addElement(menuProject);
+    menuModel.addElement(menuUser);
 
-function appHttpResponseInterceptor($q, $location, dataStorage){
-    return {
-        'request': function(config) {
-            config.url = config.url.split('%2F').join('/')
-            return config;
-        },
+    var menuInitDataBase = new MenuCommand();
+    menuInitDataBase.text = "initDataBase";
+    menuInitDataBase.command = function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")};
+    var menuRunArchiveService = new MenuCommand();
+    menuRunArchiveService.text = "runArchiveService";
+    menuRunArchiveService.command = function(){ExecuteSystemCommand(resourceService, "task/runArchiveService")};
+    var menuStopArchiveService = new MenuCommand();
+    menuStopArchiveService.text = "stopArchiveService";
+    menuStopArchiveService.command = function(){ExecuteSystemCommand(resourceService, "task/stopArchiveService")};
+    var menuInterruptTaskExecutor = new MenuCommand();
+    menuInterruptTaskExecutor.text = "interruptTaskExecutor";
+    menuInterruptTaskExecutor.command = function(){ExecuteSystemCommand(resourceService, "task/interruptTaskExecutor")};
+    var menuSystem = new MenuCommand();
+    menuSystem.text = "System";
+    menuSystem.dropdownMenu = true;
+    menuSystem.addElement(menuInitDataBase);
+    menuSystem.addElement(menuRunArchiveService);
+    menuSystem.addElement(menuStopArchiveService);
+    menuSystem.addElement(menuInterruptTaskExecutor);
 
-        'response': function (response) {
-            var errorDescription = new ErrorDescription();
-            errorDescription.SetNoError();
-            if (response.status = 200){
-                var objectResponse = response.data;
-                /*if (!(response.data instanceof Object)){
-                    var objectResponse=eval("("+response.data+")");
-                }*/
-                if (objectResponse instanceof Object){
-                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
-                        if (response.data.status != 200) {
-                            errorDescription.SetAppError(objectResponse.message);
-                        }
-                    }
-                }
-            } else {
-                errorDescription.SetHTTPError(response.statusText, response.status);
-            }
-            if (errorDescription.error) {
-                dataStorage.getErrorDescriptions().addErrorDescription(errorDescription);
-                /*$location.path("/error");*/
-            }
-            return response;
-        },
+    var menuCollection = [];
+    menuCollection.push(menuModel);
+    menuCollection.push(menuSystem);
 
-        'responseError': function(response) {
-            var errorDescription = new ErrorDescription();
-            errorDescription.SetNoError();
-            if (response.status = 200){
-                var objectResponse = response.data;
-                if (!(response.data instanceof Object)){
-                    var objectResponse=eval("("+response.data+")");
-                }
-                if (objectResponse instanceof Object){
-                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
-                        if (response.data.status != 200) {
-                            errorDescription.SetAppError(objectResponse.message);
-                        }
-                    }
-                }
-            } else {
-                errorDescription.SetHTTPError(response.statusText, response.status);
-            }
-            if (errorDescription.error) {
-                dataStorage.getErrorDescriptions().addErrorDescription(errorDescription);
-                /*$location.path("/error");*/
-            }
-            return $q.reject(response);
-        }
-    };
-};
-
-function setRoute(routeProvider){
-    routeProvider
-        .when('/login', {
-            templateUrl : 'login.html',
-            controller: 'workPlaceController'
-        })
-
-        .when("/user", {
-            templateUrl: "/usersList"
-        })
-        .when("/project", {
-            templateUrl: "/projectsList"
-        })
-        .when("/task", {
-            templateUrl: "/tasksList"
-        })
-        .when("/error", {
-            templateUrl: "/errorPage"
-        });
-
-    return routeProvider;
-};
-
-function entityEditService($location, resource){
-    return resource(getAppHttpUrl($location, '/entity/:entityName/:entityId'), {
-            entityName: "@entityName",
-            entityId: "@entityId"
-        },
-        {
-            getEntity: {
-                method: "GET"
-            },
-            createEntity: {
-                method: "POST"
-            },
-            deleteEntity: {
-                method: "DELETE"
-            }
-        });
-}
-
-function systemService($location, resource){
-    return resource(getAppHttpUrl($location, '/system/:command'), {
-            command: "@command"
-        },
-        {
-            executeCommand: {
-                method: "GET"
-            }
-        });
-}
-
-function resourceService($window, _entityEditService, _systemService) {
-
-    var entityEditService = _entityEditService;
-    var systemService = _systemService;
-
-    return {
-        getEntityEditService: function () {
-            return entityEditService;
-        },
-        getSystemService: function(){
-            return _systemService;
-        }
-    };
-}
-
-function dataStorage() {
-
-    var userList = {};
-    var projectList = {};
-    var taskList = {};
-    var errorDescriptions = {};
-
-    var currentUser = {};
-    var currentProject = {};
-    var currentTask = {};
-    var appEnums = [];
-
-    return {
-
-        getEnumValues: function(resourceService, _entityId){
-            if(appEnums[_entityId] == undefined) {
-                var appEnum = new AppEnum(_entityId);
-                appEnums[_entityId] = appEnum;
-                appEnum.update(resourceService);
-            }
-            return appEnums[_entityId];
-        },
-
-        getErrorDescriptions: function(){
-            if (!(errorDescriptions instanceof ErrorDescriptions)) {
-                errorDescriptions = new ErrorDescriptions();
-            }
-            return errorDescriptions;
-        },
-
-        setUserList: function (_data) {
-            userList = _data;
-        },
-        getUserList: function () {
-            if (!(userList instanceof UserList)) {
-                userList = new UserList(this);
-            }
-            return userList;
-        },
-        setProjectList: function (_data) {
-            projectList = _data;
-        },
-        getProjectList: function () {
-            if (!(projectList instanceof ProjectList)) {
-                projectList = new ProjectList(this);
-            }
-            return projectList;
-        },
-        setTaskList: function (_data) {
-            taskList = _data;
-        },
-        getTaskList: function () {
-            if (!(taskList instanceof TaskList)) {
-                taskList = new TaskList(this);
-            }
-            return taskList;
-        },
-
-        setCurrentUser: function (_data) {
-            currentUser = _data;
-        },
-        getCurrentUser: function () {
-            if (!(currentUser instanceof User)) {
-                currentUser = this.getNewEntityByName('user');
-            }
-            return currentUser;
-        },
-        setCurrentProject: function (_data) {
-            currentProject = _data;
-        },
-        getCurrentProject: function () {
-            if (!(currentProject instanceof Project)) {
-                currentProject = this.getNewEntityByName('project');
-            }
-            return currentProject;
-        },
-        setCurrentTask: function (_data) {
-            currentTask = _data;
-        },
-        getCurrentTask: function () {
-            if (!(currentTask instanceof Task)) {
-                currentTask = this.getNewEntityByName('task');
-            }
-            return currentTask;
-        },
-
-        getNewEntityByName: function (entityName) {
-            switch (entityName) {
-                case 'user':
-                    return new User(this);
-                    break;
-                case 'project':
-                    return new Project(this);
-                    break;
-                case 'task':
-                    return new Task(this);
-                    break;
-                default:
-                    return undefined;
-            }
-        }
-    };
+    return {mainUrl: '#/task', menuCollection: menuCollection};
 }
 
 function objectProperties(resourceService, dataStorage){
@@ -330,6 +140,270 @@ function objectProperties(resourceService, dataStorage){
     };
 }
 
+////////////////////////////////////
+// SERVICEs
+////////////////////////////////////
+
+function getAppHttpUrl($location, urlSufix){
+    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
+
+    return appAddress + urlSufix;
+}
+
+function appHttpResponseInterceptor($q, $location, dataStorage){
+    return {
+        'request': function(config) {
+            config.url = config.url.split('%2F').join('/');
+            return config;
+        },
+
+        'response': function (response) {
+            var errorDescription = new ErrorDescription();
+            errorDescription.SetNoError();
+            if (response.status = 200){
+                var objectResponse = response.data;
+                /*if (!(response.data instanceof Object)){
+                    var objectResponse=eval("("+response.data+")");
+                }*/
+                if (objectResponse instanceof Object){
+                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
+                        if (response.data.status != 200) {
+                            errorDescription.SetAppError(objectResponse.message);
+                        }
+                    }
+                }
+            } else {
+                errorDescription.SetHTTPError(response.statusText, response.status);
+            }
+            if (errorDescription.error) {
+                var errorDescriptions = dataStorage.getErrorDescriptions();
+                errorDescriptions.addErrorDescription(errorDescription);
+                errorDescriptions.show = true;
+                /*$location.path("/error");*/
+            }
+            return response;
+        },
+
+        'responseError': function(response) {
+            var errorDescription = new ErrorDescription();
+            errorDescription.SetNoError();
+            if (response.status = 200){
+                var objectResponse = response.data;
+                if (!(response.data instanceof Object)){
+                    objectResponse=eval("("+response.data+")");
+                }
+                if (objectResponse instanceof Object){
+                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
+                        if (response.data.status != 200){
+                            errorDescription.SetAppError(objectResponse.message);
+                        }
+                    }
+                }
+            } else {
+                errorDescription.SetHTTPError(response.statusText, response.status);
+            }
+            if (errorDescription.error) {
+                var errorDescriptions = dataStorage.getErrorDescriptions();
+                errorDescriptions.addErrorDescription(errorDescription);
+                errorDescriptions.show = true;
+                /*$location.path("/error");*/
+            }
+            return $q.reject(response);
+        }
+    };
+}
+
+function setRoute(routeProvider){
+    routeProvider
+        .when('/login', {
+            templateUrl : '/login',
+            controller: 'workPlaceController'
+        })
+
+        .when("/user", {
+            templateUrl: "/usersList"
+        })
+        .when("/project", {
+            templateUrl: "/projectsList"
+        })
+        .when("/task", {
+            templateUrl: "/tasksList"
+        });
+    return routeProvider;
+}
+
+function entityEditService($location, resource){
+    return resource(getAppHttpUrl($location, '/entity/:entityName/:entityId'), {
+            entityName: "@entityName",
+            entityId: "@entityId"
+        },
+        {
+            getEntity: {
+                method: "GET"
+            },
+            createEntity: {
+                method: "POST"
+            },
+            deleteEntity: {
+                method: "DELETE"
+            }
+        });
+}
+
+function operationService($location, resource){
+    return resource(getAppHttpUrl($location, '/service/:command'), {
+            command: "@command"
+        },
+        {
+            executeCommand: {
+                method: "GET"
+            }
+        });
+}
+
+function systemService($location, resource){
+    return resource(getAppHttpUrl($location, '/system/:command'), {
+            command: "@command"
+        },
+        {
+            executeCommand: {
+                method: "GET"
+            }
+        });
+}
+
+function resourceService($window, _entityEditService, _systemService, _operationService) {
+
+    var entityEditService = _entityEditService;
+    var systemService = _systemService;
+    var operationService = _operationService;
+
+    return {
+        getEntityEditService: function () {
+            return entityEditService;
+        },
+        getSystemService: function(){
+            return systemService;
+        },
+        getOperationService: function(){
+            return operationService;
+        }
+    };
+}
+
+function dataStorage() {
+
+    var principal = {};
+
+    var userList = {};
+    var projectList = {};
+    var taskList = {};
+    var errorDescriptions = {};
+
+    var currentUser = {};
+    var currentProject = {};
+    var currentTask = {};
+    var appEnums = [];
+
+    return {
+
+        getPrincipal: function(){
+            if(!(principal instanceof Principal)){
+                principal = new Principal();
+            }
+            return principal;
+        },
+
+        getErrorDescriptions: function(){
+            if (!(errorDescriptions instanceof ErrorDescriptions)) {
+                errorDescriptions = new ErrorDescriptions();
+            }
+            return errorDescriptions;
+        },
+
+        getEnumValues: function(resourceService, _entityId){
+            if(appEnums[_entityId] == undefined) {
+                var appEnum = new AppEnum(_entityId);
+                appEnums[_entityId] = appEnum;
+                appEnum.update(resourceService);
+            }
+            return appEnums[_entityId];
+        },
+
+        setUserList: function (_data) {
+            userList = _data;
+        },
+        getUserList: function () {
+            if (!(userList instanceof UserList)) {
+                userList = new UserList(this);
+            }
+            return userList;
+        },
+        setProjectList: function (_data) {
+            projectList = _data;
+        },
+        getProjectList: function () {
+            if (!(projectList instanceof ProjectList)) {
+                projectList = new ProjectList(this);
+            }
+            return projectList;
+        },
+        setTaskList: function (_data) {
+            taskList = _data;
+        },
+        getTaskList: function () {
+            if (!(taskList instanceof TaskList)) {
+                taskList = new TaskList(this);
+            }
+            return taskList;
+        },
+
+        setCurrentUser: function (_data) {
+            currentUser = _data;
+        },
+        getCurrentUser: function () {
+            if (!(currentUser instanceof User)) {
+                currentUser = this.getNewEntityByName('user');
+            }
+            return currentUser;
+        },
+        setCurrentProject: function (_data) {
+            currentProject = _data;
+        },
+        getCurrentProject: function () {
+            if (!(currentProject instanceof Project)) {
+                currentProject = this.getNewEntityByName('project');
+            }
+            return currentProject;
+        },
+        setCurrentTask: function (_data) {
+            currentTask = _data;
+        },
+        getCurrentTask: function () {
+            if (!(currentTask instanceof Task)) {
+                currentTask = this.getNewEntityByName('task');
+            }
+            return currentTask;
+        },
+
+        getNewEntityByName: function (entityName) {
+            switch (entityName) {
+                case 'user':
+                    return new User(this);
+                    break;
+                case 'project':
+                    return new Project(this);
+                    break;
+                case 'task':
+                    return new Task(this);
+                    break;
+                default:
+                    return undefined;
+            }
+        }
+    };
+}
+
 function ErrorDescription(){
     this.error = false;
     this.status = 0;
@@ -356,6 +430,7 @@ function ErrorDescription(){
 
 function ErrorDescriptions(){
     this.errorDescriptions = [];
+    this.show = false;
 
     this.addErrorDescription = function(_data){
         this.errorDescriptions.push(_data);
@@ -370,6 +445,76 @@ function ErrorDescriptions(){
 
 }
 
+function MenuCommand(){
+    this.dropdownMenu = false;
+
+    this.text = "";
+    this.command = "#";
+
+    this.list = [];
+
+    this.addElement = function(menuElement){
+        this.list.push(menuElement);
+    };
+
+}
+
+function Principal(){
+    this.authenticated = false;
+    this.name = 'NO_Authentication';
+    this.sessionId = null;
+    this.authorities = [];
+
+    this.logout = function($http) {
+        var self = this;
+        $http.post('logout', {}).finally(function() {
+            self.authenticated = false;
+            setNotAuthenticated(self);
+        });
+    };
+    this.login = function($http, credentials, callback) {
+        var self = this;
+        authenticate($http, credentials, function(data) {
+            if (data.authenticated) {
+                console.log("Login succeeded");
+                credentials.error = false;
+                self.authenticated = true;
+                self.name = data.name;
+                self.sessionId = data.details.sessionId;
+                self.authorities = data.authorities;
+            } else {
+                console.log("Login failed");
+                credentials.error = true;
+                setNotAuthenticated(self);
+            }
+            callback && callback(self);
+        })
+    };
+
+    var setNotAuthenticated = function(self){
+        self.authenticated = false;
+        self.name = 'NO_Authentication';
+        self.sessionId = null;
+        self.authorities = [];
+    };
+    var authenticate = function($http, credentials, callback) {
+        var headers = credentials ? {
+            authorization : "Basic "
+            + btoa(credentials.username + ":"
+            + credentials.password)
+        } : {};
+
+        $http.get('/service/principal', {
+            headers : headers
+        }).then(function(response) {
+            callback && callback(response.data);
+        }, function() {
+            callback && callback({authenticated: false});
+        });
+    };
+
+}
+
 ////////////////////////////////////
 // UTILS
 ////////////////////////////////////
@@ -380,6 +525,11 @@ fReplacerForEntityParser = function (key, value) {
     if (key.indexOf("_") >= 0) return undefined;
     return value;
 };
+
+function ExecuteSystemCommand(resourceService, command){
+    var systemService = resourceService.getSystemService();
+    systemService.executeCommand({command: command}, {});
+}
 
 ////////////////////////////////////
 // BASE_MODEL
@@ -448,7 +598,7 @@ function BaseEntityList(dataStorage) {
     this.addEntity = function (entity) {
 
         var entityAdded = false;
-        for (index = 0; index < this.list.length; ++index) {
+        for (var index = 0; index < this.list.length; ++index) {
             var item = this.list[index];
             if (item.id == entity.id) {
                 this.list[index] = entity;
@@ -462,7 +612,7 @@ function BaseEntityList(dataStorage) {
     };
 
     this.findEntityById = function (id) {
-        for (index = 0; index < this.list.length; ++index) {
+        for (var index = 0; index < this.list.length; ++index) {
             var item = this.list[index];
             if (item.id === id) {
                 return item;
@@ -483,10 +633,11 @@ function BaseEntityList(dataStorage) {
     };
 
     this.addEntityByTemplate = function (resourceService, template, fCallBack) {
+        var entity = null;
         if (template.isEmpty()) {
-            var entity = dataStorage.getNewEntityByName(this._entityName);
+            entity = dataStorage.getNewEntityByName(this._entityName);
         } else {
-            var entity = this.findEntityById(template.id);
+            entity = this.findEntityById(template.id);
         }
 
         var entityList = this;

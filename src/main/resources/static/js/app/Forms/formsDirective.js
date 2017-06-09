@@ -56,7 +56,7 @@ function directiveEntityProperty(resourceService, dataStorage){
         require: '',
         templateUrl: '/js/app/Forms/directive/entity-property.html ',
         scope:{
-            entity: "= entity",
+            entity: '= entity',
             property: '= property'
         },
         link: function (scope, element, attrs) {
@@ -131,29 +131,6 @@ function directiveEntityListForm(resourceService){
             $scope.editEntity = function(id){
                 $scope.entityListForm.eventEditEntity(id);
             }
-        }]
-    }
-}
-
-function directiveMessageLine(){
-    return{
-        restrict: 'E',
-        require: '',
-        templateUrl: '/js/app/Forms/directive/message-line.html ',
-        scope:{
-            errorDescriptions: "="
-        },
-        link: function(scope, element, attrs){
-
-        },
-        controller:['$scope', 'dataStorage', function($scope, dataStorage){
-            $scope.currentPage = 0;
-            $scope.updateErrorDescription = function() {
-               $scope.errorDescriptions = dataStorage.getErrorDescriptions();
-            };
-            $scope.deleteErrorDescription = function(index){
-                $scope.errorDescriptions.delErrorDescription(index)
-            };
         }]
     }
 }

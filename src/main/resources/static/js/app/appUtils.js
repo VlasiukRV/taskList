@@ -19,13 +19,13 @@ fillValuesProperty = function fillValuesProperty(source, receiver) {
         if (key.indexOf("$$") >= 0){
             continue;
         }
-        if (typeof receiver[key] == 'function'){
+        if (typeof source[key] == 'function'){
             continue;
         }
 
-        if(angular.isArray(receiver[key])){
+        if(angular.isArray(source[key])){
             receiver[key].fillByTemplate(source[key]);
-        }else if (typeof receiver[key] === 'object') {
+        }else if (typeof source[key] === 'object') {
             fillValuesProperty(source[key], receiver[key]);
         }else{
             receiver[key] = source[key];

@@ -52,19 +52,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests() /*.httpBasic().and()*/
                 .antMatchers(
-                        "/js/**", "/css/**", "/index.html", "/index",
-                        "/login.html", "/", "/login",
-                        "/error", "/errorPage"
+                        "/",
+                        "/css/**",
+                        "/js/**",
+                        "/templates/**",
+                        "/login",
+                        "/service/**"
+
                 ).permitAll()
                 .antMatchers("/usersList/**").access("hasRole('ADMIN')")
                     .antMatchers("/system/task/**").access("hasRole('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
+
                 .formLogin().loginPage("/login")
                 .and()
+
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/index")
+                    .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
 /*
                     .logoutSuccessHandler(logoutSuccessHandler)
