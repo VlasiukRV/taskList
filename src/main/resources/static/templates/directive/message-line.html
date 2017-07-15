@@ -2,12 +2,16 @@
 <div class="app-popup" ng-show="errorDescriptions.show">
     <div class="app-popup-content">
 
-        <button ng-click="errorDescriptions.show=false;" class="btn btn-primary" title="cancel">
-            <span class="glyphicon glyphicon-remove-circle"></span>
-        </button>
-
         <br>
         <table>
+            <tr>
+                <td width="400" align="left"></td>
+                <td>
+                    <button ng-click="errorDescriptions.show=false;" class="btn btn-primary" title="cancel">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </td>
+            </tr>
             <tr ng-repeat="errorDescription in errorDescriptions.errorDescriptions track by $index">
                 <td width="400" align="left">
                     <div class="alert alert-danger">
@@ -17,8 +21,8 @@
                     </div>
                 </td>
                 <td align="center">
-                    <button ng-click="deleteErrorDescription($index)" type="button" size="sm" title="dell">
-                        <span class="glyphicon glyphicon-ok"></span>
+                    <button ng-click="deleteErrorDescription($index)" type="button" size="sm" title="ok">
+                        <span class="glyphicon glyphicon-ok-circle"></span>
                     </button>
                 </td>
             </tr>

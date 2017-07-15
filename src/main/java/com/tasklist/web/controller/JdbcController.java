@@ -1,11 +1,9 @@
-package com.tasklist.web;
+package com.tasklist.web.controller;
 
 import com.tasklist.app.service.JdbcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/system/jdbc")
@@ -13,6 +11,7 @@ public class JdbcController {
     @Autowired
     JdbcService jdbcService;
 
+/*
     @RequestMapping("/initDataBase")
     public Map<String, Object> initDataBase(){
 
@@ -24,4 +23,5 @@ public class JdbcController {
             return AjaxResponse.successResponse("data inserted Successfully");
         }
     }
+*/
 }

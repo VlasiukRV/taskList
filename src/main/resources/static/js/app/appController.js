@@ -1,5 +1,7 @@
 
-workPlaceController = function($window, $http, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter){
+workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter){
+
+    var cookies = $cookies;
 
     $scope.errorDescriptions = dataStorage.getErrorDescriptions();
     $scope.menuBar = getMenuBar(resourceService);
@@ -15,6 +17,7 @@ workPlaceController = function($window, $http, $rootScope, $scope, $location, da
     };
     $scope.eventAfterLogin = function(){
         if($scope.principal.authenticated){
+            $scope.principal.getSessionInformation(resourceService, cookies);
             $location.path("/task");
         }else{
             $location.path("/");
@@ -26,5 +29,7 @@ workPlaceController = function($window, $http, $rootScope, $scope, $location, da
             $location.path("/");
         }
     };
-
+    $scope.proba = function(){
+        $scope.principal.getSessionInformation(resourceService, cookies);
+    }
 };

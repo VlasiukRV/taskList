@@ -1,5 +1,5 @@
 
-var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.select'])
+var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCookies', 'oi.select'])
 
         .config(['$controllerProvider', function ($controllerProvider) {
             $controllerProvider.allowGlobals();
@@ -28,14 +28,17 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.se
         .factory('entityEditService', function ($location, $resource) {
            return entityEditService($location, $resource);
         })
+        .factory('securityService', function($location, $resource){
+           return securityService($location, $resource);
+        })
         .factory('operationService', function ($location, $resource) {
             return operationService($location, $resource);
         })
         .factory('systemService', function ($location, $resource) {
             return systemService($location, $resource);
         })
-        .factory('resourceService', function ($window, entityEditService, systemService, operationService) {
-            return resourceService($window, entityEditService, systemService, operationService)
+        .factory('resourceService', function (entityEditService, systemService, securityService, operationService) {
+            return resourceService(entityEditService, systemService, securityService, operationService)
         })
         .service('dataStorage', function (){
             return dataStorage();
@@ -92,8 +95,8 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'oi.se
 
 // Controllers
 
-app.controller('workPlaceController', ['$window', '$http', '$rootScope', '$scope', '$location', 'dataStorage', 'resourceService', 'dateFilter',
-    workPlaceController($window, $http, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter)]);
+app.controller('workPlaceController', ['$window', '$http', '$cookies', '$rootScope', '$scope', '$location', 'dataStorage', 'resourceService', 'dateFilter',
+    workPlaceController($window, $http, $cookies, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter)]);
 
 app.controller('taskController', ['$scope', 'dataStorage', 'resourceService', 'objectProperties',
     taskController($scope, dataStorage, resourceService, objectProperties)]);
@@ -112,3 +115,12 @@ app.controller('userListController', ['$scope', 'dataStorage', 'resourceService'
 
 app.controller('editUserController', ['$scope', 'dataStorage', 'resourceService', 'objectProperties',
     editUserController($scope, dataStorage, resourceService, objectProperties)]);
+
+app.controller('roleController', ['$scope', 'dataStorage', 'resourceService', 'objectProperties',
+    roleController($scope, dataStorage, resourceService, objectProperties)]);
+
+app.controller('roleListController', ['$scope', 'dataStorage', 'resourceService', 'objectProperties',
+    roleListController($scope, dataStorage, resourceService, objectProperties)]);
+
+app.controller('editRoleController', ['$scope', 'dataStorage', 'resourceService', 'objectProperties',
+    editRoleController($scope, dataStorage, resourceService, objectProperties)]);

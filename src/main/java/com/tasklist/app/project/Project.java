@@ -1,20 +1,25 @@
 package com.tasklist.app.project;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tasklist.app.BaseEntity;
+import com.tasklist.app.task.Task;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Entity
 @Table
+@JsonIgnoreProperties(value = { "tasks" })
 public class Project extends BaseEntity<Integer> {
     @Column
     @JsonProperty
     private String name;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Task> tasks = new HashSet<>();
 
     public Project() {
         super();
@@ -32,6 +37,22 @@ public class Project extends BaseEntity<Integer> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<Task> getTasks(){
+        return this.tasks;
+    }
+
+    public void setTasks(Set<Task> tasks){
+        this.tasks = tasks;
+    }
+
+    public boolean addTask(Task task){
+        if (tasks.contains(task)){
+            return false;
+        }
+        this.tasks.add(task);
+        return true;
     }
 
     @Override

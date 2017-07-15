@@ -1,4 +1,4 @@
-package com.tasklist.app.service;
+package com.tasklist.app.service.taskScheduler;
 
 import org.springframework.stereotype.Service;
 
@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class TaskExecutor extends Thread{
+public class TaskScheduler extends Thread{
 
     private int MAX_RUNNING_TASK = 5;
     private int runningTaskCount;
     private volatile Map<String, IServiceTask> taskPool = new HashMap<>();
 
-    public TaskExecutor(){
+    public TaskScheduler(){
 
     }
 

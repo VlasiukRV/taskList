@@ -1,4 +1,4 @@
-package com.tasklist.app.service;
+package com.tasklist.app.service.taskScheduler;
 
 public interface IServiceTask{
     public String getTaskName();

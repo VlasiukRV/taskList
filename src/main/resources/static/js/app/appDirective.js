@@ -39,7 +39,10 @@ function directiveMessageLine(){
                 $scope.errorDescriptions = dataStorage.getErrorDescriptions();
             };
             $scope.deleteErrorDescription = function(index){
-                $scope.errorDescriptions.delErrorDescription(index)
+                $scope.errorDescriptions.delErrorDescription(index);
+                if($scope.errorDescriptions.errorsCount() == 0){
+                    $scope.errorDescriptions.show = false;
+                }
             };
         }]
     }

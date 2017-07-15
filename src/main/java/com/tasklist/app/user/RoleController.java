@@ -1,4 +1,4 @@
-package com.tasklist.app.task;
+package com.tasklist.app.user;
 
 import com.tasklist.app.BaseEntityController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/entity/task")
-public class TaskController extends BaseEntityController {
+@RequestMapping(value = "/entity/role")
+public class RoleController extends BaseEntityController{
 
     @Autowired
-    public TaskController(TaskService entityService) {
-        entityName = "task";
+    public RoleController(RoleService entityService) {
+        this.entityName = "role";
         this.entityService = entityService;
     }
 
@@ -36,4 +36,3 @@ public class TaskController extends BaseEntityController {
         return super.createEntityStrJSON(strJSONEntity);
     }
 }
-

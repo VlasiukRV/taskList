@@ -25,13 +25,13 @@ public class Task extends BaseEntity<Integer> {
     @JoinColumn
     private User author;
     @JsonProperty
-    @OneToMany(cascade={CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade={CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
-            name="task_executor",
+            name="task_executor_detail",
             joinColumns = @JoinColumn( name="task_id"),
-            inverseJoinColumns = @JoinColumn( name="user_id", unique = false)
+            inverseJoinColumns = @JoinColumn( name="user_id")
     )
-    private List<User> executor = new ArrayList<>();
+    private Set<User> executor = new HashSet<>();
     @JsonProperty
     @ManyToOne
     @JoinColumn
@@ -68,11 +68,11 @@ public class Task extends BaseEntity<Integer> {
         this.author = author;
     }
 
-    public List<User> getExecutor() {
+    public Set<User> getExecutor() {
         return executor;
     }
 
-    public void setExecutor(List<User> executor) {
+    public void setExecutor(Set<User> executor) {
         this.executor = executor;
     }
 

@@ -20,6 +20,7 @@
         <script type="text/javascript" src="/js/lib/angular-route.js"></script>
         <script type="text/javascript" src="/js/lib/angular-sanitize.js"></script>
         <script type="text/javascript" src="/js/lib/angular-resource.js"></script>
+        <script type="text/javascript" src="/js/lib/angular-cookies.js"></script>
 
 
     </head>
@@ -35,13 +36,16 @@
                         <updatable-text f-call-back="getCurrentTime"></updatable-text>
                     </td>
                     <td>
-                        {{principal.name}}
+                        {{principal.name}} {{principal.sessionId}}
                         <span style='padding-left:10px;'> </span>
                         <button ng-show="!principal.authenticated" ng-click="login()" type="button" size="sm" title="log-in">
                             <span class="glyphicon glyphicon-log-in"></span>
                         </button>
                         <button ng-show="principal.authenticated" ng-click="logout()" type="button" size="sm" title="log-out">
                             <span class="glyphicon glyphicon-log-out"></span>
+                        </button>
+                        <button ng-click="proba()" type="button" size="sm" title="proba">
+                            <span></span>
                         </button>
                     </td>
                 </tr>

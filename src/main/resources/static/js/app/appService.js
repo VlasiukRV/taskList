@@ -14,25 +14,30 @@ function getMenuBar(resourceService){
     var menuUser = new MenuCommand();
     menuUser.text = "User";
     menuUser.command = "user";
+    var menuRole = new MenuCommand();
+    menuRole.text = "Role";
+    menuRole.command = "role";
+
     var menuModel = new MenuCommand();
     menuModel.text = "Model";
     menuModel.dropdownMenu = true;
     menuModel.addElement(menuTask);
     menuModel.addElement(menuProject);
     menuModel.addElement(menuUser);
+    menuModel.addElement(menuRole);
 
     var menuInitDataBase = new MenuCommand();
     menuInitDataBase.text = "initDataBase";
     menuInitDataBase.command = function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")};
     var menuRunArchiveService = new MenuCommand();
     menuRunArchiveService.text = "runArchiveService";
-    menuRunArchiveService.command = function(){ExecuteSystemCommand(resourceService, "task/runArchiveService")};
+    menuRunArchiveService.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")};
     var menuStopArchiveService = new MenuCommand();
     menuStopArchiveService.text = "stopArchiveService";
-    menuStopArchiveService.command = function(){ExecuteSystemCommand(resourceService, "task/stopArchiveService")};
+    menuStopArchiveService.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")};
     var menuInterruptTaskExecutor = new MenuCommand();
     menuInterruptTaskExecutor.text = "interruptTaskExecutor";
-    menuInterruptTaskExecutor.command = function(){ExecuteSystemCommand(resourceService, "task/interruptTaskExecutor")};
+    menuInterruptTaskExecutor.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")};
     var menuSystem = new MenuCommand();
     menuSystem.text = "System";
     menuSystem.dropdownMenu = true;
@@ -53,11 +58,15 @@ function objectProperties(resourceService, dataStorage){
     var user_formProperties;
     var user_listProperties;
 
+    var role_formProperties;
+    var role_listProperties;
+
     var task_formProperties;
     var task_listProperties;
 
     var project_formProperties;
     var project_listProperties;
+    var task_filter_listProperties;
 
     fillPropertiesDescriptions();
 
@@ -66,7 +75,10 @@ function objectProperties(resourceService, dataStorage){
         var propertyId          = buildEntityProperty('id',             'text', 'id',                   false);
         var propertyDescription = buildEntityProperty('description',    'textarea');
         var propertyName        = buildEntityProperty('name',           'text');
+        var propertyUserName    = buildEntityProperty('username',       'text');
         var propertyPassword    = buildEntityProperty('password',       'text');
+        var propertyUserRole    = buildEntityProperty('role',           'text');
+        var propertyRole        = buildEntityProperty('role',           'multiselect', 'role',          true, dataStorage.getRoleList());
         var propertyDate        = buildEntityProperty('date',           'date');
         var propertyTitle       = buildEntityProperty('title',          'text');
         var propertyAuthor      = buildEntityProperty('author',         'select','author',              true, dataStorage.getUserList());
@@ -77,14 +89,26 @@ function objectProperties(resourceService, dataStorage){
 
         user_formProperties = [];
         user_formProperties.push(propertyId);
-        user_formProperties.push(propertyName);
+        user_formProperties.push(propertyUserName);
         user_formProperties.push(propertyPassword);
+        user_formProperties.push(propertyRole);
         user_formProperties.push(propertyDescription);
 
         user_listProperties = [];
         user_listProperties.push(propertyId);
-        user_listProperties.push(propertyName);
+        user_listProperties.push(propertyUserName);
+        user_listProperties.push(propertyRole);
         user_listProperties.push(propertyDescription);
+
+        role_formProperties = [];
+        role_formProperties.push(propertyId);
+        role_formProperties.push(propertyUserRole);
+        role_formProperties.push(propertyDescription);
+
+        role_listProperties = [];
+        role_listProperties.push(propertyId);
+        role_listProperties.push(propertyUserRole);
+        role_listProperties.push(propertyDescription);
 
         project_formProperties = [];
         project_formProperties.push(propertyId);
@@ -116,6 +140,8 @@ function objectProperties(resourceService, dataStorage){
         task_listProperties.push(propertyDescription);
         task_listProperties.push(propertyTaskState);
 
+        task_filter_listProperties = [];
+        task_filter_listProperties.push(propertyProject);
     }
 
     return {
@@ -123,6 +149,12 @@ function objectProperties(resourceService, dataStorage){
             return new FormProperties(
                 user_formProperties,
                 user_listProperties
+            );
+        },
+        getRoleObjectProperties: function () {
+            return new FormProperties(
+                role_formProperties,
+                role_listProperties
             );
         },
         getProjectObjectProperties: function () {
@@ -134,7 +166,8 @@ function objectProperties(resourceService, dataStorage){
         getTaskObjectProperties: function () {
             return new FormProperties(
                 task_formProperties,
-                task_listProperties
+                task_listProperties,
+                task_filter_listProperties
             );
         }
     };
@@ -219,9 +252,11 @@ function setRoute(routeProvider){
             templateUrl : '/login',
             controller: 'workPlaceController'
         })
-
         .when("/user", {
-            templateUrl: "/usersList"
+            templateUrl: "/security/usersList"
+        })
+        .when("/role", {
+            templateUrl: "/security/roleList"
         })
         .when("/project", {
             templateUrl: "/projectsList"
@@ -250,6 +285,26 @@ function entityEditService($location, resource){
         });
 }
 
+function securityService($location, resource){
+    return resource(getAppHttpUrl($location, '/system/security/:command'), {
+            sessionID: "@sessionID"
+        },
+        {
+            getAllPrincipals: {
+                method: "GET",
+                params: {
+                    command: "getAllPrincipals"
+                }
+            },
+            getSessionInformation: {
+                method: "GET",
+                params: {
+                    command: "getSessionInformation"
+                }
+            }
+        });
+}
+
 function operationService($location, resource){
     return resource(getAppHttpUrl($location, '/service/:command'), {
             command: "@command"
@@ -272,11 +327,12 @@ function systemService($location, resource){
         });
 }
 
-function resourceService($window, _entityEditService, _systemService, _operationService) {
+function resourceService(_entityEditService, _systemService, _securityService, _operationService) {
 
-    var entityEditService = _entityEditService;
-    var systemService = _systemService;
-    var operationService = _operationService;
+    var entityEditService   = _entityEditService;
+    var systemService       = _systemService;
+    var securityService    = _securityService;
+    var operationService    = _operationService;
 
     return {
         getEntityEditService: function () {
@@ -284,6 +340,9 @@ function resourceService($window, _entityEditService, _systemService, _operation
         },
         getSystemService: function(){
             return systemService;
+        },
+        getSecurityService: function(){
+            return securityService;
         },
         getOperationService: function(){
             return operationService;
@@ -296,11 +355,13 @@ function dataStorage() {
     var principal = {};
 
     var userList = {};
+    var roleList = {};
     var projectList = {};
     var taskList = {};
     var errorDescriptions = {};
 
     var currentUser = {};
+    var currentRole = {};
     var currentProject = {};
     var currentTask = {};
     var appEnums = [];
@@ -342,6 +403,15 @@ function dataStorage() {
         setProjectList: function (_data) {
             projectList = _data;
         },
+        setRoleList: function (_data){
+            roleList = _data;
+        },
+        getRoleList: function (){
+            if (!(roleList instanceof RoleList)){
+                roleList = new RoleList(this);
+            }
+            return roleList
+        },
         getProjectList: function () {
             if (!(projectList instanceof ProjectList)) {
                 projectList = new ProjectList(this);
@@ -367,6 +437,15 @@ function dataStorage() {
             }
             return currentUser;
         },
+        setCurrentRole: function (_data) {
+            currentRole = _data;
+        },
+        getCurrentRole: function () {
+            if (!(currentRole instanceof Role)) {
+                currentRole = this.getNewEntityByName('role');
+            }
+            return currentRole;
+        },
         setCurrentProject: function (_data) {
             currentProject = _data;
         },
@@ -390,6 +469,9 @@ function dataStorage() {
             switch (entityName) {
                 case 'user':
                     return new User(this);
+                    break;
+                case 'role':
+                    return new Role(this);
                     break;
                 case 'project':
                     return new Project(this);
@@ -441,6 +523,9 @@ function ErrorDescriptions(){
     };
     this.getErrorDescriptions = function(){
         return this.errorDescriptions;
+    };
+    this.errorsCount = function(){
+        return this.errorDescriptions.length;
     }
 
 }
@@ -467,7 +552,7 @@ function Principal(){
 
     this.logout = function($http) {
         var self = this;
-        $http.post('logout', {}).finally(function() {
+        $http.post('\logout', {}).finally(function() {
             self.authenticated = false;
             setNotAuthenticated(self);
         });
@@ -478,39 +563,63 @@ function Principal(){
             if (data.authenticated) {
                 console.log("Login succeeded");
                 credentials.error = false;
-                self.authenticated = true;
-                self.name = data.name;
-                self.sessionId = data.details.sessionId;
-                self.authorities = data.authorities;
             } else {
                 console.log("Login failed");
                 credentials.error = true;
-                setNotAuthenticated(self);
             }
+            setAuthenticated(self, data.principal);
             callback && callback(self);
         })
     };
+    this.getSessionInformation = function(resourceService, $cookies){
+        var securityService = resourceService.getSecurityService();
 
-    var setNotAuthenticated = function(self){
-        self.authenticated = false;
-        self.name = 'NO_Authentication';
-        self.sessionId = null;
-        self.authorities = [];
+        var currentPrincipal = this;
+        var sessionID = "111111";
+        securityService.getSessionInformation({sessionID: sessionID}, {}, function(response){
+            if (response.result == 200) {
+                var data = response.data;
+                setAuthenticated(currentPrincipal, data);
+            }
+        })
+    };
+
+    var setNotAuthenticated = function(currentPrincipal){
+        currentPrincipal.authenticated  = false;
+        currentPrincipal.name           = 'NO_Authentication';
+        currentPrincipal.sessionId      = null;
+        currentPrincipal.authorities    = [];
+    };
+    var setAuthenticated = function(currentPrincipal, data){
+        setNotAuthenticated(self);
+        if(data != undefined){
+            currentPrincipal.authenticated  = true;
+            currentPrincipal.name           = data.userName;
+            currentPrincipal.sessionId      = data.sessionId;
+            currentPrincipal.authorities    = data.authorities;
+        }
     };
     var authenticate = function($http, credentials, callback) {
+
+        var principal  = undefined;
         var headers = credentials ? {
             authorization : "Basic "
             + btoa(credentials.username + ":"
             + credentials.password)
         } : {};
 
-        $http.get('/service/principal', {
-            headers : headers
-        }).then(function(response) {
-            callback && callback(response.data);
-        }, function() {
-            callback && callback({authenticated: false});
-        });
+        $http.get('/service/authenticate', {
+                    headers : headers
+                })
+            .then(function(response){
+                if (response.data.status == 200){
+                    var principal = response.data.data;
+                }
+                callback && callback({authenticated: false, principal: principal});
+                }, function() {
+                callback && callback({authenticated: false, principal: principal});
+                }
+            );
     };
 
 }
@@ -529,6 +638,10 @@ fReplacerForEntityParser = function (key, value) {
 function ExecuteSystemCommand(resourceService, command){
     var systemService = resourceService.getSystemService();
     systemService.executeCommand({command: command}, {});
+}
+function ExecuteServiceCommand(resourceService, command){
+    var operationService = resourceService.getOperationService();
+    operationService.executeCommand({command: command}, {});
 }
 
 ////////////////////////////////////

@@ -1,13 +1,15 @@
-package com.tasklist.app.task;
+package com.tasklist.app.service.taskScheduler;
 
-import com.tasklist.Utils;
-import com.tasklist.app.service.IServiceTask;
+import com.tasklist.AppUtils;
+import com.tasklist.app.task.Task;
+import com.tasklist.app.task.TaskService;
+import com.tasklist.app.task.TaskState;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskArchiveService extends Thread implements IServiceTask {
+public class ServiceTaskArchiveTask extends Thread implements IServiceTask {
 
     TaskService entityService;
 
@@ -17,7 +19,7 @@ public class TaskArchiveService extends Thread implements IServiceTask {
     private String fileName = "E:\\Work\\archiveTask.yaml";
 
 
-    public TaskArchiveService(String taskName) {
+    public ServiceTaskArchiveTask(String taskName) {
         this.taskName = taskName;
         this.execute = false;
     }
@@ -56,7 +58,7 @@ public class TaskArchiveService extends Thread implements IServiceTask {
 
             List<Task> archiveTaskList = new ArrayList<>();
             try {
-                archiveTaskList = (List<Task>)Utils.getObjectFromYaml(fileName);
+                archiveTaskList = (List<Task>) AppUtils.getObjectFromYaml(fileName);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -65,14 +67,14 @@ public class TaskArchiveService extends Thread implements IServiceTask {
             for (Task task : taskList) {
                 if (task.getState() == TaskState.DONE){
                     entityService.deleteEntity(task.getId());
-                    Task archiveTask = Utils.initializeAndUnproxy(task);
+                    Task archiveTask = AppUtils.initializeAndUnproxy(task);
                     archiveTaskList.add(archiveTask);
                     System.out.println(" - Task " +archiveTask.toString()+ " arhived");
                 }
             }
 
             if (archiveTaskList.size() != 0){
-                Utils.saveObjectToYaml(archiveTaskList, fileName);
+                AppUtils.saveObjectToYaml(archiveTaskList, fileName);
             }
 
             try {

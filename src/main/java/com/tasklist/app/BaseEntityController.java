@@ -10,7 +10,6 @@ public abstract class BaseEntityController {
     protected BaseEntityService entityService;
 
    public Map<String, Object> getEntityById(Integer id) {
-
         if (entityService == null) {
             return AjaxResponse.errorResponse("entity '" + entityName + "' not found");
         }
@@ -37,7 +36,6 @@ public abstract class BaseEntityController {
     }
 
     public Map<String, Object> deleteEntity(Integer id) {
-
         if (entityService == null) {
             return AjaxResponse.errorResponse("entity '" + entityName + "' not found");
         }
@@ -49,8 +47,8 @@ public abstract class BaseEntityController {
         }catch (RuntimeException ex){
             return AjaxResponse.errorResponse("entity '" + entityName + " id " + id + "' not deleted");
         }
-        return AjaxResponse.successResponse(true);
 
+        return AjaxResponse.successResponse(true);
     }
 
     public Map<String, Object> createEntityStrJSON(String strJSONEntity) {

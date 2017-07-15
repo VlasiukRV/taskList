@@ -1,6 +1,6 @@
 package com.tasklist.app;
 
-import com.tasklist.Utils;
+import com.tasklist.AppUtils;
 import org.springframework.data.repository.CrudRepository;
 
 import java.io.Serializable;
@@ -39,12 +39,21 @@ public abstract class BaseEntityService<T extends BaseEntity<ID>, ID extends Ser
         return !entityRepository.exists(id);
     }
 
+    public T getEntityByJSON(String strJSONEntity){
+        T entity = AppUtils.getEntityByJSON(this.baseEntityClass, strJSONEntity);
+        if (entity == null){
+            return null;
+        }
+
+        return entity;
+    }
+
     public T saveEntity(T entity){
         return entityRepository.save(entity);
     }
 
     public T saveEntity(String strJSONEntity){
-        T entity = (T)Utils.getEntityByJSON(this.baseEntityClass, strJSONEntity);
+        T entity = getEntityByJSON(strJSONEntity);
         if (entity == null){
             return null;
         }
