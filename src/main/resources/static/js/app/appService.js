@@ -21,10 +21,10 @@ function getMenuBar(resourceService){
     var menuModel = new MenuCommand();
     menuModel.text = "Model";
     menuModel.dropdownMenu = true;
-    menuModel.addElement(menuTask);
-    menuModel.addElement(menuProject);
-    menuModel.addElement(menuUser);
-    menuModel.addElement(menuRole);
+    menuModel.addElement(menuTask)
+        .addElement(menuProject)
+        .addElement(menuUser)
+        .addElement(menuRole);
 
     var menuInitDataBase = new MenuCommand();
     menuInitDataBase.text = "initDataBase";
@@ -35,16 +35,25 @@ function getMenuBar(resourceService){
     var menuStopArchiveService = new MenuCommand();
     menuStopArchiveService.text = "stopArchiveService";
     menuStopArchiveService.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")};
+    var menuSendMail = new MenuCommand();
+    menuSendMail.text = "sendMail";
+    menuSendMail.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")};
+    var menuStopSendMail = new MenuCommand();
+    menuStopSendMail.text = "stopSendMail";
+    menuStopSendMail.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopSendMail")};
     var menuInterruptTaskExecutor = new MenuCommand();
     menuInterruptTaskExecutor.text = "interruptTaskExecutor";
     menuInterruptTaskExecutor.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")};
+
     var menuSystem = new MenuCommand();
     menuSystem.text = "System";
     menuSystem.dropdownMenu = true;
-    menuSystem.addElement(menuInitDataBase);
-    menuSystem.addElement(menuRunArchiveService);
-    menuSystem.addElement(menuStopArchiveService);
-    menuSystem.addElement(menuInterruptTaskExecutor);
+    menuSystem.addElement(menuInitDataBase)
+                .addElement(menuRunArchiveService)
+                .addElement(menuStopArchiveService)
+                .addElement(menuSendMail)
+                .addElement(menuStopSendMail)
+                .addElement(menuInterruptTaskExecutor);
 
     var menuCollection = [];
     menuCollection.push(menuModel);
@@ -540,6 +549,8 @@ function MenuCommand(){
 
     this.addElement = function(menuElement){
         this.list.push(menuElement);
+
+        return this;
     };
 
 }
@@ -635,6 +646,7 @@ fReplacerForEntityParser = function (key, value) {
     return value;
 };
 
+
 function ExecuteSystemCommand(resourceService, command){
     var systemService = resourceService.getSystemService();
     systemService.executeCommand({command: command}, {});
@@ -664,7 +676,6 @@ function AppEnum(enumName){
             }
         );
     }
-
 }
 
 function BaseEntity(dataStorage) {
@@ -700,7 +711,6 @@ function BaseEntity(dataStorage) {
             fCallBack(this);
         }
     };
-
 }
 
 function BaseEntityList(dataStorage) {
@@ -806,3 +816,4 @@ function BaseEntityList(dataStorage) {
     }
 
 }
+
