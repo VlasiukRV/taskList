@@ -1,8 +1,8 @@
-package com.approom.tasklist.app.task;
+package com.approom.tasklist.app.domain.user;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TaskRepository extends CrudRepository<Task, Integer> {
+public interface RoleRepository extends CrudRepository<Role, Integer> {
 }

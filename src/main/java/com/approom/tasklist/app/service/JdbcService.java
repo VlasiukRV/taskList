@@ -1,23 +1,20 @@
 package com.approom.tasklist.app.service;
 
-import com.approom.tasklist.app.project.Project;
-import com.approom.tasklist.app.project.ProjectService;
-import com.approom.tasklist.app.task.Task;
-import com.approom.tasklist.app.task.TaskService;
-import com.approom.tasklist.app.task.TaskState;
-import com.approom.tasklist.app.user.Role;
-import com.approom.tasklist.app.user.RoleService;
-import com.approom.tasklist.app.user.User;
-import com.approom.tasklist.app.user.UserService;
+import com.approom.tasklist.app.domain.project.Project;
+import com.approom.tasklist.app.domain.project.ProjectService;
+import com.approom.tasklist.app.domain.task.TaskService;
+import com.approom.tasklist.app.domain.user.Role;
+import com.approom.tasklist.app.domain.user.RoleService;
+import com.approom.tasklist.app.domain.user.User;
+import com.approom.tasklist.app.domain.user.UserService;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.time.Instant;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
 
 @Service
@@ -25,7 +22,7 @@ public class JdbcService {
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
-    private DataSource dataSource;
+    private SessionFactory sessionFactory;
 
     @Autowired
     UserService userService;
@@ -41,7 +38,11 @@ public class JdbcService {
     }
 
     public DataSource getDataSource() {
-        return dataSource;
+        return jdbc.getDataSource();
+    }
+
+    public Session getORMSession(){
+        return sessionFactory.getCurrentSession();
     }
 
     public Boolean dropDataBase() {
@@ -84,6 +85,7 @@ public class JdbcService {
         project1.setName("Family");
         projectService.saveEntity(project1);
 
+       /* User u = userService.getUserByName("admin");*/
         return true;
     }
 

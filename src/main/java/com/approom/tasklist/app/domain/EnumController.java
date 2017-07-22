@@ -1,6 +1,6 @@
-package com.approom.tasklist.app;
+package com.approom.tasklist.app.domain;
 
-import com.approom.tasklist.app.task.TaskState;
+import com.approom.tasklist.app.domain.task.TaskState;
 import com.approom.tasklist.web.AjaxResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

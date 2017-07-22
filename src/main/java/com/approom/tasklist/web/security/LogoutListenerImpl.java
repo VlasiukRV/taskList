@@ -1,5 +1,6 @@
 package com.approom.tasklist.web.security;
 
+import com.approom.tasklist.app.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.core.context.SecurityContext;

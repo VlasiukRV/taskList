@@ -2,7 +2,7 @@ package com.approom.tasklist.web.controller;
 
 import com.approom.tasklist.app.service.ServiceTaskArchiveTask;
 import com.approom.tasklist.app.service.ServiceTaskSendMailForAuthor;
-import com.approom.tasklist.app.task.TaskService;
+import com.approom.tasklist.app.domain.task.TaskService;
 import com.approom.tasklist.web.AjaxResponse;
 import com.service.MailSender;
 import com.service.taskScheduler.TaskScheduler;

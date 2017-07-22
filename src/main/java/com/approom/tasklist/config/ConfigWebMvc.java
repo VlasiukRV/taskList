@@ -27,6 +27,7 @@ public class ConfigWebMvc extends WebMvcConfigurerAdapter {
         registry.addViewController("/security/usersList").setViewName("/templates/usersListEdit.html");
         registry.addViewController("/security/roleList").setViewName("/templates/rolesListEdit.html");
         registry.addViewController("/tasksList").setViewName("templates/tasksListEdit.html");
+        registry.addViewController("/currentPrincipalInformation").setViewName("templates/viewCurrentPrincipalInformation.html");
     }
 
     @Override

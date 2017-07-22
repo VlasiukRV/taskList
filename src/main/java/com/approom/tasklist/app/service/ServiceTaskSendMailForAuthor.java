@@ -1,9 +1,9 @@
 package com.approom.tasklist.app.service;
 
-import com.approom.tasklist.app.task.Task;
-import com.approom.tasklist.app.task.TaskService;
-import com.approom.tasklist.app.task.TaskState;
-import com.approom.tasklist.app.user.User;
+import com.approom.tasklist.app.domain.task.Task;
+import com.approom.tasklist.app.domain.task.TaskService;
+import com.approom.tasklist.app.domain.task.TaskState;
+import com.approom.tasklist.app.domain.user.User;
 import com.service.MailSender;
 import com.service.taskScheduler.AbstractServiceTask;
 import freemarker.template.Configuration;

@@ -1,4 +1,4 @@
-package com.approom.tasklist.app;
+package com.approom.tasklist.app.domain;
 
 import com.approom.tasklist.web.AjaxResponse;
 

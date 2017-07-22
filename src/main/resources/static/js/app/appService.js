@@ -272,6 +272,10 @@ function setRoute(routeProvider){
         })
         .when("/task", {
             templateUrl: "/tasksList"
+        })
+        .when("/currentPrincipalInformation", {
+            templateUrl: "/currentPrincipalInformation",
+            controller: 'workPlaceController'
         });
     return routeProvider;
 }
@@ -486,7 +490,8 @@ function dataStorage() {
                     return new Project(this);
                     break;
                 case 'task':
-                    return new Task(this);
+                    var newTask = new Task(this);
+                    return newTask;
                     break;
                 default:
                     return undefined;
@@ -536,7 +541,6 @@ function ErrorDescriptions(){
     this.errorsCount = function(){
         return this.errorDescriptions.length;
     }
-
 }
 
 function MenuCommand(){
@@ -555,11 +559,21 @@ function MenuCommand(){
 
 }
 
+function updateCurrentUserForPrincipal(dataStorage, resourceService){
+    var currentPrincipal = dataStorage.getPrincipal();
+    var userList = dataStorage.getUserList();
+    userList.update(resourceService, function(){
+        currentPrincipal.currentUser = dataStorage.getUserList().findEntityById(currentPrincipal.currentUserId);
+    });
+}
+
 function Principal(){
     this.authenticated = false;
     this.name = 'NO_Authentication';
     this.sessionId = null;
     this.authorities = [];
+    this.currentUserId = 0;
+    this.currentUser = {};
 
     this.logout = function($http) {
         var self = this;
@@ -578,7 +592,7 @@ function Principal(){
                 console.log("Login failed");
                 credentials.error = true;
             }
-            setAuthenticated(self, data.principal);
+            self.setAuthenticated(data.principal);
             callback && callback(self);
         })
     };
@@ -586,11 +600,10 @@ function Principal(){
         var securityService = resourceService.getSecurityService();
 
         var currentPrincipal = this;
-        var sessionID = "111111";
-        securityService.getSessionInformation({sessionID: sessionID}, {}, function(response){
-            if (response.result == 200) {
+        securityService.getSessionInformation({}, {}, function(response){
+            if (response.status == 200) {
                 var data = response.data;
-                setAuthenticated(currentPrincipal, data);
+                currentPrincipal.setAuthenticated(data);
             }
         })
     };
@@ -600,14 +613,17 @@ function Principal(){
         currentPrincipal.name           = 'NO_Authentication';
         currentPrincipal.sessionId      = null;
         currentPrincipal.authorities    = [];
+        currentPrincipal.currentUserId  = 0;
+        currentPrincipal.currentUser    = {};
     };
-    var setAuthenticated = function(currentPrincipal, data){
+    this.setAuthenticated = function(data){
         setNotAuthenticated(self);
         if(data != undefined){
-            currentPrincipal.authenticated  = true;
-            currentPrincipal.name           = data.userName;
-            currentPrincipal.sessionId      = data.sessionId;
-            currentPrincipal.authorities    = data.authorities;
+            this.authenticated  = true;
+            this.name           = data.userName;
+            this.sessionId      = data.sessionId;
+            this.authorities    = data.authorities;
+            this.currentUserId  = data.currentUserId;
         }
     };
     var authenticate = function($http, credentials, callback) {
@@ -626,7 +642,7 @@ function Principal(){
                 if (response.data.status == 200){
                     var principal = response.data.data;
                 }
-                callback && callback({authenticated: false, principal: principal});
+                callback && callback({authenticated: true, principal: principal});
                 }, function() {
                 callback && callback({authenticated: false, principal: principal});
                 }
@@ -707,7 +723,7 @@ function BaseEntity(dataStorage) {
 
         if (data.result = 200) {
             var originalEntity = data.data;
-            fillValuesProperty(originalEntity, this);
+            appUtils.fillValuesProperty(originalEntity, this);
             fCallBack(this);
         }
     };
@@ -764,7 +780,7 @@ function BaseEntityList(dataStorage) {
         }
 
         var entityList = this;
-        fillValuesProperty(template, entity);
+        appUtils.fillValuesProperty(template, entity);
         entity.createEntity(resourceService, function (data) {
             entityList.addEntity(data);
             fCallBack();
@@ -790,7 +806,7 @@ function BaseEntityList(dataStorage) {
 
             originalUserList.forEach(function (item, i, arr) {
                 var entity = dataStorage.getNewEntityByName(this._entityName);
-                fillValuesProperty(item, entity);
+                appUtils.fillValuesProperty(item, entity);
                 this.addEntity(entity);
             }, this)
         }
@@ -816,4 +832,3 @@ function BaseEntityList(dataStorage) {
     }
 
 }
-

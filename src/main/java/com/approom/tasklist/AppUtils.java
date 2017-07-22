@@ -1,7 +1,7 @@
 package com.approom.tasklist;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.approom.tasklist.app.BaseEntity;
+import com.approom.tasklist.app.domain.BaseEntity;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.yaml.snakeyaml.Yaml;

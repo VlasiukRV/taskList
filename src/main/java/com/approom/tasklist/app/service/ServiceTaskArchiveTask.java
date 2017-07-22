@@ -2,9 +2,9 @@ package com.approom.tasklist.app.service;
 
 import com.approom.tasklist.AppUtils;
 import com.service.taskScheduler.AbstractServiceTask;
-import com.approom.tasklist.app.task.Task;
-import com.approom.tasklist.app.task.TaskService;
-import com.approom.tasklist.app.task.TaskState;
+import com.approom.tasklist.app.domain.task.Task;
+import com.approom.tasklist.app.domain.task.TaskService;
+import com.approom.tasklist.app.domain.task.TaskState;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

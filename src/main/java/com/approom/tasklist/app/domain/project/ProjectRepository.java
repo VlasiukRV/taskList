@@ -1,4 +1,4 @@
-package com.approom.tasklist.app.project;
+package com.approom.tasklist.app.domain.project;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

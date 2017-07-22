@@ -18,6 +18,7 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
     $scope.eventAfterLogin = function(){
         if($scope.principal.authenticated){
             $scope.principal.getSessionInformation(resourceService, cookies);
+            updateCurrentUserForPrincipal(dataStorage, resourceService);
             $location.path("/task");
         }else{
             $location.path("/");
@@ -29,7 +30,4 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
             $location.path("/");
         }
     };
-    $scope.proba = function(){
-        $scope.principal.getSessionInformation(resourceService, cookies);
-    }
 };

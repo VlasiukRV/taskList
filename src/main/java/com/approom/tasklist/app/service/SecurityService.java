@@ -1,5 +1,6 @@
-package com.approom.tasklist.web.security;
+package com.approom.tasklist.app.service;
 
+import com.approom.tasklist.app.domain.user.UserService;
 import com.approom.tasklist.web.AjaxResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,8 @@ public class SecurityService implements HttpSessionListener {
     private static int totalActiveSessions;
     @Autowired
     private SessionRegistry sessionRegistry;
+    @Autowired
+    UserService userService;
 
     public static int getTotalActiveSession() {
         return totalActiveSessions;
@@ -44,11 +47,13 @@ public class SecurityService implements HttpSessionListener {
     public Map<String, Object> getSessionInformation(HttpServletRequest request) {
         SessionInformation sessionInformation = sessionRegistry.getSessionInformation(request.getSession().getId());
         User user = (User) sessionInformation.getPrincipal();
+        com.approom.tasklist.app.domain.user.User currentUser = userService.getUserByName(user.getUsername());
 
         Map<String, Object> currentPrincipal = new HashMap<>();
         currentPrincipal.put("sessionId", sessionInformation.getSessionId());
         currentPrincipal.put("userName", user.getUsername());
         currentPrincipal.put("authorities", user.getAuthorities());
+        currentPrincipal.put("currentUserId", currentUser.getId());
         return currentPrincipal;
     }
 

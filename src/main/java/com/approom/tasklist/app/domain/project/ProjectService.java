@@ -1,6 +1,6 @@
-package com.approom.tasklist.app.project;
+package com.approom.tasklist.app.domain.project;
 
-import com.approom.tasklist.app.BaseEntityService;
+import com.approom.tasklist.app.domain.BaseEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

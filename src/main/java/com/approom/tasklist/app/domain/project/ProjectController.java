@@ -1,6 +1,6 @@
-package com.approom.tasklist.app.project;
+package com.approom.tasklist.app.domain.project;
 
-import com.approom.tasklist.app.BaseEntityController;
+import com.approom.tasklist.app.domain.BaseEntityController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -15,6 +15,10 @@ public class MailSender {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    public MailSender(){
+
+    }
+
     public void sendMail(String from, String to, String subject, String content){
         try {
             MimeMessage message = javaMailSender.createMimeMessage();

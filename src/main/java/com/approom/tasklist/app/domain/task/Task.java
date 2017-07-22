@@ -1,9 +1,9 @@
-package com.approom.tasklist.app.task;
+package com.approom.tasklist.app.domain.task;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.approom.tasklist.app.BaseEntity;
-import com.approom.tasklist.app.project.Project;
-import com.approom.tasklist.app.user.User;
+import com.approom.tasklist.app.domain.BaseEntity;
+import com.approom.tasklist.app.domain.project.Project;
+import com.approom.tasklist.app.domain.user.User;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;

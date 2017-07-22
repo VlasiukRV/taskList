@@ -1,11 +1,11 @@
-package com.approom.tasklist.app.task;
+package com.approom.tasklist.app.domain.task;
 
 import com.approom.tasklist.AppUtils;
-import com.approom.tasklist.app.BaseEntityService;
-import com.approom.tasklist.app.project.Project;
-import com.approom.tasklist.app.project.ProjectService;
-import com.approom.tasklist.app.user.User;
-import com.approom.tasklist.app.user.UserService;
+import com.approom.tasklist.app.domain.BaseEntityService;
+import com.approom.tasklist.app.domain.project.Project;
+import com.approom.tasklist.app.domain.project.ProjectService;
+import com.approom.tasklist.app.domain.user.User;
+import com.approom.tasklist.app.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

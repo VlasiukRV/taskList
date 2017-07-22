@@ -2,7 +2,7 @@ package com.approom.tasklist.web.controller;
 
 
 import com.approom.tasklist.web.AjaxResponse;
-import com.approom.tasklist.web.security.SecurityService;
+import com.approom.tasklist.app.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
