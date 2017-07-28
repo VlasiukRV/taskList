@@ -1,0 +1,129 @@
+<div class="col-lg-6" class="input-group input-group-sm">
+
+    <label>{{property.label}}:</label>
+
+    <div ng-switch on="property.inputType">
+
+        <!--enum-->
+        <div ng-switch-when="enum">
+
+            <div class="input-group">
+
+                <select class="form-control"
+                        ng-model="entity[property.name]"
+                        ng-options="el for el in selectList"
+                        ng-change="propertyChanged()"
+                        title="{{property.label}}">
+
+                    <option value="" selected="">--Chose {{property.label}}--</option>
+
+                </select>
+
+                        <span class="input-group-btn">
+                           <button
+                                   class="btn btn-default"
+                                   ng-click="refreshSelectList(property, selectList)"
+                                   type="button"
+                                   title="refresh report">
+
+                               <span class="glyphicon glyphicon-refresh"></span>
+
+                           </button>
+                       </span>
+
+            </div>
+
+        </div>
+
+        <!--select-->
+        <div ng-switch-when="select">
+
+            <div class="input-group">
+
+                <select class="form-control"
+                        ng-model="entity[property.name]"
+                        ng-options="el.representation for el in selectList track by el.id"
+                        ng-change="propertyChanged()"
+                        title="{{property.label}}">
+
+                    <option value="" selected="">--Chose {{property.label}}--</option>
+
+                </select>
+
+                        <span class="input-group-btn">
+                           <button
+                                   class="btn btn-default"
+                                   ng-click="refreshSelectList(property, selectList)"
+                                   type="button"
+                                   title="refresh report">
+
+                               <span class="glyphicon glyphicon-refresh"></span>
+
+                           </button>
+                       </span>
+
+            </div>
+
+        </div>
+
+        <div ng-switch-when="multiselect">
+
+            <div class="input-group">
+
+                <oi-select
+                           ng-model="entity[property.name]"
+                           oi-options="el.representation for el in selectList track by el.id"
+                           multiple
+                           placeholder="Select"
+                           oi-select-options="{
+                                            closeList: false,
+                                            cleanModel: true}">
+
+                </oi-select>
+
+                <span class="input-group-btn">
+                    <button
+                            class="btn btn-default"
+                            ng-click="refreshSelectList(property, selectList)"
+                            type="button"
+                            title="refresh report">
+
+                        <span class="glyphicon glyphicon-refresh"></span>
+
+                    </button>
+                </span>
+            </div>
+
+        </div>
+
+        <!--date-->
+        <div ng-switch-when="date">
+            <input
+                    type="date"
+                    sm-datepicker
+                    ng-model="entity[property.name]"
+                    class="date form-control"/>
+        </div>
+
+        <!--textarea-->
+        <div ng-switch-when="textarea">
+                <textarea
+                        rows="10" cols="35"
+                        ng-model="entity[property.name]"
+                        class="date form-control"/>
+            </textarea>
+        </div>
+
+        <!--default-->
+        <div ng-switch-default>
+            <input
+                    type="{{property.inputType}}"
+                    ng-model="entity[property.name]"
+                    ng-disabled="{{!property.availability}}"
+                    class="form-control"
+                    />
+        </div>
+
+    </div>
+
+</div>
