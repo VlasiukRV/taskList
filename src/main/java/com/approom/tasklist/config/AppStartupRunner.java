@@ -23,7 +23,6 @@ public class AppStartupRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        System.out.println("		---- Init data base");
         logger.info("Init data base");
         jdbcService.initDataBase();
     }

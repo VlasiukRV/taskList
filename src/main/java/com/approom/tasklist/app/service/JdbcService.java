@@ -3,12 +3,15 @@ package com.approom.tasklist.app.service;
 import com.approom.tasklist.app.domain.project.Project;
 import com.approom.tasklist.app.domain.project.ProjectService;
 import com.approom.tasklist.app.domain.task.TaskService;
-import com.approom.tasklist.app.domain.user.role.Role;
-import com.approom.tasklist.app.domain.user.role.RoleService;
 import com.approom.tasklist.app.domain.user.User;
 import com.approom.tasklist.app.domain.user.UserService;
+import com.approom.tasklist.app.domain.user.role.Role;
+import com.approom.tasklist.app.domain.user.role.RoleService;
+import com.approom.tasklist.config.AppStartupRunner;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ import java.util.HashSet;
 
 @Service
 public class JdbcService {
+    private static final Logger logger = LoggerFactory.getLogger(AppStartupRunner.class);
+
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
@@ -55,7 +60,8 @@ public class JdbcService {
         jdbc.execute("insert into user(name, description)values('admin','admin')");
 */
 
-        System.out.println("		---- Load user's");
+        logger.info("Init data base");
+        System.out.println("		---- Load user's: admin password admin; user password user");
 
         Role roleAdmin = new Role();
         roleAdmin.setRole("ROLE_ADMIN");
