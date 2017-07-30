@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author Roman Vlasiuk
  */
 @SpringBootApplication
+@Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.service", "com.approom.tasklist.app", "com.approom.tasklist.web", "com.approom.tasklist.config"})
 public class App extends SpringBootServletInitializer {

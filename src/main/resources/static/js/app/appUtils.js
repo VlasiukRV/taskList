@@ -160,5 +160,7 @@ var appUtils = Object.create(null);
         var args = jQuery.makeArray(arguments);
         args.unshift("(App:)");
         console.log.apply(console, args);
+
+        document.write(args);
     }
 })();
