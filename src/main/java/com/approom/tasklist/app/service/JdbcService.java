@@ -71,14 +71,14 @@ public class JdbcService {
         roleService.saveEntity(roleUser);
 
         User userAdmin = new User();
-        userAdmin.setName("admin");
+        userAdmin.setUsername("admin");
         userAdmin.setPassword("admin");
         userAdmin.setMailAddress("vlasiukrv@gmail.com");
         userAdmin.addRole(roleAdmin);
         userAdmin.addRole(roleUser);
         userService.saveEntity(userAdmin);
         User userUser = new User();
-        userUser.setName("user");
+        userUser.setUsername("user");
         userUser.setPassword("user");
         userUser.setMailAddress("alyona.lisitsyna@gmail.com ");
         userUser.addRole(roleUser);

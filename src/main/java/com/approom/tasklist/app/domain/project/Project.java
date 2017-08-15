@@ -1,9 +1,12 @@
 package com.approom.tasklist.app.domain.project;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.approom.tasklist.app.domain.BaseEntity;
 import com.approom.tasklist.app.domain.task.Task;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -14,37 +17,19 @@ import java.util.Set;
 @Entity
 @Table
 @JsonIgnoreProperties(value = { "tasks" })
+
+@NoArgsConstructor
 public class Project extends BaseEntity<Integer> {
     @Column
     @JsonProperty
-    private String name;
+    private @Getter @Setter String name;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Task> tasks = new HashSet<>();
-
-    public Project() {
-        super();
-    }
+    private @Getter @Setter Set<Task> tasks = new HashSet<>();
 
     public Project(String name) {
         super();
 
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Task> getTasks(){
-        return this.tasks;
-    }
-
-    public void setTasks(Set<Task> tasks){
-        this.tasks = tasks;
     }
 
     public boolean addTask(Task task){
@@ -53,6 +38,11 @@ public class Project extends BaseEntity<Integer> {
         }
         this.tasks.add(task);
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return ("Project"+id).hashCode();
     }
 
     @Override
@@ -67,8 +57,4 @@ public class Project extends BaseEntity<Integer> {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        return ("Project"+id).hashCode();
-    }
 }

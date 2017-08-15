@@ -108,10 +108,46 @@ var appUtils = Object.create(null);
                 continue;
             }
 
-            if (angular.isArray(sourceProperty)) {
+            if (angular.isDate(sourceProperty)){
+                receiver[key] = sourceProperty;
+            } else if (angular.isArray(sourceProperty)) {
                 receiver[key].fillByTemplate(sourceProperty);
+            } else if(sourceProperty == null){
+                receiver[key] = sourceProperty;
             } else if (typeof sourceProperty === 'object') {
+                receiver[key] = {};
                 appUtils.fillValuesProperty(sourceProperty, receiver[key]);
+            } else {
+                receiver[key] = sourceProperty;
+            }
+        }
+        return receiver;
+    };
+
+    // ToDo
+    appUtils.fillAllValuesProperty = function (source, receiver) {
+        for (var key in source) {
+            var sourceProperty = source[key];
+            if (key.indexOf("$$") >= 0) {
+                continue;
+            }
+
+            if (angular.isDate(sourceProperty)){
+                receiver[key] = sourceProperty;
+            } else if (angular.isArray(sourceProperty)) {
+                receiver[key] = [];
+                // ToDo
+                if(sourceProperty.fillByTemplate){
+                    receiver[key].fillByTemplate = sourceProperty.fillByTemplate;
+                }
+                if(sourceProperty.representationList){
+                    receiver[key].representationList = sourceProperty.representationList;
+                }
+            } else if(sourceProperty == null){
+                receiver[key] = sourceProperty;
+            } else if (typeof sourceProperty === 'object') {
+                receiver[key] = {};
+                appUtils.fillAllValuesProperty(sourceProperty, receiver[key]);
             } else {
                 receiver[key] = sourceProperty;
             }
@@ -160,7 +196,5 @@ var appUtils = Object.create(null);
         var args = jQuery.makeArray(arguments);
         args.unshift("(App:)");
         console.log.apply(console, args);
-
-        document.write(args);
     }
 })();

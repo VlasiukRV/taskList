@@ -1,196 +1,502 @@
 
+function getMetadataSet(resourceService) {
+
+    appORMModule.resourceService = resourceService;
+    var appMetadataSet = new appORMModule.MetadataSet();
+
+    // EditBar
+    var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model");
+    var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
+        .addCommand(appInterface.getNewCommand("initDataBase",          "initDataBase",         function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")}))
+        .addCommand(appInterface.getNewCommand("runArchiveService",     "runArchiveService",    function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")}))
+        .addCommand(appInterface.getNewCommand("stopArchiveService",    "stopArchiveService",   function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")}))
+        .addCommand(appInterface.getNewCommand("sendMail",              "sendMail",             function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")}))
+        .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor",function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")}));
+    
+    var interface = new appInterface.Interface();
+    appMetadataSet.interface = interface;
+    interface
+        .commandBarSetMainUrl("#/task")
+        .commandBar.commandBar
+        .addCommand(menuModel)
+        .addCommand(menuSystem);
+
+    // enums
+
+    var EnumTaskState = new appORMModule.Enum;
+    var metadataEnumSpecification_TaskState = {
+        enumClass: EnumTaskState,
+        metadataName: "taskState"
+    };
+
+    // entities
+
+    var Task = appUtils.Class(appORMModule.Entity);
+    var metadataEntitySpecification_Task = {
+        entityClass: Task,
+        fnGetEntityInstance: function () {
+            return new Task()
+        },
+        metadataName: "task",
+        metadataRepresentation: "Task",
+        metadataDescription: "Task list",
+        entityField: {
+            objectField: {},
+            entityField: {
+
+                date: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "date",
+                        label: "date",
+                        availability: true,
+                        entityListService: null
+                    }
+                },
+                title: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "title",
+                        availability: true,
+                        entityListService: null
+                    }
+                },
+                author: {
+                    value: {},
+                    fieldDescription: {
+                        inputType: "select",
+                        label: "author",
+                        availability: true,
+                        entityListService: function () {
+                            return appMetadataSet.getEntityList("user");
+                        }
+                    }
+                },
+                executor: {
+                    value: [],
+                    fieldDescription: {
+                        inputType: "multiselect",
+                        label: "executor",
+                        availability: true,
+                        entityListService: function () {
+                            return appMetadataSet.getEntityList("user");
+                        }
+                    }
+                },
+                project: {
+                    value: {},
+                    fieldDescription: {
+                        inputType: "select",
+                        label: "project",
+                        availability: true,
+                        entityListService: function () {
+                            return appMetadataSet.getEntityList("project")
+                        }
+                    }
+                },
+                state: {
+                    value: "TODO",
+                    fieldDescription: {
+                        inputType: "enum",
+                        label: "state",
+                        availability: true,
+                        entityListService: function(){
+                            return appMetadataSet.getEntityList("taskState")
+                        }
+                    }
+                }
+
+            },
+            defineField: {
+
+                representation: {
+                    enumerable: true,
+                    get: function () {
+                        return "" + this.date + " /" + this.title + "/ (" + this.description + ") ";
+                    }
+                }
+
+            }
+        }
+    };
+    metadataEntitySpecification_Task.entityField.entityField.executor.value.representationList = function() {
+        var str = "";
+        var k=0;
+        while (true) {
+            if(k == this.length){
+                break;
+            }
+            str = str+"; "+this[k].representation;
+            k = k+1;
+
+        }
+        return str;
+    };
+    metadataEntitySpecification_Task.entityField.entityField.executor.value.fillByTemplate = function(template) {
+        this.length=0;
+        var k=0;
+        while (true) {
+            if(k == template.length){
+                break;
+            }
+            var entity = appMetadataSet.getEntityInstance("user");
+            appUtils.fillValuesProperty(template[k], entity);
+            this.push(entity);
+            k = k+1;
+        }
+    };
+
+    var User = appUtils.Class(appORMModule.Entity);
+    var metadataEntitySpecification_User = {
+        entityClass: User,
+        fnGetEntityInstance: function () {
+            return new User()
+        },
+        metadataName: "user",
+        metadataRepresentation: "User",
+        metadataDescription: "User list",
+        entityField: {
+            objectField: {},
+            entityField: {
+
+                username: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "username",
+                        availability: true,
+                        entityListService: null
+                    }
+                },
+                password: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "password",
+                        availability: true,
+                        entityListService: null
+                    }
+                },
+                mailAddress: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "mailAddress",
+                        availability: true,
+                        entityListService: null
+                    }
+                },
+                role: {
+                    value: [],
+                    fieldDescription: {
+                        inputType: "multiselect",
+                        label: "role",
+                        availability: true,
+                        entityListService: function () {
+                            return appMetadataSet.getEntityList("role");
+                        }
+                    }
+                },
+                enabled: {
+                    value: false,
+                    fieldDescription: {
+                        inputType: "checkbox",
+                        label: "enabled",
+                        availability: false,
+                        entityListService: null
+                    }
+                }
+
+            },
+            defineField: {
+
+                representation: {
+                    enumerable: true,
+                    get: function () {
+                        return "" + this.username + " (" + this.description + ") ";
+                    }
+                }
+
+            }
+        }
+    };
+    metadataEntitySpecification_User.entityField.entityField.role.value.representationList = function() {
+        var str = "";
+        var k=0;
+        while (true) {
+            if(k == this.length){
+                break;
+            }
+            str = str+"; "+this[k].representation;
+            k = k+1;
+
+        }
+        return str;
+    };
+    metadataEntitySpecification_User.entityField.entityField.role.value.fillByTemplate = function(template) {
+        this.length=0;
+        var k=0;
+        while (true) {
+            if(k == template.length){
+                break;
+            }
+            var entity = appMetadataSet.getEntityInstance("role");
+            appUtils.fillValuesProperty(template[k], entity);
+            this.push(entity);
+            k = k+1;
+        }
+    };
+
+    var Project = appUtils.Class(appORMModule.Entity);
+    var metadataEntitySpecification_Project = {
+        entityClass: Project,
+        fnGetEntityInstance: function () {
+            return new Project()
+        },
+        metadataName: "project",
+        metadataRepresentation: "Project",
+        metadataDescription: "Project list",
+        entityField: {
+            objectField: {},
+            entityField: {
+
+                // entity field
+                name: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "name",
+                        availability: true,
+                        entityListService: null
+                    }
+                }
+
+            },
+            defineField: {
+
+                representation: {
+                    enumerable: true,
+                    get: function () {
+                        return "" + this.name;
+                    }
+                }
+
+            }
+        }
+    };
+
+    var Role = appUtils.Class(appORMModule.Entity);
+    var metadataEntitySpecification_Role = {
+        entityClass: Role,
+        fnGetEntityInstance: function () {
+            return new Role()
+        },
+        metadataName: "role",
+        metadataRepresentation: "Role",
+        metadataDescription: "Role list",
+        entityField: {
+            objectField: {},
+            entityField: {
+
+                // entity field
+                role: {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "role",
+                        availability: true,
+                        entityListService: null
+                    }
+                }
+
+            },
+            defineField: {
+
+                representation: {
+                    enumerable: true,
+                    get: function () {
+                        return "" + this.role;
+                    }
+                }
+
+            }
+        }
+    };
+
+    appMetadataSet
+        .installMetadataObjectEntity(metadataEntitySpecification_Task)
+        .installMetadataObjectEntity(metadataEntitySpecification_User)
+        .installMetadataObjectEntity(metadataEntitySpecification_Project)
+        .installMetadataObjectEntity(metadataEntitySpecification_Role)
+
+        .installMetadataObjectEnum(metadataEnumSpecification_TaskState);
+
+    return appMetadataSet;
+}
+
+function ListEntityController($scope, dataStorage){
+    this.appMetadataSet = dataStorage.getAppMetadaSet();
+
+    this.initController = function(){
+        $scope.$parent.openListForm = this.openListForm;
+        $scope.$parent.closeListForm = this.closeListForm;
+
+        var metadataSpecification = this.appMetadataSet.getEntityList(this.metadataName);
+        var entityListForm = new EntityListForm();
+
+        entityListForm.metadataName = this.metadataName;
+        entityListForm.appMetadataSet = this.appMetadataSet;
+        entityListForm.metadataSpecification = metadataSpecification;
+        entityListForm.editFormName = metadataSpecification.metadataObject.description;
+        entityListForm.formProperties = metadataSpecification.metadataObject.fmListForm.metadataEditFieldsSet;
+        entityListForm.entities = metadataSpecification.list;
+
+        entityListForm.eventCloseForm = this.closeListForm;
+        entityListForm.eventUpdateForm = this.updateForm;
+        entityListForm.eventAddNewEntity = this.addNewEntity;
+        entityListForm.eventEditEntity = this.editEntity;
+        entityListForm.eventDeleteEntity = this.deleteEntity;
+
+        entityListForm.openEditForm = this.openEditForm;
+        entityListForm.updateViewEntityList = this.updateViewEntityList;
+        entityListForm.closeListForm = this.closeListForm;
+
+        $scope.entityListForm = entityListForm;
+
+        this.updateForm();
+    };
+
+    this.addNewEntity = function(){
+        this.openEditForm(this.appMetadataSet.getEntityList(this.metadataName).metadataObject.getEntityInstance())
+    };
+
+    this.editEntity = function(id){
+        var entity = this.appMetadataSet.getEntityList(this.metadataName).findEntityById(id);
+        if(entity != undefined){
+            var editEntity = this.appMetadataSet.getEntityList(this.metadataName).metadataObject.getEntityInstance();
+            appUtils.fillValuesProperty(entity, editEntity);
+            this.openEditForm(editEntity);
+        }
+    };
+
+    this.deleteEntity = function(id){
+        this.appMetadataSet.getEntityList(this.metadataName).deleteEntity(id, function(data){
+            this.updateViewEntityList();
+        });
+    };
+
+    this.updateViewEntityList = function(){
+        this.appMetadataSet.metadataEvents.publish("ev:entityList:" +this.metadataName+ ":update");
+    };
+
+    this.openEditForm = function(currentEntity){
+        dataStorage.setCurrentEntityByName(this.metadataName, currentEntity);
+        this.closeListForm();
+    };
+
+    this.closeListForm = function(){
+        $scope.$parent.showListForm = false;
+        $scope.$parent.openEditForm();
+    };
+
+    this.openListForm = function(){
+        $scope.$parent.showListForm = true;
+    };
+
+    this.updateForm = function(){
+        this.updateViewEntityList();
+    };
+
+}
+
+function EditEntityController($scope, dataStorage){
+    this.appMetadataSet = dataStorage.getAppMetadaSet();
+    this.currentEntity = dataStorage.getCurrentEntityByName(this.metadataName);
+
+    this.initController = function(){
+        $scope.$parent.openEditForm = this.openEditForm;
+        $scope.$parent.closeEditForm = this.closeEditForm;
+
+        var metadataSpecification = this.appMetadataSet.getEntityList(this.metadataName);
+
+        var entityEditForm = new EntityEditForm();
+        entityEditForm.metadataName = this.metadataName;
+        entityEditForm.appMetadataSet = this.appMetadataSet;
+        entityEditForm.metadataSpecification = metadataSpecification;
+        entityEditForm.editFormName = "New " +this.metadataName+ ":";
+        entityEditForm.formProperties = metadataSpecification.metadataObject.fmEditForm.metadataEditFieldsSet;
+
+        entityEditForm.eventCloseForm = this.closeEditForm;
+        entityEditForm.eventUpdateForm = this.updateForm;
+        entityEditForm.eventCreateEntity = this.createEntity;
+
+        entityEditForm.openEditForm = this.openEditForm;
+        entityEditForm.closeEditForm = this.closeEditForm;
+        entityEditForm.updateForm = this.updateForm;
+        entityEditForm.createEntity = this.createEntity;
+
+        $scope.entityEditForm = entityEditForm;
+    };
+
+    this.updateForm = function(){
+        this.currentEntity = dataStorage.getCurrentEntityByName(this.metadataName);
+    };
+
+    this.createEntity = function(template){
+        var entityList = this.appMetadataSet.getEntityList(this.metadataName);
+        var self = this;
+        entityList.addEntityByTemplate(template, function(){
+            self.appMetadataSet.metadataEvents.publish("ev:entityList:" +self.metadataName+ ":update", function(){
+                self.closeEditForm();
+            });
+        });
+    };
+
+    this.openEditForm = function(){
+        $scope.$parent.showEditForm = true;
+    };
+
+    this.closeEditForm = function(){
+        $scope.$parent.showEditForm = false;
+        $scope.$parent.openListForm();
+    };
+
+}
+
 ////////////////////////////////////
 // INTERFACE
 ////////////////////////////////////
 
 function getMenuBar(resourceService){
 
-    var menuTask = new MenuCommand();
-    menuTask.text = "Task";
-    menuTask.command = "task";
-    var menuProject = new MenuCommand();
-    menuProject.text = "Project";
-    menuProject.command = "project";
-    var menuUser = new MenuCommand();
-    menuUser.text = "User";
-    menuUser.command = "user";
-    var menuRole = new MenuCommand();
-    menuRole.text = "Role";
-    menuRole.command = "role";
+    var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model")
+        .addCommand(appInterface.getNewEntityCommand("task", "Task"))
+        .addCommand(appInterface.getNewEntityCommand("project", "Project"))
+        .addCommand(appInterface.getNewEntityCommand("user",    "User"))
+        .addCommand(appInterface.getNewEntityCommand("role",    "Role"));
 
-    var menuModel = new MenuCommand();
-    menuModel.text = "Model";
-    menuModel.dropdownMenu = true;
-    menuModel.addElement(menuTask)
-        .addElement(menuProject)
-        .addElement(menuUser)
-        .addElement(menuRole);
+    var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
+        .addCommand(appInterface.getNewCommand("initDataBase",          "initDataBase",         function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")}))
+        .addCommand(appInterface.getNewCommand("runArchiveService",     "runArchiveService",    function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")}))
+        .addCommand(appInterface.getNewCommand("stopArchiveService",    "stopArchiveService",   function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")}))
+        .addCommand(appInterface.getNewCommand("sendMail",              "sendMail",             function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")}))
+        .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor",function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")}));
 
-    var menuInitDataBase = new MenuCommand();
-    menuInitDataBase.text = "initDataBase";
-    menuInitDataBase.command = function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")};
-    var menuRunArchiveService = new MenuCommand();
-    menuRunArchiveService.text = "runArchiveService";
-    menuRunArchiveService.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")};
-    var menuStopArchiveService = new MenuCommand();
-    menuStopArchiveService.text = "stopArchiveService";
-    menuStopArchiveService.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")};
-    var menuSendMail = new MenuCommand();
-    menuSendMail.text = "sendMail";
-    menuSendMail.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")};
-    var menuStopSendMail = new MenuCommand();
-    menuStopSendMail.text = "stopSendMail";
-    menuStopSendMail.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopSendMail")};
-    var menuInterruptTaskExecutor = new MenuCommand();
-    menuInterruptTaskExecutor.text = "interruptTaskExecutor";
-    menuInterruptTaskExecutor.command = function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")};
+    var appInt = new appInterface.Interface();
 
-    var menuSystem = new MenuCommand();
-    menuSystem.text = "System";
-    menuSystem.dropdownMenu = true;
-    menuSystem.addElement(menuInitDataBase)
-                .addElement(menuRunArchiveService)
-                .addElement(menuStopArchiveService)
-                .addElement(menuSendMail)
-                .addElement(menuStopSendMail)
-                .addElement(menuInterruptTaskExecutor);
+    appInt.commandBarSetMainUrl("#/task")
+        .commandBar.commandBar
+        .addCommand(menuModel)
+        .addCommand(menuSystem);
 
-    var menuCollection = [];
-    menuCollection.push(menuModel);
-    menuCollection.push(menuSystem);
+    return appInt.commandBar;
 
-    return {mainUrl: '#/task', menuCollection: menuCollection};
-}
-
-function objectProperties(resourceService, dataStorage){
-
-    var user_formProperties;
-    var user_listProperties;
-
-    var role_formProperties;
-    var role_listProperties;
-
-    var task_formProperties;
-    var task_listProperties;
-
-    var project_formProperties;
-    var project_listProperties;
-    var task_filter_listProperties;
-
-    fillPropertiesDescriptions();
-
-    function fillPropertiesDescriptions() {
-
-        var propertyId          = buildEntityProperty('id',             'text', 'id',                   false);
-        var propertyDescription = buildEntityProperty('description',    'textarea');
-        var propertyName        = buildEntityProperty('name',           'text');
-        var propertyUserName    = buildEntityProperty('username',       'text');
-        var propertyPassword    = buildEntityProperty('password',       'text');
-        var propertyUserRole    = buildEntityProperty('role',           'text');
-        var propertyRole        = buildEntityProperty('role',           'multiselect', 'role',          true, dataStorage.getRoleList());
-        var propertyDate        = buildEntityProperty('date',           'date');
-        var propertyTitle       = buildEntityProperty('title',          'text');
-        var propertyAuthor      = buildEntityProperty('author',         'select','author',              true, dataStorage.getUserList());
-        var propertyExecutor    = buildEntityProperty('executor',       'multiselect','executor',       true, dataStorage.getUserList());
-        var propertyProject     = buildEntityProperty('project',        'select','project',             true, dataStorage.getProjectList());
-        var propertyTaskState   = buildEntityProperty('state',          'enum','state',                 true, undefined);
-        propertyTaskState.entityList = dataStorage.getEnumValues(resourceService, "TaskState");
-
-        user_formProperties = [];
-        user_formProperties.push(propertyId);
-        user_formProperties.push(propertyUserName);
-        user_formProperties.push(propertyPassword);
-        user_formProperties.push(propertyRole);
-        user_formProperties.push(propertyDescription);
-
-        user_listProperties = [];
-        user_listProperties.push(propertyId);
-        user_listProperties.push(propertyUserName);
-        user_listProperties.push(propertyRole);
-        user_listProperties.push(propertyDescription);
-
-        role_formProperties = [];
-        role_formProperties.push(propertyId);
-        role_formProperties.push(propertyUserRole);
-        role_formProperties.push(propertyDescription);
-
-        role_listProperties = [];
-        role_listProperties.push(propertyId);
-        role_listProperties.push(propertyUserRole);
-        role_listProperties.push(propertyDescription);
-
-        project_formProperties = [];
-        project_formProperties.push(propertyId);
-        project_formProperties.push(propertyName);
-        project_formProperties.push(propertyDescription);
-
-        project_listProperties = [];
-        project_listProperties.push(propertyId);
-        project_listProperties.push(propertyName);
-        project_listProperties.push(propertyDescription);
-
-        task_formProperties = [];
-        task_formProperties.push(propertyId);
-        task_formProperties.push(propertyProject);
-        task_formProperties.push(propertyDate);
-        task_formProperties.push(propertyTitle);
-        task_formProperties.push(propertyAuthor);
-        task_formProperties.push(propertyExecutor);
-        task_formProperties.push(propertyDescription);
-        task_formProperties.push(propertyTaskState);
-
-        task_listProperties = [];
-        task_listProperties.push(propertyId);
-        task_listProperties.push(propertyProject);
-        task_listProperties.push(propertyDate);
-        task_listProperties.push(propertyTitle);
-        task_listProperties.push(propertyAuthor);
-        task_listProperties.push(propertyExecutor);
-        task_listProperties.push(propertyDescription);
-        task_listProperties.push(propertyTaskState);
-
-        task_filter_listProperties = [];
-        task_filter_listProperties.push(propertyProject);
-    }
-
-    return {
-        getUserObjectProperties: function () {
-            return new FormProperties(
-                user_formProperties,
-                user_listProperties
-            );
-        },
-        getRoleObjectProperties: function () {
-            return new FormProperties(
-                role_formProperties,
-                role_listProperties
-            );
-        },
-        getProjectObjectProperties: function () {
-            return new FormProperties(
-                project_formProperties,
-                project_listProperties
-            );
-        },
-        getTaskObjectProperties: function () {
-            return new FormProperties(
-                task_formProperties,
-                task_listProperties,
-                task_filter_listProperties
-            );
-        }
-    };
 }
 
 ////////////////////////////////////
 // SERVICEs
 ////////////////////////////////////
-
-function getAppHttpUrl($location, urlSufix){
-    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
-
-    return appAddress + urlSufix;
-}
 
 function appHttpResponseInterceptor($q, $location, dataStorage){
     return {
@@ -205,8 +511,8 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
             if (response.status = 200){
                 var objectResponse = response.data;
                 /*if (!(response.data instanceof Object)){
-                    var objectResponse=eval("("+response.data+")");
-                }*/
+                 var objectResponse=eval("("+response.data+")");
+                 }*/
                 if (objectResponse instanceof Object){
                     if ("message" in objectResponse && "status" in objectResponse) { //ToDo
                         if (response.data.status != 200) {
@@ -253,6 +559,12 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
             return $q.reject(response);
         }
     };
+}
+
+function getAppHttpUrl($location, urlSufix){
+    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
+
+    return appAddress + urlSufix;
 }
 
 function setRoute(routeProvider){
@@ -365,6 +677,7 @@ function resourceService(_entityEditService, _systemService, _securityService, _
 
 function dataStorage() {
 
+    var appMetadataSet = null;
     var principal = {};
 
     var userList = {};
@@ -373,14 +686,20 @@ function dataStorage() {
     var taskList = {};
     var errorDescriptions = {};
 
-    var currentUser = {};
-    var currentRole = {};
-    var currentProject = {};
-    var currentTask = {};
+    var currentUser = null;
+    var currentRole = null;
+    var currentProject = null
+    var currentTask = null;
     var appEnums = [];
 
     return {
 
+        getAppMetadaSet: function(){
+            return appMetadataSet;
+        },
+        setAppMetadataSet: function(metadataSet){
+            appMetadataSet = metadataSet;
+        },
         getPrincipal: function(){
             if(!(principal instanceof Principal)){
                 principal = new Principal();
@@ -408,44 +727,32 @@ function dataStorage() {
             userList = _data;
         },
         getUserList: function () {
-            if (!(userList instanceof UserList)) {
-                userList = new UserList(this);
-            }
-            return userList;
+            return appMetadataSet.getEntityList("user");
         },
         setProjectList: function (_data) {
             projectList = _data;
+        },
+        getProjectList: function () {
+            return appMetadataSet.getEntityList("project");
         },
         setRoleList: function (_data){
             roleList = _data;
         },
         getRoleList: function (){
-            if (!(roleList instanceof RoleList)){
-                roleList = new RoleList(this);
-            }
-            return roleList
-        },
-        getProjectList: function () {
-            if (!(projectList instanceof ProjectList)) {
-                projectList = new ProjectList(this);
-            }
-            return projectList;
+            return appMetadataSet.getEntityList("role");
         },
         setTaskList: function (_data) {
             taskList = _data;
         },
         getTaskList: function () {
-            if (!(taskList instanceof TaskList)) {
-                taskList = new TaskList(this);
-            }
-            return taskList;
+            return appMetadataSet.getEntityList("task");
         },
 
         setCurrentUser: function (_data) {
             currentUser = _data;
         },
         getCurrentUser: function () {
-            if (!(currentUser instanceof User)) {
+            if (currentUser == null) {
                 currentUser = this.getNewEntityByName('user');
             }
             return currentUser;
@@ -454,7 +761,7 @@ function dataStorage() {
             currentRole = _data;
         },
         getCurrentRole: function () {
-            if (!(currentRole instanceof Role)) {
+            if (currentRole == null) {
                 currentRole = this.getNewEntityByName('role');
             }
             return currentRole;
@@ -463,7 +770,7 @@ function dataStorage() {
             currentProject = _data;
         },
         getCurrentProject: function () {
-            if (!(currentProject instanceof Project)) {
+            if (currentProject == null) {
                 currentProject = this.getNewEntityByName('project');
             }
             return currentProject;
@@ -472,30 +779,50 @@ function dataStorage() {
             currentTask = _data;
         },
         getCurrentTask: function () {
-            if (!(currentTask instanceof Task)) {
+            if (currentTask == null) {
                 currentTask = this.getNewEntityByName('task');
             }
             return currentTask;
         },
 
-        getNewEntityByName: function (entityName) {
+        setCurrentEntityByName: function (entityName, _date) {
             switch (entityName) {
                 case 'user':
-                    return new User(this);
+                    currentUser = _date;
                     break;
                 case 'role':
-                    return new Role(this);
+                    currentRole = _date;
                     break;
                 case 'project':
-                    return new Project(this);
+                    currentProject = _date;
                     break;
                 case 'task':
-                    var newTask = new Task(this);
-                    return newTask;
+                    currentTask = _date;
                     break;
                 default:
                     return undefined;
             }
+        },
+        getCurrentEntityByName: function (entityName) {
+            switch (entityName) {
+                case 'user':
+                    return this.getCurrentUser();
+                    break;
+                case 'role':
+                    return this.getCurrentRole();
+                    break;
+                case 'project':
+                    return this.getCurrentProject();
+                    break;
+                case 'task':
+                    return this.getCurrentTask();
+                    break;
+                default:
+                    return undefined;
+            }
+        },
+        getNewEntityByName: function (entityName) {
+            this.getNewEntityByName(entityName)
         }
     };
 }
@@ -562,7 +889,7 @@ function MenuCommand(){
 function updateCurrentUserForPrincipal(dataStorage, resourceService){
     var currentPrincipal = dataStorage.getPrincipal();
     var userList = dataStorage.getUserList();
-    userList.update(resourceService, function(){
+    userList.update(function(){
         currentPrincipal.currentUser = dataStorage.getUserList().findEntityById(currentPrincipal.currentUserId);
     });
 }
@@ -655,14 +982,6 @@ function Principal(){
 // UTILS
 ////////////////////////////////////
 
-fReplacerForEntityParser = function (key, value) {
-    if (key == 'dataStorage' || key == 'representation') return undefined;
-    if (key.indexOf("$$") >= 0) return undefined;
-    if (key.indexOf("_") >= 0) return undefined;
-    return value;
-};
-
-
 function ExecuteSystemCommand(resourceService, command){
     var systemService = resourceService.getSystemService();
     systemService.executeCommand({command: command}, {});
@@ -670,165 +989,4 @@ function ExecuteSystemCommand(resourceService, command){
 function ExecuteServiceCommand(resourceService, command){
     var operationService = resourceService.getOperationService();
     operationService.executeCommand({command: command}, {});
-}
-
-////////////////////////////////////
-// BASE_MODEL
-////////////////////////////////////
-
-function AppEnum(enumName){
-    this.enumName = enumName;
-    this.list = {};
-
-    this.update = function(resourceService){
-        var source = this;
-        resourceService.getEntityEditService()
-            .getEntity({entityName: "enum", entityId: this.enumName}, {},
-            function (data) {
-                source.list = data.data;
-            },
-            function (httpResponse) {
-                /*resourceService.collError(httpResponse)*/
-            }
-        );
-    }
-}
-
-function BaseEntity(dataStorage) {
-    this._entityName = '';
-    this.dataStorage = dataStorage;
-
-    this.id = "";
-    this.description = "";
-
-    this.isEmpty = function () {
-        // ToDo ??????
-        return this.id == 0;
-    };
-
-    this.createEntity = function (resourceService, fCallBack) {
-        var entityJSON = JSON.stringify(this, fReplacerForEntityParser);
-        resourceService.getEntityEditService()
-            .createEntity({entityName: this._entityName}, entityJSON,
-            baseCreateEntity.bind(this, fCallBack),
-            function (httpResponse) {
-                /*resourceService.collError(httpResponse)*/
-            }
-        )
-    };
-
-    var baseCreateEntity = function () {
-        var fCallBack = arguments[0];
-        var data = arguments[1];
-
-        if (data.result = 200) {
-            var originalEntity = data.data;
-            appUtils.fillValuesProperty(originalEntity, this);
-            fCallBack(this);
-        }
-    };
-}
-
-function BaseEntityList(dataStorage) {
-    this._entityName = '';
-    this.dataStorage = dataStorage;
-    this.list = [];
-
-    this.addEntity = function (entity) {
-
-        var entityAdded = false;
-        for (var index = 0; index < this.list.length; ++index) {
-            var item = this.list[index];
-            if (item.id == entity.id) {
-                this.list[index] = entity;
-                entityAdded = true;
-                return;
-            }
-        }
-        if (!entityAdded) {
-            this.list.push(entity);
-        }
-    };
-
-    this.findEntityById = function (id) {
-        for (var index = 0; index < this.list.length; ++index) {
-            var item = this.list[index];
-            if (item.id === id) {
-                return item;
-            }
-        }
-        return undefined;
-    };
-
-    this.update = function (resourceService, fCallBack) {
-        this.list = [];
-        resourceService.getEntityEditService()
-            .getEntity({entityName: this._entityName}, {},
-            update.bind(this, fCallBack),
-                function (httpResponse) {
-                    /*resourceService.collError(httpResponse)*/
-                }
-        );
-    };
-
-    this.addEntityByTemplate = function (resourceService, template, fCallBack) {
-        var entity = null;
-        if (template.isEmpty()) {
-            entity = dataStorage.getNewEntityByName(this._entityName);
-        } else {
-            entity = this.findEntityById(template.id);
-        }
-
-        var entityList = this;
-        appUtils.fillValuesProperty(template, entity);
-        entity.createEntity(resourceService, function (data) {
-            entityList.addEntity(data);
-            fCallBack();
-        });
-    };
-
-    this.deleteEntity = function (resourceService, id, fCallBack) {
-        resourceService.getEntityEditService()
-            .deleteEntity({entityName: this._entityName, entityId: id}, {},
-            deleteEntity.bind(this, id, fCallBack),
-            function (httpResponse) {
-                /*resourceService.collError(httpResponse)*/
-            }
-        )
-    };
-
-    var update = function () {
-        var fCallBack = arguments[0];
-        var data = arguments[1];
-
-        if (data.result = 200) {
-            var originalUserList = data.data;
-
-            originalUserList.forEach(function (item, i, arr) {
-                var entity = dataStorage.getNewEntityByName(this._entityName);
-                appUtils.fillValuesProperty(item, entity);
-                this.addEntity(entity);
-            }, this)
-        }
-
-        fCallBack(this)
-    };
-
-    var deleteEntity = function () {
-        var id = arguments[0];
-        var fCallBack = arguments[1];
-        var data = arguments[2];
-
-        if (data.result = 200) {
-            this.list.forEach(function (item, i, arr) {
-                if (item.id == id) {
-                    this.list.splice(i, 1);
-                    return true;
-                }
-            }, this);
-        }
-
-        fCallBack(this);
-    }
-
 }

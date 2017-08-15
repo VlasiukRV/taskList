@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.approom.tasklist.app.domain.BaseEntity;
 import com.approom.tasklist.app.domain.project.Project;
 import com.approom.tasklist.app.domain.user.User;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -12,89 +15,41 @@ import java.util.*;
 @Component
 @Entity
 @Table
+
+@NoArgsConstructor
 public class Task extends BaseEntity<Integer> {
 
     @JsonProperty
     @Column
-    private Date date;
+    private @Getter @Setter Date date;
+
     @Column
     @JsonProperty
-    private String title;
+    private @Getter @Setter String title;
+
     @JsonProperty
-    @ManyToOne
+    @ManyToOne(cascade={CascadeType.PERSIST})
     @JoinColumn
-    private User author;
+    private @Getter @Setter User author;
+
     @JsonProperty
-    @ManyToMany(cascade={CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade={CascadeType.ALL, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name="task_executor_detail",
             joinColumns = @JoinColumn( name="task_id"),
             inverseJoinColumns = @JoinColumn( name="user_id")
     )
-    private Set<User> executor = new HashSet<>();
+    private @Getter @Setter Set<User> executor = new HashSet<>();
+
     @JsonProperty
-    @ManyToOne
+    @ManyToOne(cascade={CascadeType.ALL})
     @JoinColumn
-    private Project project;
+    private @Getter @Setter Project project;
+
     @JsonProperty
     @Column
     @Enumerated(EnumType.ORDINAL)
-    protected TaskState state;
-
-    public Task() {
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
-    public Set<User> getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(Set<User> executor) {
-        this.executor = executor;
-    }
-
-    public void addExecutor(User user){
-        executor.add(user);
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public TaskState getState() {
-        return state;
-    }
-
-    public void setState(TaskState state) {
-        this.state = state;
-    }
+    protected @Getter @Setter TaskState state;
 
     @Override
     public boolean equals(Object o) {

@@ -1,3 +1,4 @@
+/*
 
 buildEntityProperty = function(name, inputType, label, availability, entityList){
     var entityProperty = new EntityProperty();
@@ -60,3 +61,4 @@ function EntityListForm(){
     this.eventEditEntity = function(id){};
     this._show = function(entity){};
 }
+*/

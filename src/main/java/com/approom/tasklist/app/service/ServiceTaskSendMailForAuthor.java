@@ -44,7 +44,7 @@ public class ServiceTaskSendMailForAuthor extends AbstractServiceTask {
             String mailAddress = recipient.getMailAddress();
 
             if (mailAddress.equals("")) {
-                System.out.println("" + recipient.getName() + ": Have no mail address");
+                System.out.println("" + recipient.getUsername() + ": Have no mail address");
                 continue;
             }
             try {
@@ -62,7 +62,7 @@ public class ServiceTaskSendMailForAuthor extends AbstractServiceTask {
     private String getMailTemlate(Task task) throws IOException, TemplateException {
 
         Map<String, Object> model = new HashMap();
-        model.put("userName", task.getAuthor().getName());
+        model.put("userName", task.getAuthor().getUsername());
         model.put("projectName", task.getProject().getName());
         model.put("taskName", task.getTitle());
         model.put("link_app", "http://192.168.0.110:8080");

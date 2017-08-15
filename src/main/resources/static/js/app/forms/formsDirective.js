@@ -52,11 +52,14 @@ function directiveDatePicker(dateFilter){
 
 var refreshSelectList = function(scope, resourceService){
     if(scope.property.inputType == "enum"){
-        scope.selectList = scope.property.entityList.list;
+        scope.selectList = scope.property.entityListService().list;
     }else if(scope.property.inputType == "select" || scope.property.inputType == "multiselect"){
+        scope.selectList = scope.property.entityListService().list;
+/*
         scope.property.entityList.update(resourceService, function (data) {
             scope.selectList = data.list;
         })
+*/
     }
 };
 
@@ -122,6 +125,7 @@ function directiveEntityListForm(resourceService){
             };
             $scope.updateForm = function(){
                 $scope.entityListForm.eventUpdateForm();
+                $scope.entityListForm.entities = $scope.entityListForm.appMetadataSet.getEntityList($scope.entityListForm.metadataName).list;
             };
             $scope.addNewEntity = function(){
                 $scope.entityListForm.eventAddNewEntity();

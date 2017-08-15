@@ -1,3 +1,4 @@
+/*
 
 function User(dataStorage) {
     BaseEntity.apply(this, arguments);
@@ -67,3 +68,4 @@ function RoleList(dataStorage){
     BaseEntityList.apply(this, arguments);
     this._entityName = 'role';
 }
+*/

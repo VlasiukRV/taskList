@@ -1,6 +1,118 @@
+
+var appInterface = Object.create(null);
+
+(function (appInterface){
+
+    var Interface = appUtils.Class();
+    (function () {
+        Interface.prototype.$_buildObject = function () {
+            this.includeFd({
+
+                commandBar: {
+                    mainUrl: '#',
+                    commandBar: new MenuCommand()
+                }
+
+            });
+        };
+        Interface.includeMthd({
+            commandBarSetMainUrl: function (mainUrl){
+                this.commandBar.mainUrl = mainUrl;
+                return this;
+            },
+            commandBarAddCommand: function(command){
+                this.commandBar.commandList.push(command);
+                return this;
+            }
+        })
+    }());
+
+    var MenuCommand = appUtils.Class();
+    (function(){
+        MenuCommand.prototype.$_buildObject = function(){
+            this.includeFd({
+                commandName: "",
+
+                dropdownMenu: false,
+                text: "",
+                command: null,
+                commandList: []
+            })
+        };
+        MenuCommand.includeMthd({
+            addCommand: function(command){
+                this.commandList.push(command);
+                return this;
+            },
+            getSubMenu: function(commandName){
+                for(var i=0; this.commandList.length; i++){
+                    var currentCommand = this.commandList[i];
+                    if (currentCommand.commandName === commandName){
+                        return currentCommand;
+                    }
+                    if(currentCommand.commandList.length > 0){
+                        return currentCommand.getSubMenu(commandName);
+                    }
+                }
+                return undefined;
+            }
+        });
+
+    }());
+
+    appInterface.Interface = Interface;
+    appInterface.getNewEntityCommand = function(commandName, text){
+        var command = new MenuCommand();
+        command.dropdownMenu = false;
+        command.commandName = commandName;
+        command.text = text;
+        command.command = commandName;
+
+        return command;
+    };
+    appInterface.getNewDropdownCommand = function(commandName, text){
+        var command = new MenuCommand();
+        command.dropdownMenu = true;
+        command.commandName = commandName;
+        command.text = text;
+        return command;
+    };
+    appInterface.getNewCommand = function(commandName, text, functionCommand){
+        var command = new MenuCommand();
+        command.dropdownMenu = false;
+        command.commandName = commandName;
+        command.text = text;
+        command.command = functionCommand;
+
+        return command;
+    };
+
+}(appInterface));
+
 var appORMModule = Object.create(null);
-(function () {
-    appORMModule.resourceService = null;
+(function (appORMModule, appInterface) {
+    appORMModule.resourceService = undefined;
+
+    var MetadataEvents = appUtils.Class();
+    (function (){
+        MetadataEvents.prototype.$_buildObject = function () {
+            this.includeFd({
+                events: $({})
+            });
+        };
+        MetadataEvents.includeMthd({
+            subscribe: function(){
+                this.events.bind.apply(this.events, arguments);
+            },
+            unSubscribe: function(){
+                this.events.unbind.apply(this.events, arguments);
+            },
+            publish: function(){
+                this.events.trigger.apply(this.events, arguments);
+            }
+        });
+    })();
+    var metadataEventsImpl = new MetadataEvents();
 
     var Entity = appUtils.Class();
     (function () {
@@ -54,7 +166,7 @@ var appORMModule = Object.create(null);
         Entity.includeMthd({
             isEmpty: function () {
                 // ToDo write what attribute of empty entity
-                return this.id == 0;
+                return this.id == 0 || this.id == null;
             },
 
             translateToEntityJSON: function () {
@@ -95,33 +207,38 @@ var appORMModule = Object.create(null);
             this.includeFd(
                 {
                     metadataName: "",
-                    list: []
+                    list: [],
+                    metadataObject: null
                 });
         };
-        var update = function () {
+        var updateEnt = function (fCallBack, data) {
+/*
             var fCallBack = arguments[0];
             var data = arguments[1];
+*/
 
             if (data.result = 200) {
                 var originalUserList = data.data;
 
                 originalUserList.forEach(function (item, i, arr) {
-                    var entity = dataStorage.getNewEntityByName(this._entityName);
+                    var entity = this.metadataObject.getEntityInstance();
                     appUtils.fillValuesProperty(item, entity);
                     this.addEntity(entity);
-                }, this)
+                }, this);
             }
 
-            fCallBack(this)
+            if(fCallBack) {
+                fCallBack(this);
+            }
         };
 
-        var deleteEntity = function () {
+        var deleteEnt = function () {
             var id = arguments[0];
             var fCallBack = arguments[1];
             var data = arguments[2];
 
             if (data.result = 200) {
-                this.list.forEach(function (item, i, arr) {
+                this.list.forEach(function (item, i) {
                     if (item.id == id) {
                         this.list.splice(i, 1);
                         return true;
@@ -129,7 +246,9 @@ var appORMModule = Object.create(null);
                 }, this);
             }
 
-            fCallBack(this);
+            if(fCallBack) {
+                fCallBack(this);
+            }
         };
 
         EntityList.includeMthd({
@@ -159,7 +278,7 @@ var appORMModule = Object.create(null);
             addEntityByTemplate: function (template, fCallBack) {
                 var entity = null;
                 if (template.isEmpty()) {
-                    entity = appMetadataSet.getEntityInstance(this.metadataName);
+                    entity = this.metadataObject.getEntityInstance(this.metadataName);
                 } else {
                     entity = this.findEntityById(template.id);
                 }
@@ -172,19 +291,22 @@ var appORMModule = Object.create(null);
                 });
             },
             update: function (fCallBack) {
-                this.list = [];
+                var self = this;
+                self.list = [];
                 appORMModule.resourceService.getEntityEditService()
                     .getEntity({entityName: this.metadataName}, {},
-                    update.bind(this, fCallBack),
-                    function (httpResponse) {
-                        /*resourceService.collError(httpResponse)*/
-                    }
+                    function (data){
+                        updateEnt.call(self, fCallBack, data)
+                    },
+                        function (httpResponse) {
+                            /*resourceService.collError(httpResponse)*/
+                        }
                 );
             },
             deleteEntity: function (id, fCallBack) {
                 appORMModule.resourceService.getEntityEditService()
-                    .deleteEntity({entityName: this._entityName, entityId: id}, {},
-                    deleteEntity.bind(this, id, fCallBack),
+                    .deleteEntity({entityName: this.metadataName, entityId: id}, {},
+                    deleteEnt.bind(this, id, fCallBack),
                     function (httpResponse) {
                         /*resourceService.collError(httpResponse)*/
                     }
@@ -309,9 +431,10 @@ var appORMModule = Object.create(null);
             bookEntityForms: function (_metadataEditFieldsSet, _metadataFilterFieldsSet) {
 
                 if (_metadataEditFieldsSet) {
+                    var editField = undefined;
 
                     for (var i = 0; i < _metadataEditFieldsSet.length; i++) {
-                        var editField = _metadataEditFieldsSet[i];
+                        editField = _metadataEditFieldsSet[i];
 
                         if (editField.availability) {
                             this.metadataEditFieldsSet.push(editField);
@@ -319,7 +442,7 @@ var appORMModule = Object.create(null);
                     }
 
                     for (var i = 0; i < this.metadataEditFieldsSet.length; i++) {
-                        var editField = this.metadataEditFieldsSet[i];
+                        editField = this.metadataEditFieldsSet[i];
 
                         if (editField.availabilityInEditForm) {
                             this.fmEditForm.metadataEditFieldsSet.push(editField);
@@ -331,7 +454,7 @@ var appORMModule = Object.create(null);
                 }
                 if (_metadataFilterFieldsSet) {
                     for (var i = 0; i < _metadataEditFieldsSet.length; i++) {
-                        var editField = _metadataEditFieldsSet[i];
+                        editField = _metadataEditFieldsSet[i];
                         /*if (appUtils.find(this.fmListForm.metadataEditFieldsSet, editField) > 0) {*/
                         this.fmListForm.metadataFilterFieldsSet.push(editField);
                         /*}*/
@@ -345,10 +468,113 @@ var appORMModule = Object.create(null);
     (function () {
         MetadataSet.prototype.$_buildObject = function () {
             this.includeFd({
-                entityList: Object.create(null)
+                // entities
+                entityList: Object.create(null),
+                metadataEvents: metadataEventsImpl,
+
+                // interface
+                interface: new appInterface.Interface()
             });
         };
         MetadataSet.includeMthd({
+            installMetadataObjectEnum: function(metadataEnumSpecification){
+            var EnumClass = metadataEnumSpecification.enumClass;
+            var metadataSet = this;
+
+            metadataSet.bookEntityList(EnumClass);
+            // event
+            metadataSet.metadataEvents.subscribe("ev:entityList:" +metadataEnumSpecification.metadataName+ ":update",
+                function(event, fCallBack){
+                    EnumClass.update(fCallBack)
+                }
+            );
+
+            return metadataSet;
+            },
+            installMetadataObjectEntity:function (entitySpecification) {
+                var metadataSet = this;
+                var EntityClass = entitySpecification.entityClass;
+
+                var metadataEntitySpecification = new MetadataEntitySpecification();
+                metadataEntitySpecification.metadataName = entitySpecification.metadataName;
+                metadataEntitySpecification.metadataRepresentation = entitySpecification.metadataRepresentation;
+                metadataEntitySpecification.metadataDescription = entitySpecification.metadataDescription;
+
+                appUtils.fillAllValuesProperty(entitySpecification.entityField.entityField, metadataEntitySpecification.entityField.entityField);
+                appUtils.fillAllValuesProperty(entitySpecification.entityField.objectField, metadataEntitySpecification.entityField.objectField);
+                metadataEntitySpecification.entityField.defineField = entitySpecification.entityField.defineField;
+
+
+                metadataEntitySpecification.entityField.entityField.id = {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "id",
+                        availability: true,
+                        entityListService: null
+                    }
+                };
+                metadataEntitySpecification.entityField.entityField.description = {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "textarea",
+                        label: "description",
+                        availability: true,
+                        entityListService: null
+                    }
+                };
+
+                (function () {
+                    // field
+                    EntityClass.prototype.$_buildObject = function () {
+                        this.includeEntityFd(
+                            metadataEntitySpecification.getObjectFields(),
+                            metadataEntitySpecification.getEntityFields(),
+                            metadataEntitySpecification.entityField.defineField
+                        );
+                    };
+                })();
+
+                var entityList = new EntityList();
+                entityList.metadataName = metadataEntitySpecification.metadataName;
+
+                var metadataObject = new appORMModule.MetadataObject();
+
+                metadataObject.installMetadata(metadataEntitySpecification.metadataName,
+                    entitySpecification.fnGetEntityInstance,
+                    metadataEntitySpecification.metadataRepresentation,
+                    metadataEntitySpecification.metadataDescription
+                );
+
+                var metadataEditFieldsSet = metadataEntitySpecification.getEntityFieldsDescription();
+                metadataObject.bookEntityForms(metadataEditFieldsSet);
+
+                metadataSet.bookMetadataObject(metadataObject);
+                metadataSet.bookEntityList(entityList);
+
+                // event
+                metadataEventsImpl.subscribe("ev:entityList:" +metadataEntitySpecification.metadataName+ ":update",
+                    function(event, fCallBack){
+                        entityList.update(fCallBack)
+                    }
+                );
+                metadataEventsImpl.subscribe("ev:entityList:" +metadataEntitySpecification.metadataName+ ":deleteEntity",
+                    function(event, id, fCallBack){
+                        entityList.deleteEntity(id, fCallBack);
+                    }
+                );
+
+                // EditMenu
+                var entitySubMenu = metadataSet.interface.commandBar.commandBar.getSubMenu('modelDD');
+                if(entitySubMenu != undefined){
+                    entitySubMenu.addCommand(appInterface.getNewEntityCommand(entitySpecification.metadataName, entitySpecification.metadataRepresentation))
+                }
+
+                return metadataSet;
+            },
+            getInterface: function (){
+                this.interface;
+            },
             getMetadataSpecification: function (metadataName) {
                 var metadataSpecification = this.entityList[metadataName];
                 if (metadataSpecification) {
@@ -366,6 +592,7 @@ var appORMModule = Object.create(null);
             bookEntityList: function (entityList) {
                 var metadataSpecification = this.getMetadataSpecification(entityList.metadataName);
                 metadataSpecification.entityList = entityList;
+                metadataSpecification.entityList.metadataObject = metadataSpecification.metadataObject;
             },
             getMetadataObject: function (metadataName) {
                 if (this.entityList[metadataName]) {
@@ -405,8 +632,7 @@ var appORMModule = Object.create(null);
                     entityField: {},
                     defineField: {}
                 }
-            })
-        };
+            })};
         MetadataEntitySpecification.includeMthd({
             getObjectFields: function () {
                 var objectFields = this.entityField.objectField;
@@ -417,7 +643,22 @@ var appORMModule = Object.create(null);
                 var source = this.entityField.entityField;
                 var entityFields = {};
                 for (var key in source) {
-                    entityFields[key] = source[key].value;
+                    if (angular.isArray(source[key].value)){
+                        entityFields[key] = [];
+                        // ToDo
+                        if(source[key].value.fillByTemplate){
+                            entityFields[key].fillByTemplate = source[key].value.fillByTemplate;
+                        }
+                        if(source[key].value.representationList){
+                            entityFields[key].representationList = source[key].value.representationList;
+                            /*entityFields[key].representationList = source[key].representationList;*/
+                        }
+                    }else if (typeof source[key].value === 'object') {
+                        entityFields[key] = {};
+                    }
+                    else {
+                        entityFields[key] = source[key].value;
+                    }
                 }
                 return entityFields;
             },
@@ -434,54 +675,14 @@ var appORMModule = Object.create(null);
         });
     })();
 
-    var installMetadataObject = function (EntityClass, metadataSet, entitySpecification) {
-
-        var metadataEntitySpecification = new MetadataEntitySpecification();
-        metadataEntitySpecification.metadataName = entitySpecification.metadataName;
-        metadataEntitySpecification.metadataRepresentation = entitySpecification.metadataRepresentation;
-        metadataEntitySpecification.metadataDescription = entitySpecification.metadataDescription;
-        metadataEntitySpecification.entityField = entitySpecification.entityField;
-        metadataEntitySpecification.objectField = entitySpecification.objectField;
-        metadataEntitySpecification.entityField = entitySpecification.entityField;
-        metadataEntitySpecification.defineField = entitySpecification.defineField;
-
-        (function () {
-            // field
-            EntityClass.prototype.$_buildObject = function () {
-                this.includeEntityFd(
-                    metadataEntitySpecification.getObjectFields(),
-                    metadataEntitySpecification.getEntityFields(),
-                    metadataEntitySpecification.entityField.defineField
-                );
-            };
-        })();
-
-        var entityList = new EntityList();
-        entityList.metadataName = metadataEntitySpecification.metadataName;
-
-        var metadataObject = new appORMModule.MetadataObject();
-
-        metadataObject.installMetadata(metadataEntitySpecification.metadataName,
-            entitySpecification.fnGetEntityInstance,
-            metadataEntitySpecification.metadataRepresentation,
-            metadataEntitySpecification.metadataDescription
-        );
-
-        var metadataEditFieldsSet = metadataEntitySpecification.getEntityFieldsDescription();
-        metadataObject.bookEntityForms(metadataEditFieldsSet);
-
-        metadataSet.bookMetadataObject(metadataObject);
-        metadataSet.bookEntityList(entityList);
-    };
-
     appORMModule.MetadataSet = MetadataSet;
     appORMModule.MetadataObject = MetadataObject;
     appORMModule.Entity = Entity;
+    appORMModule.Enum = Enum;
 
     appORMModule.MetadataEditField = MetadataEditField;
 
-    appORMModule.installMetadataObject = installMetadataObject;
-})();
+})(appORMModule, appInterface);
 
 /*
  ////////////////////////////////////
@@ -493,265 +694,5 @@ var appORMModule = Object.create(null);
     var f = function () {
     };
     var map = Object.create(null);
-
-})();
-
-var appMetadataSet = new appORMModule.MetadataSet;
-(function () {
-
-    appORMModule.resourceService = resourceService;
-
-    // enums
-
-    // enteties
-
-    var Task = appUtils.Class(appORMModule.Entity);
-    var propertyTaskState_entityList = null;
-    /* = dataStorage.getEnumValues(appORMModule.resourceService, "TaskState");*/
-    var metadataEntitySpecification_Task = {
-        fnGetEntityInstance: function () {
-            return new Task()
-        },
-        metadataName: "task",
-        metadataRepresentation: "Task",
-        metadataDescription: "Task list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                date: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "date",
-                        label: "date",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                title: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "title",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                author: {
-                    value: {},
-                    fieldDescription: {
-                        inputType: "select",
-                        label: "author",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("role");
-                        }
-                    }
-                },
-                executor: {
-                    value: [],
-                    fieldDescription: {
-                        inputType: "multiselect",
-                        label: "executor",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("user");
-                        }
-                    }
-                },
-                project: {
-                    value: {},
-                    fieldDescription: {
-                        inputType: "select",
-                        label: "project",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("project")
-                        }
-                    }
-                },
-                state: {
-                    value: "TODO",
-                    fieldDescription: {
-                        inputType: "enum",
-                        label: "state",
-                        availability: true,
-                        entityListService: propertyTaskState_entityList
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.date + " /" + this.title + "/ (" + this.description + ") ";
-                    }
-                }
-
-            }
-        }
-    };
-    appORMModule.installMetadataObject(Task, appMetadataSet, metadataEntitySpecification_Task);
-
-    var User = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_User = {
-        fnGetEntityInstance: function () {
-            return new User()
-        },
-        metadataName: "user",
-        metadataRepresentation: "User",
-        metadataDescription: "User list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                username: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "username",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                password: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "password",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                mailAddress: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "mailAddress",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                role: {
-                    value: [],
-                    fieldDescription: {
-                        inputType: "multiselect",
-                        label: "role",
-                        availability: true,
-                        entityListService: function () {
-                            appMetadataSet.getEntityList("role");
-                        }
-                    }
-                },
-                enabled: {
-                    value: [],
-                    fieldDescription: {
-                        inputType: "boolean",
-                        label: "enabled",
-                        availability: false,
-                        entityListService: null
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.username + " (" + this.description + ") ";
-                    }
-                }
-
-            }
-        }
-    };
-    appORMModule.installMetadataObject(User, appMetadataSet, metadataEntitySpecification_User);
-
-    var Project = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_Project = {
-        fnGetEntityInstance: function () {
-            return new Project()
-        },
-        metadataName: "project",
-        metadataRepresentation: "Project",
-        metadataDescription: "Project list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                // entity field
-                name: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "name",
-                        availability: true,
-                        entityListService: null
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.name;
-                    }
-                }
-
-            }
-        }
-    };
-    appORMModule.installMetadataObject(Project, appMetadataSet, metadataEntitySpecification_Project);
-
-    var Role = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_Role = {
-        fnGetEntityInstance: function () {
-            return new Role()
-        },
-        metadataName: "role",
-        metadataRepresentation: "Role",
-        metadataDescription: "Role list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                // entity field
-                role: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "role",
-                        availability: true,
-                        entityListService: null
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.role;
-                    }
-                }
-
-            }
-        }
-    };
-    appORMModule.installMetadataObject(Role, appMetadataSet, metadataEntitySpecification_Role);
-
-    // Test
-
-    var project1 = appMetadataSet.getEntityInstance("project");
-    project1.name = "Family";
-
-    appUtils.log(project1.representation);
-    appUtils.log(project1.translateToEntityJSON());
 
 })();

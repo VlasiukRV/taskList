@@ -3,6 +3,8 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
 
     var cookies = $cookies;
 
+    var appMetadataSet = getMetadataSet(resourceService);
+    dataStorage.setAppMetadataSet(appMetadataSet);
     $scope.errorDescriptions = dataStorage.getErrorDescriptions();
     $scope.menuBar = getMenuBar(resourceService);
     $scope.principal = dataStorage.getPrincipal();
@@ -29,5 +31,11 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
             $scope.principal.logout($http);
             $location.path("/");
         }
+    };
+
+    $scope.proba = function(){
+
+        window.status = "Load objects...";
+        appMetadataSet.metadataEvents.publish("ev:entityList:" +"taskState"+ ":update")
     };
 };

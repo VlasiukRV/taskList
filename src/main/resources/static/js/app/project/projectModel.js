@@ -1,3 +1,4 @@
+/*
 
 function Project(dataStorage){
     BaseEntity.apply(this, arguments);
@@ -18,3 +19,4 @@ function ProjectList(dataStorage){
     BaseEntityList.apply(this, arguments);
     this._entityName = 'project';
 }
+*/

@@ -1,10 +1,11 @@
 package com.approom.tasklist.app.domain.user;
 
-import com.approom.tasklist.app.domain.user.role.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.approom.tasklist.app.domain.BaseEntity;
-import com.approom.tasklist.app.domain.task.Task;
+import com.approom.tasklist.app.domain.user.role.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -14,17 +15,20 @@ import java.util.Set;
 @Component
 @Entity
 @Table
+
+@NoArgsConstructor
 public class User extends BaseEntity<Integer> {
 
     @JsonProperty
-    @ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     @JoinTable(
             name="user_roles",
             joinColumns = @JoinColumn( name="user_id"),
             inverseJoinColumns = @JoinColumn( name="role_id")
     )
-    private Set<Role> role = new HashSet<>();
+    private @Getter @Setter Set<Role> role = new HashSet<>();
 
+/*
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name="task_executor_detail",
@@ -33,75 +37,26 @@ public class User extends BaseEntity<Integer> {
     )
     @JsonIgnore
     private Set<Task> tasks = new HashSet<>();
+*/
 
     @Column
     @JsonProperty
-    private String username;
+    private @Getter @Setter String username;
     @Column
     @JsonProperty
-    private String password;
+    private @Getter @Setter String password;
     @Column(name = "mailadress")
     @JsonProperty
-    private String mailAddress;
+    private @Getter @Setter String mailAddress;
     @Column
     @JsonProperty
-    private Boolean enabled;
-
-    public User() {
-        super();
-    }
+    private @Getter @Setter Boolean enabled;
 
     public User(String username, String password) {
         super();
 
         this.username = username;
         this.password = password;
-    }
-
-    public String getName() {
-        return username;
-    }
-
-    public void setName(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getMailAddress() {
-        return mailAddress;
-    }
-
-    public void setMailAddress(String mailAddress) {
-        this.mailAddress = mailAddress;
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public Set<Role> getRole() {
-        return role;
-    }
-    public void setRole(Set<Role> role) {
-        this.role = role;
-    }
-
-    public Set<Task> getTasks(){
-        return  this.tasks;
-    }
-    public void setTasks(Set<Task> tasks){
-        this.tasks = tasks;
     }
 
     public boolean addRole(Role role){
@@ -119,13 +74,10 @@ public class User extends BaseEntity<Integer> {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
 
-        User user = (User) o;
+        User entity = (User) o;
 
-        if (user.getId() != id) {
-            return false;
-        }
+        return entity.getId() == id;
 
-        return true;
     }
 
     @Override

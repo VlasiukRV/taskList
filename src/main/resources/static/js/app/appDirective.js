@@ -84,7 +84,7 @@ function directiveMenuItem($compile){
         },
         link: function(scope, element, attrs){
             if (scope.command.dropdownMenu) {
-                var e =$compile("<menu-collection command = 'command' menu-collection='command.list'></menu-collection>")(scope);
+                var e =$compile("<menu-collection command = 'command' menu-collection='command.commandList'></menu-collection>")(scope);
                 element.replaceWith(e);
             }
         },

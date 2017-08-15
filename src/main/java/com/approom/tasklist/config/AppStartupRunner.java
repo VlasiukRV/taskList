@@ -25,6 +25,7 @@ public class AppStartupRunner implements ApplicationRunner {
 
         logger.info("Init data base");
         jdbcService.initDataBase();
+
     }
 
 }

@@ -1,3 +1,4 @@
+/*
 
 function Task(dataStorage){
     BaseEntity.apply(this, arguments);
@@ -48,3 +49,4 @@ function TaskList(dataStorage){
     BaseEntityList.apply(this, arguments);
     this._entityName = 'task';
 }
+*/

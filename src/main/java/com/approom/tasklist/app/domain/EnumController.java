@@ -16,7 +16,7 @@ public class EnumController {
     public Map<String, Object> getEnumValues(@PathVariable("entityId")String enumName){
 
         Enum[] enumValues = null;
-        if (enumName.equals("TaskState")){
+        if (enumName.equals("taskState")){
             enumValues = TaskState.values();
         }
 

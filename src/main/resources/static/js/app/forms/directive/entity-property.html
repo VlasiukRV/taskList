@@ -1,16 +1,17 @@
 <div class="col-lg-6" class="input-group input-group-sm">
 
-    <label>{{property.label}}:</label>
-
     <div ng-switch on="property.inputType">
 
         <!--enum-->
         <div ng-switch-when="enum">
 
+            <label>{{property.label}}:</label>
+
             <div class="input-group">
 
                 <select class="form-control"
                         ng-model="entity[property.name]"
+                        ng-disabled="{{!property.availability}}"
                         ng-options="el for el in selectList"
                         ng-change="propertyChanged()"
                         title="{{property.label}}">
@@ -38,10 +39,13 @@
         <!--select-->
         <div ng-switch-when="select">
 
+            <label>{{property.label}}:</label>
+
             <div class="input-group">
 
                 <select class="form-control"
                         ng-model="entity[property.name]"
+                        ng-disabled="{{!property.availability}}"
                         ng-options="el.representation for el in selectList track by el.id"
                         ng-change="propertyChanged()"
                         title="{{property.label}}">
@@ -68,10 +72,13 @@
 
         <div ng-switch-when="multiselect">
 
+            <label>{{property.label}}:</label>
+
             <div class="input-group">
 
                 <oi-select
                            ng-model="entity[property.name]"
+                           ng-disabled="{{!property.availability}}"
                            oi-options="el.representation for el in selectList track by el.id"
                            multiple
                            placeholder="Select"
@@ -98,24 +105,41 @@
 
         <!--date-->
         <div ng-switch-when="date">
+
+            <label>{{property.label}}:</label>
+
             <input
                     type="date"
                     sm-datepicker
                     ng-model="entity[property.name]"
+                    ng-disabled="{{!property.availability}}"
                     class="date form-control"/>
+        </div>
+
+        <!--checkbox-->
+        <div ng-switch-when="checkbox">
+            <input
+                    type="checkbox"
+                    ng-model="entity[property.name]"
+                    ng-disabled="{{!property.availability}}"
+                    class="date form-control"/>
+            <label>{{property.label}}:</label>
         </div>
 
         <!--textarea-->
         <div ng-switch-when="textarea">
+            <label>{{property.label}}:</label>
                 <textarea
                         rows="10" cols="35"
                         ng-model="entity[property.name]"
+                        ng-disabled="{{!property.availability}}"
                         class="date form-control"/>
-            </textarea>
+                </textarea>
         </div>
 
         <!--default-->
         <div ng-switch-default>
+            <label>{{property.label}}:</label>
             <input
                     type="{{property.inputType}}"
                     ng-model="entity[property.name]"
