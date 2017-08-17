@@ -1,501 +1,1103 @@
 
+////////////////////////////////////
+// app SERVICEs
+////////////////////////////////////
+
+function dataStorage() {
+
+    var appMetadataSet = null;
+
+    var currentUser = null;
+    var currentRole = null;
+    var currentProject = null
+    var currentTask = null;
+
+    return {
+
+        getAppMetadaSet: function(){
+            return appMetadataSet;
+        },
+        setAppMetadataSet: function(metadataSet){
+            appMetadataSet = metadataSet;
+        },
+
+        setCurrentUser: function (_data) {
+            currentUser = _data;
+        },
+        getCurrentUser: function () {
+            if (currentUser == null) {
+                currentUser = this.getNewEntityByName('user');
+            }
+            return currentUser;
+        },
+        setCurrentRole: function (_data) {
+            currentRole = _data;
+        },
+        getCurrentRole: function () {
+            if (currentRole == null) {
+                currentRole = this.getNewEntityByName('role');
+            }
+            return currentRole;
+        },
+        setCurrentProject: function (_data) {
+            currentProject = _data;
+        },
+        getCurrentProject: function () {
+            if (currentProject == null) {
+                currentProject = this.getNewEntityByName('project');
+            }
+            return currentProject;
+        },
+        setCurrentTask: function (_data) {
+            currentTask = _data;
+        },
+        getCurrentTask: function () {
+            if (currentTask == null) {
+                currentTask = this.getNewEntityByName('task');
+            }
+            return currentTask;
+        },
+
+        setCurrentEntityByName: function (entityName, _date) {
+            switch (entityName) {
+                case 'user':
+                    currentUser = _date;
+                    break;
+                case 'role':
+                    currentRole = _date;
+                    break;
+                case 'project':
+                    currentProject = _date;
+                    break;
+                case 'task':
+                    currentTask = _date;
+                    break;
+                default:
+                    return undefined;
+            }
+        },
+        getCurrentEntityByName: function (entityName) {
+            switch (entityName) {
+                case 'user':
+                    return this.getCurrentUser();
+                    break;
+                case 'role':
+                    return this.getCurrentRole();
+                    break;
+                case 'project':
+                    return this.getCurrentProject();
+                    break;
+                case 'task':
+                    return this.getCurrentTask();
+                    break;
+                default:
+                    return undefined;
+            }
+        },
+        getNewEntityByName: function (entityName) {
+            this.getNewEntityByName(entityName)
+        }
+    };
+}
+
+function getAppHttpUrl($location, urlSufix){
+    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
+
+    return appAddress + urlSufix;
+}
+
 function getMetadataSet(resourceService) {
 
-    appORMModule.resourceService = resourceService;
-    var appMetadataSet = new appORMModule.MetadataSet();
+    appModel.resourceService = resourceService;
+    var appMetadataSet = new appModel.MetadataSet();
 
-    // EditBar
-    var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model");
-    var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
-        .addCommand(appInterface.getNewCommand("initDataBase",          "initDataBase",         function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")}))
-        .addCommand(appInterface.getNewCommand("runArchiveService",     "runArchiveService",    function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")}))
-        .addCommand(appInterface.getNewCommand("stopArchiveService",    "stopArchiveService",   function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")}))
-        .addCommand(appInterface.getNewCommand("sendMail",              "sendMail",             function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")}))
-        .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor",function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")}));
+    appInitialization
+        .setMetadataSet(appMetadataSet)
+
+        .InitEnumsModel()
+
+        .InitUserModel()
+        .InitProjectModel()
+        .InitTaskModel()
+        
+        .initMetadataSet();
     
-    var interface = new appInterface.Interface();
-    appMetadataSet.interface = interface;
-    interface
-        .commandBarSetMainUrl("#/task")
-        .commandBar.commandBar
-        .addCommand(menuModel)
-        .addCommand(menuSystem);
-
-    // enums
-
-    var EnumTaskState = new appORMModule.Enum;
-    var metadataEnumSpecification_TaskState = {
-        enumClass: EnumTaskState,
-        metadataName: "taskState"
-    };
-
-    // entities
-
-    var Task = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_Task = {
-        entityClass: Task,
-        fnGetEntityInstance: function () {
-            return new Task()
-        },
-        metadataName: "task",
-        metadataRepresentation: "Task",
-        metadataDescription: "Task list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                date: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "date",
-                        label: "date",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                title: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "title",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                author: {
-                    value: {},
-                    fieldDescription: {
-                        inputType: "select",
-                        label: "author",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("user");
-                        }
-                    }
-                },
-                executor: {
-                    value: [],
-                    fieldDescription: {
-                        inputType: "multiselect",
-                        label: "executor",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("user");
-                        }
-                    }
-                },
-                project: {
-                    value: {},
-                    fieldDescription: {
-                        inputType: "select",
-                        label: "project",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("project")
-                        }
-                    }
-                },
-                state: {
-                    value: "TODO",
-                    fieldDescription: {
-                        inputType: "enum",
-                        label: "state",
-                        availability: true,
-                        entityListService: function(){
-                            return appMetadataSet.getEntityList("taskState")
-                        }
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.date + " /" + this.title + "/ (" + this.description + ") ";
-                    }
-                }
-
-            }
-        }
-    };
-    metadataEntitySpecification_Task.entityField.entityField.executor.value.representationList = function() {
-        var str = "";
-        var k=0;
-        while (true) {
-            if(k == this.length){
-                break;
-            }
-            str = str+"; "+this[k].representation;
-            k = k+1;
-
-        }
-        return str;
-    };
-    metadataEntitySpecification_Task.entityField.entityField.executor.value.fillByTemplate = function(template) {
-        this.length=0;
-        var k=0;
-        while (true) {
-            if(k == template.length){
-                break;
-            }
-            var entity = appMetadataSet.getEntityInstance("user");
-            appUtils.fillValuesProperty(template[k], entity);
-            this.push(entity);
-            k = k+1;
-        }
-    };
-
-    var User = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_User = {
-        entityClass: User,
-        fnGetEntityInstance: function () {
-            return new User()
-        },
-        metadataName: "user",
-        metadataRepresentation: "User",
-        metadataDescription: "User list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                username: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "username",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                password: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "password",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                mailAddress: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "mailAddress",
-                        availability: true,
-                        entityListService: null
-                    }
-                },
-                role: {
-                    value: [],
-                    fieldDescription: {
-                        inputType: "multiselect",
-                        label: "role",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("role");
-                        }
-                    }
-                },
-                enabled: {
-                    value: false,
-                    fieldDescription: {
-                        inputType: "checkbox",
-                        label: "enabled",
-                        availability: false,
-                        entityListService: null
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.username + " (" + this.description + ") ";
-                    }
-                }
-
-            }
-        }
-    };
-    metadataEntitySpecification_User.entityField.entityField.role.value.representationList = function() {
-        var str = "";
-        var k=0;
-        while (true) {
-            if(k == this.length){
-                break;
-            }
-            str = str+"; "+this[k].representation;
-            k = k+1;
-
-        }
-        return str;
-    };
-    metadataEntitySpecification_User.entityField.entityField.role.value.fillByTemplate = function(template) {
-        this.length=0;
-        var k=0;
-        while (true) {
-            if(k == template.length){
-                break;
-            }
-            var entity = appMetadataSet.getEntityInstance("role");
-            appUtils.fillValuesProperty(template[k], entity);
-            this.push(entity);
-            k = k+1;
-        }
-    };
-
-    var Project = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_Project = {
-        entityClass: Project,
-        fnGetEntityInstance: function () {
-            return new Project()
-        },
-        metadataName: "project",
-        metadataRepresentation: "Project",
-        metadataDescription: "Project list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                // entity field
-                name: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "name",
-                        availability: true,
-                        entityListService: null
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.name;
-                    }
-                }
-
-            }
-        }
-    };
-
-    var Role = appUtils.Class(appORMModule.Entity);
-    var metadataEntitySpecification_Role = {
-        entityClass: Role,
-        fnGetEntityInstance: function () {
-            return new Role()
-        },
-        metadataName: "role",
-        metadataRepresentation: "Role",
-        metadataDescription: "Role list",
-        entityField: {
-            objectField: {},
-            entityField: {
-
-                // entity field
-                role: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "role",
-                        availability: true,
-                        entityListService: null
-                    }
-                }
-
-            },
-            defineField: {
-
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.role;
-                    }
-                }
-
-            }
-        }
-    };
-
-    appMetadataSet
-        .installMetadataObjectEntity(metadataEntitySpecification_Task)
-        .installMetadataObjectEntity(metadataEntitySpecification_User)
-        .installMetadataObjectEntity(metadataEntitySpecification_Project)
-        .installMetadataObjectEntity(metadataEntitySpecification_Role)
-
-        .installMetadataObjectEnum(metadataEnumSpecification_TaskState);
-
     return appMetadataSet;
 }
 
-function ListEntityController($scope, dataStorage){
-    this.appMetadataSet = dataStorage.getAppMetadaSet();
+var appInitialization = Object.create(null);
+(function(){
+    appInitialization.metadataSet = undefined;
 
-    this.initController = function(){
-        $scope.$parent.openListForm = this.openListForm;
-        $scope.$parent.closeListForm = this.closeListForm;
-
-        var metadataSpecification = this.appMetadataSet.getEntityList(this.metadataName);
-        var entityListForm = new EntityListForm();
-
-        entityListForm.metadataName = this.metadataName;
-        entityListForm.appMetadataSet = this.appMetadataSet;
-        entityListForm.metadataSpecification = metadataSpecification;
-        entityListForm.editFormName = metadataSpecification.metadataObject.description;
-        entityListForm.formProperties = metadataSpecification.metadataObject.fmListForm.metadataEditFieldsSet;
-        entityListForm.entities = metadataSpecification.list;
-
-        entityListForm.eventCloseForm = this.closeListForm;
-        entityListForm.eventUpdateForm = this.updateForm;
-        entityListForm.eventAddNewEntity = this.addNewEntity;
-        entityListForm.eventEditEntity = this.editEntity;
-        entityListForm.eventDeleteEntity = this.deleteEntity;
-
-        entityListForm.openEditForm = this.openEditForm;
-        entityListForm.updateViewEntityList = this.updateViewEntityList;
-        entityListForm.closeListForm = this.closeListForm;
-
-        $scope.entityListForm = entityListForm;
-
-        this.updateForm();
+    appInitialization.metadataSpecifications = {
+        enums: [],
+        entities: []
     };
 
-    this.addNewEntity = function(){
-        this.openEditForm(this.appMetadataSet.getEntityList(this.metadataName).metadataObject.getEntityInstance())
+    appInitialization.setMetadataSet = function(metadataSet){
+        appInitialization.metadataSet = metadataSet;
+        
+        return appInitialization;
     };
+    appInitialization.initMetadataSet = function(){
+        var appMetadataSet = appInitialization.metadataSet;
+        
+        // EditBar
+        var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model");
+        var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
+            .addCommand(appInterface.getNewCommand("initDataBase",          "initDataBase",         function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")}))
+            .addCommand(appInterface.getNewCommand("runArchiveService",     "runArchiveService",    function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")}))
+            .addCommand(appInterface.getNewCommand("stopArchiveService",    "stopArchiveService",   function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")}))
+            .addCommand(appInterface.getNewCommand("sendMail",              "sendMail",             function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")}))
+            .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor",function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")}));
 
-    this.editEntity = function(id){
-        var entity = this.appMetadataSet.getEntityList(this.metadataName).findEntityById(id);
-        if(entity != undefined){
-            var editEntity = this.appMetadataSet.getEntityList(this.metadataName).metadataObject.getEntityInstance();
-            appUtils.fillValuesProperty(entity, editEntity);
-            this.openEditForm(editEntity);
+        var interface = new appInterface.Interface();
+        interface.appMetadataSet = appMetadataSet;
+        interface
+            .commandBarSetMainUrl("#/task")
+            .commandBar.commandBar
+            .addCommand(menuModel)
+            .addCommand(menuSystem);
+
+        appMetadataSet.interface = interface;
+        for(var i=0; i < appInitialization.metadataSpecifications.enums.length; i++){
+            appMetadataSet.installMetadataObjectEnum(appInitialization.metadataSpecifications.enums[i]);
         }
-    };
+        for(var i=0; i < appInitialization.metadataSpecifications.entities.length; i++){
+            appMetadataSet.installMetadataObjectEntity(appInitialization.metadataSpecifications.entities[i]);
+        }
+        return appInitialization;
+    }
+    
+})(appInitialization)
 
-    this.deleteEntity = function(id){
-        this.appMetadataSet.getEntityList(this.metadataName).deleteEntity(id, function(data){
-            this.updateViewEntityList();
+var appInterface = Object.create(null);
+(function (appInterface){
+
+    var Principal = appUtils.Class();
+    (function () {
+        Principal.prototype.$_buildObject = function () {
+            this.includeFd({
+                authenticated: false,
+                name: 'NO_Authentication',
+                sessionId: null,
+                authorities: [],
+                currentUserId: 0,
+                currentUser: {}
+            })
+        };
+        var setNotAuthenticated = function (currentPrincipal) {
+            currentPrincipal.authenticated = false;
+            currentPrincipal.name = 'NO_Authentication';
+            currentPrincipal.sessionId = null;
+            currentPrincipal.authorities = [];
+            currentPrincipal.currentUserId = 0;
+            currentPrincipal.currentUser = {};
+        };
+        var authenticate = function ($http, credentials, callback) {
+
+            var principal = undefined;
+            var headers = credentials ? {
+                authorization: "Basic "
+                + btoa(credentials.username + ":"
+                + credentials.password)
+            } : {};
+
+            $http.get('/service/authenticate', {
+                headers: headers
+            })
+                .then(function (response) {
+                    if (response.data.status == 200) {
+                        var principal = response.data.data;
+                    }
+                    callback && callback({authenticated: true, principal: principal});
+                }, function () {
+                    callback && callback({authenticated: false, principal: principal});
+                }
+            );
+        };
+        Principal.includeMthd({
+            logout: function ($http) {
+                var self = this;
+                $http.post('\logout', {}).finally(function () {
+                    self.authenticated = false;
+                    setNotAuthenticated(self);
+                });
+            },
+            login: function ($http, credentials, callback) {
+                var self = this;
+                authenticate($http, credentials, function (data) {
+                    if (data.authenticated) {
+                        console.log("Login succeeded");
+                        credentials.error = false;
+                    } else {
+                        console.log("Login failed");
+                        credentials.error = true;
+                    }
+                    self.setAuthenticated(data.principal);
+                    callback && callback(self);
+                })
+            },
+            getSessionInformation: function (resourceService, $cookies) {
+                var securityService = resourceService.getSecurityService();
+
+                var currentPrincipal = this;
+                securityService.getSessionInformation({}, {}, function (response) {
+                    if (response.status == 200) {
+                        var data = response.data;
+                        currentPrincipal.setAuthenticated(data);
+                    }
+                })
+            },
+            updatePrincipalUser: function(appMetadataSet){
+                var self = this;
+                appMetadataSet.metadataEvents.publish("ev:entityList:" +"user"+ ":update", function(){
+                    var entityList = appMetadataSet.getEntityList("user");
+                    if(entityList){
+                        self.currentUser = entityList.findEntityById(self.currentUserId);
+                    }
+                });
+            },
+            setAuthenticated: function (data) {
+                setNotAuthenticated(self);
+                if (data != undefined) {
+                    this.authenticated = true;
+                    this.name = data.userName;
+                    this.sessionId = data.sessionId;
+                    this.authorities = data.authorities;
+                    this.currentUserId = data.currentUserId;
+                }
+            }
         });
-    };
+    })();
 
-    this.updateViewEntityList = function(){
-        this.appMetadataSet.metadataEvents.publish("ev:entityList:" +this.metadataName+ ":update");
-    };
+    var ErrorDescription = appUtils.Class();
+    (function () {
+        ErrorDescription.prototype.$_buildObject = function () {
+            this.includeFd({
+                error: false,
+                status: 0,
+                statusText: "",
+                type: 'success'
+            })
+        };
+        ErrorDescription.includeMthd({
+            SetHTTPError: function (statusText, status) {
+                this.error = true;
+                this.status = status;
+                this.statusText = "HTTP error: " + statusText;
+            },
+            SetNoError: function () {
+                this.error = false;
+                this.status = 200;
+                this.statusText = "";
+            },
+            SetAppError: function (statusText) {
+                this.error = true;
+                this.status = 0;
+                this.statusText = "App error: " + statusText;
+            }
+        });
+    })();
 
-    this.openEditForm = function(currentEntity){
-        dataStorage.setCurrentEntityByName(this.metadataName, currentEntity);
-        this.closeListForm();
-    };
-
-    this.closeListForm = function(){
-        $scope.$parent.showListForm = false;
-        $scope.$parent.openEditForm();
-    };
-
-    this.openListForm = function(){
-        $scope.$parent.showListForm = true;
-    };
-
-    this.updateForm = function(){
-        this.updateViewEntityList();
-    };
-
-}
-
-function EditEntityController($scope, dataStorage){
-    this.appMetadataSet = dataStorage.getAppMetadaSet();
-    this.currentEntity = dataStorage.getCurrentEntityByName(this.metadataName);
-
-    this.initController = function(){
-        $scope.$parent.openEditForm = this.openEditForm;
-        $scope.$parent.closeEditForm = this.closeEditForm;
-
-        var metadataSpecification = this.appMetadataSet.getEntityList(this.metadataName);
-
-        var entityEditForm = new EntityEditForm();
-        entityEditForm.metadataName = this.metadataName;
-        entityEditForm.appMetadataSet = this.appMetadataSet;
-        entityEditForm.metadataSpecification = metadataSpecification;
-        entityEditForm.editFormName = "New " +this.metadataName+ ":";
-        entityEditForm.formProperties = metadataSpecification.metadataObject.fmEditForm.metadataEditFieldsSet;
-
-        entityEditForm.eventCloseForm = this.closeEditForm;
-        entityEditForm.eventUpdateForm = this.updateForm;
-        entityEditForm.eventCreateEntity = this.createEntity;
-
-        entityEditForm.openEditForm = this.openEditForm;
-        entityEditForm.closeEditForm = this.closeEditForm;
-        entityEditForm.updateForm = this.updateForm;
-        entityEditForm.createEntity = this.createEntity;
-
-        $scope.entityEditForm = entityEditForm;
-    };
-
-    this.updateForm = function(){
-        this.currentEntity = dataStorage.getCurrentEntityByName(this.metadataName);
-    };
-
-    this.createEntity = function(template){
-        var entityList = this.appMetadataSet.getEntityList(this.metadataName);
-        var self = this;
-        entityList.addEntityByTemplate(template, function(){
-            self.appMetadataSet.metadataEvents.publish("ev:entityList:" +self.metadataName+ ":update", function(){
-                self.closeEditForm();
+    var ErrorDescriptions = appUtils.Class();
+    (function () {
+        ErrorDescriptions.prototype.$_buildObject = function () {
+            this.includeFd({
+                errorDescriptions: [],
+                show: false
             });
+        };
+        ErrorDescriptions.includeMthd({
+            handleResponse: function (response) {
+                var errorDescription = new ErrorDescription();
+                errorDescription.SetNoError();
+                if (response.status = 200) {
+                    var objectResponse = response.data;
+                    /*
+                     if (!(response.data instanceof Object)){
+                     objectResponse=eval("("+response.data+")");
+                     }
+                     */
+                    if (objectResponse instanceof Object) {
+                        if ("message" in objectResponse && "status" in objectResponse) { //ToDo
+                            if (response.data.status != 200) {
+                                errorDescription.SetAppError(objectResponse.message);
+                            }
+                        }
+                    }
+                } else {
+                    errorDescription.SetHTTPError(response.statusText, response.status);
+                }
+                if (errorDescription.error) {
+                    this.addErrorDescription(errorDescription);
+                    this.show = true;
+                }
+            },
+            addErrorDescription: function (_data) {
+                this.errorDescriptions.push(_data);
+            },
+            delErrorDescription: function (index) {
+                this.errorDescriptions.splice(index, 1);
+            },
+            getErrorDescriptions: function () {
+                return this.errorDescriptions;
+            },
+            errorsCount: function () {
+                return this.errorDescriptions.length;
+            }
         });
+    })();
+
+    var EditForm = appUtils.Class();
+    (function () {
+        EditForm.prototype.$_buildObject = function () {
+            this.includeFd({
+                editFormName: "<--label for form-->",
+                formProperties: {},
+
+                eventCloseForm: function () {
+                },
+                eventUpdateForm: function () {
+                }
+            });
+        };
+    })();
+
+    var EntityEditForm = appUtils.Class(EditForm);
+    (function () {
+        EntityEditForm.prototype.$_buildObject = function () {
+            this.includeFd({
+                currentEntity: {},
+
+                eventCreateEntity: function () {
+                }
+            });
+        };
+    })();
+
+    var EntityListForm = appUtils.Class(EditForm);
+    (function () {
+        EntityListForm.prototype.$_buildObject = function () {
+            this.includeFd({
+                entities: [],
+
+                eventAddNewEntity: function () {
+                },
+                eventDeleteEntity: function (id) {
+                },
+                eventEditEntity: function (id) {
+                }
+            });
+        };
+    })();
+
+    var MenuCommand = appUtils.Class();
+    (function(){
+        MenuCommand.prototype.$_buildObject = function(){
+            this.includeFd({
+                commandName: "",
+
+                dropdownMenu: false,
+                text: "",
+                command: null,
+                commandList: []
+            })
+        };
+        MenuCommand.includeMthd({
+            addCommand: function(command){
+                this.commandList.push(command);
+                return this;
+            },
+            getSubMenu: function(commandName){
+                for (var i = 0; i < this.commandList.length; i++) {
+                    var currentCommand = this.commandList[i];
+                    if (currentCommand.commandName === commandName){
+                        return currentCommand;
+                    }
+                    if(currentCommand.commandList.length > 0){
+                        return currentCommand.getSubMenu(commandName);
+                    }
+                }
+                return undefined;
+            }
+        });
+
+    }());
+
+    var Interface = appUtils.Class();
+    (function () {
+        Interface.prototype.$_buildObject = function () {
+            this.includeFd({
+                security: {
+                    principal: new Principal()
+                },
+                errorDescriptions: new ErrorDescriptions(),
+                commandBar: {
+                    mainUrl: '#',
+                    commandBar: new MenuCommand()
+                },
+                appMetadataSet: null
+            });
+        };
+        Interface.includeMthd({
+            commandBarSetMainUrl: function (mainUrl) {
+                this.commandBar.mainUrl = mainUrl;
+                return this;
+            },
+            commandBarAddCommand: function (command) {
+                this.commandBar.commandList.push(command);
+                return this;
+            },
+            editFormGetEntityEditForm: function () {
+                return new EntityEditForm();
+            },
+            editFormGetEntityListForm: function () {
+                return new EntityListForm();
+            }
+        })
+    }());
+
+    appInterface.Interface = Interface;
+    appInterface.getNewEntityCommand = function(commandName, text){
+        var command = new MenuCommand();
+        command.dropdownMenu = false;
+        command.commandName = commandName;
+        command.text = text;
+        command.command = commandName;
+
+        return command;
+    };
+    appInterface.getNewDropdownCommand = function(commandName, text){
+        var command = new MenuCommand();
+        command.dropdownMenu = true;
+        command.commandName = commandName;
+        command.text = text;
+        return command;
+    };
+    appInterface.getNewCommand = function(commandName, text, functionCommand){
+        var command = new MenuCommand();
+        command.dropdownMenu = false;
+        command.commandName = commandName;
+        command.text = text;
+        command.command = functionCommand;
+
+        return command;
     };
 
-    this.openEditForm = function(){
-        $scope.$parent.showEditForm = true;
-    };
+}(appInterface));
 
-    this.closeEditForm = function(){
-        $scope.$parent.showEditForm = false;
-        $scope.$parent.openListForm();
-    };
+var appModel = Object.create(null);
+(function (appModel, appInterface) {
+    appModel.resourceService = undefined;
 
-}
+    var MetadataEvents = appUtils.Class();
+    (function (){
+        MetadataEvents.prototype.$_buildObject = function () {
+            this.includeFd({
+                events: $({})
+            });
+        };
+        MetadataEvents.includeMthd({
+            subscribe: function(){
+                this.events.bind.apply(this.events, arguments);
+            },
+            unSubscribe: function(){
+                this.events.unbind.apply(this.events, arguments);
+            },
+            publish: function(){
+                this.events.trigger.apply(this.events, arguments);
+            }
+        });
+    })();
+    var metadataEventsImpl = new MetadataEvents();
+
+    var Entity = appUtils.Class();
+    (function () {
+        Entity.prototype.includeEntityFd = function (fd, entityFd, defineFd) {
+            var strEntityFd = "";
+            this.includeFd({entityFd: ""});
+            if (fd) {
+                this.includeFd(fd);
+            }
+            if (entityFd) {
+                this.includeFd(entityFd);
+                for (var key in entityFd) {
+                    strEntityFd = "" + strEntityFd + ", " + key;
+                }
+                if (strEntityFd.length > 0) strEntityFd = strEntityFd.slice(2);
+                this.includeFd({entityFd: strEntityFd});
+            }
+            if (defineFd) {
+                for (var key in defineFd) {
+                    this.includeDefineFd(key, defineFd[key])
+                }
+            }
+        };
+
+        Entity.prototype.$_buildObject = function () {
+            this.includeEntityFd(
+                {
+                    // object field
+                    metadataName: ""
+                }, {
+                    // entity field
+                    id: null,
+                    description: ""
+                }, {
+                    // define field
+                    representation: {
+                        enumerable: true,
+                        get: function () {
+                            if (this.name) {
+                                return "" + this.name;
+                            } else {
+                                return "entity [" + this.metadataName + "] id: " + this.id + "";
+                            }
+                        }
+                    }
+                }
+            );
+
+        };
+
+        Entity.includeMthd({
+            isEmpty: function () {
+                // ToDo write what attribute of empty entity
+                return this.id == 0 || this.id == null;
+            },
+
+            translateToEntityJSON: function () {
+                var replacer = this.entityFd.split(", ");
+                return JSON.stringify(this, replacer);
+            },
+
+            createEntity: function (fCallBack) {
+                if (!this.metadataName) {
+
+                }
+                var entityJSON = this.translateToEntityJSON();
+                appModel.resourceService.getEntityEditService().createEntity(
+                    {entityName: this.metadataName}, entityJSON,
+                    baseCreateEntity.bind(this, fCallBack),
+                    function (httpResponse) {
+                        /*resourceService.collError(httpResponse)*/
+                    }
+                )
+            }
+
+        });
+        var baseCreateEntity = function () {
+            var fCallBack = arguments[0];
+            var data = arguments[1];
+
+            if (data.result = 200) {
+                var originalEntity = data.data;
+                if (originalEntity) {
+                    appUtils.fillValuesProperty(originalEntity, this);
+                    fCallBack(this);
+                }
+            }
+        };
+    })();
+
+    var EntityList = appUtils.Class();
+    (function () {
+        EntityList.prototype.$_buildObject = function () {
+            this.includeFd(
+                {
+                    metadataName: "",
+                    list: [],
+                    metadataObject: null
+                });
+        };
+        var updateEnt = function (fCallBack, data) {
+            /*
+             var fCallBack = arguments[0];
+             var data = arguments[1];
+             */
+
+            if (data.result = 200) {
+                var originalUserList = data.data;
+                if (originalUserList) {
+                    originalUserList.forEach(function (item, i, arr) {
+                        var entity = this.metadataObject.getEntityInstance();
+                        appUtils.fillValuesProperty(item, entity);
+                        this.addEntity(entity);
+                    }, this);
+                }
+            }
+
+            if(fCallBack) {
+                fCallBack(this);
+            }
+        };
+
+        var deleteEnt = function () {
+            var id = arguments[0];
+            var fCallBack = arguments[1];
+            var data = arguments[2];
+
+            if (data.result = 200) {
+                this.list.forEach(function (item, i) {
+                    if (item.id == id) {
+                        this.list.splice(i, 1);
+                        return true;
+                    }
+                }, this);
+            }
+
+            if(fCallBack) {
+                fCallBack(this);
+            }
+        };
+
+        EntityList.includeMthd({
+            addEntity: function (entity) {
+                var entityAdded = false;
+                for (var index = 0; index < this.list.length; ++index) {
+                    var item = this.list[index];
+                    if (item.id === entity.id) {
+                        this.list[index] = entity;
+                        entityAdded = true;
+                        return;
+                    }
+                }
+                if (!entityAdded) {
+                    this.list.push(entity);
+                }
+            },
+            findEntityById: function (id) {
+                for (var index = 0; index < this.list.length; ++index) {
+                    var item = this.list[index];
+                    if (item.id === id) {
+                        return item;
+                    }
+                }
+                return undefined;
+            },
+            addEntityByTemplate: function (template, fCallBack) {
+                var entity = null;
+                if (template.isEmpty()) {
+                    entity = this.metadataObject.getEntityInstance(this.metadataName);
+                } else {
+                    entity = this.findEntityById(template.id);
+                }
+
+                var entityList = this;
+                appUtils.fillValuesProperty(template, entity);
+                entity.createEntity(function (data) {
+                    entityList.addEntity(data);
+                    fCallBack();
+                });
+            },
+            update: function (fCallBack) {
+                var self = this;
+                self.list = [];
+                appModel.resourceService.getEntityEditService()
+                    .getEntity({entityName: this.metadataName}, {},
+                    function (data){
+                        updateEnt.call(self, fCallBack, data)
+                    },
+                    function (httpResponse) {
+                        /*resourceService.collError(httpResponse)*/
+                    }
+                );
+            },
+            deleteEntity: function (id, fCallBack) {
+                appModel.resourceService.getEntityEditService()
+                    .deleteEntity({entityName: this.metadataName, entityId: id}, {},
+                    deleteEnt.bind(this, id, fCallBack),
+                    function (httpResponse) {
+                        /*resourceService.collError(httpResponse)*/
+                    }
+                )
+            }
+
+        })
+    })();
+
+    var Enum = appUtils.Class();
+    (function () {
+        Enum.prototype.$_buildObject = function () {
+            this.includeFd(
+                {
+                    metadataName: "",
+                    list: {}
+                });
+        };
+
+        Enum.includeMthd({
+            update: function () {
+                var source = this;
+                appModel.resourceService.getEntityEditService()
+                    .getEntity({entityName: "enum", entityId: this.metadataName}, {},
+                    function (data) {
+                        source.list = data.data;
+                    },
+                    function (httpResponse) {
+                        /*resourceService.collError(httpResponse)*/
+                    }
+                );
+            }
+        });
+
+    })();
+
+    var MetadataEditField = appUtils.Class();
+    (function () {
+        MetadataEditField.prototype.$_buildObject = function () {
+            this.includeFd({
+                name: "",
+                inputType: "text",
+                label: "<--label for property-->",
+
+                entityListService: {},
+
+                availability: true,
+
+                visibility: true,
+                availabilityInEditForm: true,
+                visibilityInEditForm: true,
+                availabilityInListForm: true,
+                visibilityInListForm: true
+            })
+        };
+        MetadataEditField.includeMthd({
+            buildEditField: function (fieldDescription, name) {
+                if (name) {
+                    this.name = name;
+                } else {
+                    if (fieldDescription.name) {
+                        this.name = fieldDescription.name;
+                    }
+                }
+                if (fieldDescription.inputType) {
+                    this.inputType = fieldDescription.inputType;
+                }
+                if (fieldDescription.label) {
+                    this.label = fieldDescription.label;
+                } else {
+                    this.label = this.name;
+                }
+                if (fieldDescription.availability) {
+                    this.availability = fieldDescription.availability;
+                }
+                if (fieldDescription.entityListService) {
+                    this.entityListService = fieldDescription.entityListService;
+                }
+            }
+        })
+    })();
+
+    var MetadataObject = appUtils.Class();
+    (function () {
+        MetadataObject.prototype.$_buildObject = function () {
+            this.includeFd({
+                metadataName: "",
+
+                representation: "",
+                description: "",
+                image: null,
+
+                metadataEditFieldsSet: [],
+                fmEditForm: {
+                    metadataEditFieldsSet: []
+                },
+                fmListForm: {
+                    metadataEditFieldsSet: [],
+                    metadataFilterFieldsSet: []
+                }
+            })
+        };
+        MetadataObject.includeMthd({
+            getEntityInstance: function () {
+                return null;
+            },
+            installMetadata: function (metadataName, fnGetEntityInstance, representation, description, image) {
+                this.metadataName = metadataName;
+                this.getEntityInstance = fnGetEntityInstance;
+
+                if (representation) {
+                    this.representation = representation;
+                }
+                if (description) {
+                    this.description = description;
+                }
+                if (image) {
+                    this.image = image;
+                }
+
+            },
+            bookEntityForms: function (_metadataEditFieldsSet, _metadataFilterFieldsSet) {
+
+                if (_metadataEditFieldsSet) {
+                    var editField = undefined;
+
+                    for (var i = 0; i < _metadataEditFieldsSet.length; i++) {
+                        editField = _metadataEditFieldsSet[i];
+
+                        if (editField.availability) {
+                            this.metadataEditFieldsSet.push(editField);
+                        }
+                    }
+
+                    for (var i = 0; i < this.metadataEditFieldsSet.length; i++) {
+                        editField = this.metadataEditFieldsSet[i];
+
+                        if (editField.availabilityInEditForm) {
+                            this.fmEditForm.metadataEditFieldsSet.push(editField);
+                        }
+                        if (editField.availabilityInListForm) {
+                            this.fmListForm.metadataEditFieldsSet.push(editField);
+                        }
+                    }
+                }
+                if (_metadataFilterFieldsSet) {
+                    for (var i = 0; i < _metadataEditFieldsSet.length; i++) {
+                        editField = _metadataEditFieldsSet[i];
+                        /*if (appUtils.find(this.fmListForm.metadataEditFieldsSet, editField) > 0) {*/
+                        this.fmListForm.metadataFilterFieldsSet.push(editField);
+                        /*}*/
+                    }
+                }
+            }
+        })
+    })();
+
+    var MetadataEntitySpecification = appUtils.Class();
+    (function () {
+        MetadataEntitySpecification.prototype.$_buildObject = function () {
+            this.includeFd({
+                metadataName: "",
+                metadataRepresentation: "",
+                metadataDescription: "",
+                entityField: {
+                    objectField: {},
+                    entityField: {},
+                    defineField: {}
+                }
+            })
+        };
+        MetadataEntitySpecification.includeMthd({
+            getObjectFields: function () {
+                var objectFields = this.entityField.objectField;
+                objectFields.metadataName = this.metadataName;
+                return objectFields;
+            },
+            getEntityFields: function () {
+                var source = this.entityField.entityField;
+                var entityFields = {};
+                for (var key in source) {
+                    if (angular.isArray(source[key].value)) {
+                        entityFields[key] = [];
+                        // ToDo
+                        if (source[key].value.fillByTemplate) {
+                            entityFields[key].fillByTemplate = source[key].value.fillByTemplate;
+                        }
+                        if (source[key].value.representationList) {
+                            entityFields[key].representationList = source[key].value.representationList;
+                            /*entityFields[key].representationList = source[key].representationList;*/
+                        }
+                    } else if (typeof source[key].value === 'object') {
+                        entityFields[key] = {};
+                    }
+                    else {
+                        entityFields[key] = source[key].value;
+                    }
+                }
+                return entityFields;
+            },
+            getEntityFieldsDescription: function () {
+                var source = this.entityField.entityField;
+                var entityFieldsDescription = [];
+                for (var key in source) {
+                    var metadataEditField = new MetadataEditField();
+                    metadataEditField.buildEditField(source[key].fieldDescription, key);
+                    entityFieldsDescription.push(metadataEditField);
+                }
+                return entityFieldsDescription;
+            }
+        });
+    })();
+
+    var MetadataSet = appUtils.Class();
+    (function () {
+        MetadataSet.prototype.$_buildObject = function () {
+            this.includeFd({
+                // entities
+                entityList: Object.create(null),
+                metadataEvents: metadataEventsImpl,
+
+                // interface
+                interface: new appInterface.Interface()
+            });
+        };
+        MetadataSet.includeMthd({
+            installMetadataObjectEnum: function(metadataEnumSpecification){
+                var EnumClass = metadataEnumSpecification.enumClass;
+                EnumClass.metadataName = metadataEnumSpecification.metadataName;
+                var metadataSet = this;
+
+                metadataSet.bookEntityList(EnumClass);
+                // event
+                metadataSet.metadataEvents.subscribe("ev:entityList:" + metadataEnumSpecification.metadataName + ":update",
+                    function (event, fCallBack) {
+                        EnumClass.update(fCallBack)
+                    }
+                );
+
+                return metadataSet;
+            },
+            installMetadataObjectEntity:function (entitySpecification) {
+                var metadataSet = this;
+                var EntityClass = entitySpecification.entityClass;
+
+                var metadataEntitySpecification = new MetadataEntitySpecification();
+                metadataEntitySpecification.metadataName = entitySpecification.metadataName;
+                metadataEntitySpecification.metadataRepresentation = entitySpecification.metadataRepresentation;
+                metadataEntitySpecification.metadataDescription = entitySpecification.metadataDescription;
+
+                appUtils.fillAllValuesProperty(entitySpecification.entityField.entityField, metadataEntitySpecification.entityField.entityField);
+                appUtils.fillAllValuesProperty(entitySpecification.entityField.objectField, metadataEntitySpecification.entityField.objectField);
+                metadataEntitySpecification.entityField.defineField = entitySpecification.entityField.defineField;
+
+                metadataEntitySpecification.entityField.entityField.id = {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "text",
+                        label: "id",
+                        availability: true,
+                        entityListService: null
+                    }
+                };
+                metadataEntitySpecification.entityField.entityField.description = {
+                    value: "",
+                    fieldDescription: {
+                        inputType: "textarea",
+                        label: "description",
+                        availability: true,
+                        entityListService: null
+                    }
+                };
+
+                (function () {
+                    // field
+                    EntityClass.prototype.$_buildObject = function () {
+                        this.includeEntityFd(
+                            metadataEntitySpecification.getObjectFields(),
+                            metadataEntitySpecification.getEntityFields(),
+                            metadataEntitySpecification.entityField.defineField
+                        );
+                    };
+                })();
+
+                var entityList = new EntityList();
+                entityList.metadataName = metadataEntitySpecification.metadataName;
+
+                var metadataObject = new MetadataObject();
+
+                metadataObject.installMetadata(metadataEntitySpecification.metadataName,
+                    entitySpecification.fnGetEntityInstance,
+                    metadataEntitySpecification.metadataRepresentation,
+                    metadataEntitySpecification.metadataDescription
+                );
+
+                var metadataEditFieldsSet = metadataEntitySpecification.getEntityFieldsDescription();
+                metadataObject.bookEntityForms(metadataEditFieldsSet);
+
+                metadataSet.bookMetadataObject(metadataObject);
+                metadataSet.bookEntityList(entityList);
+
+                // event
+                metadataEventsImpl.subscribe("ev:entityList:" +metadataEntitySpecification.metadataName+ ":update",
+                    function(event, fCallBack){
+                        entityList.update(fCallBack)
+                    }
+                );
+                metadataEventsImpl.subscribe("ev:entityList:" +metadataEntitySpecification.metadataName+ ":deleteEntity",
+                    function(event, id, fCallBack){
+                        entityList.deleteEntity(id, fCallBack);
+                    }
+                );
+
+                // EditMenu
+                var entitySubMenu = metadataSet.interface.commandBar.commandBar.getSubMenu('modelDD');
+                if(entitySubMenu != undefined){
+                    entitySubMenu.addCommand(appInterface.getNewEntityCommand(entitySpecification.metadataName, entitySpecification.metadataRepresentation))
+                }
+
+                return metadataSet;
+            },
+            getMetadataSpecification: function (metadataName) {
+                var metadataSpecification = this.entityList[metadataName];
+                if (metadataSpecification) {
+                    return metadataSpecification
+                } else {
+                    metadataSpecification = {metadataName: metadataName, metadataObject: null, entityList: null};
+                    this.entityList[metadataName] = metadataSpecification;
+                    return metadataSpecification;
+                }
+            },
+            bookMetadataObject: function (metadataObject) {
+                var metadataSpecification = this.getMetadataSpecification(metadataObject.metadataName);
+                metadataSpecification.metadataObject = metadataObject;
+            },
+            bookEntityList: function (entityList) {
+                var metadataSpecification = this.getMetadataSpecification(entityList.metadataName);
+                metadataSpecification.entityList = entityList;
+                metadataSpecification.entityList.metadataObject = metadataSpecification.metadataObject;
+            },
+            getMetadataObject: function (metadataName) {
+                if (this.entityList[metadataName]) {
+                    return this.entityList[metadataName].metadataObject;
+                } else {
+                    return undefined;
+                }
+            },
+            getEntityList: function (metadataName) {
+                if (this.entityList[metadataName]) {
+                    return this.entityList[metadataName].entityList;
+                } else {
+                    return undefined;
+                }
+            },
+            getEntityInstance: function (metadataName) {
+                var metadataSpecification = this.entityList[metadataName];
+                if (metadataSpecification) {
+                    if (metadataSpecification.metadataObject) {
+                        return metadataSpecification.metadataObject.getEntityInstance();
+                    }
+                }
+                return null;
+            },
+            getInterface: function () {
+                this.interface;
+            },
+
+            loadAllEntities: function () {
+                window.status = "Load objects...";
+                var entityName = undefined;
+                for (entityName in this.entityList) {
+                    this.metadataEvents.publish("ev:entityList:" + entityName + ":update")
+                }
+            }
+        })
+    })();
+
+    appModel.Entity = Entity;
+    appModel.Enum = Enum;
+    appModel.MetadataSet = MetadataSet;
+    
+    /*
+     appModel.MetadataObject = MetadataObject;
+     appModel.MetadataEditField = MetadataEditField;
+     */
+
+})(appModel, appInterface);
 
 ////////////////////////////////////
-// INTERFACE
-////////////////////////////////////
-
-function getMenuBar(resourceService){
-
-    var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model")
-        .addCommand(appInterface.getNewEntityCommand("task", "Task"))
-        .addCommand(appInterface.getNewEntityCommand("project", "Project"))
-        .addCommand(appInterface.getNewEntityCommand("user",    "User"))
-        .addCommand(appInterface.getNewEntityCommand("role",    "Role"));
-
-    var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
-        .addCommand(appInterface.getNewCommand("initDataBase",          "initDataBase",         function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")}))
-        .addCommand(appInterface.getNewCommand("runArchiveService",     "runArchiveService",    function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")}))
-        .addCommand(appInterface.getNewCommand("stopArchiveService",    "stopArchiveService",   function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")}))
-        .addCommand(appInterface.getNewCommand("sendMail",              "sendMail",             function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")}))
-        .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor",function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")}));
-
-    var appInt = new appInterface.Interface();
-
-    appInt.commandBarSetMainUrl("#/task")
-        .commandBar.commandBar
-        .addCommand(menuModel)
-        .addCommand(menuSystem);
-
-    return appInt.commandBar;
-
-}
-
-////////////////////////////////////
-// SERVICEs
+// angular SERVICEs
 ////////////////////////////////////
 
 function appHttpResponseInterceptor($q, $location, dataStorage){
@@ -506,13 +1108,24 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
         },
 
         'response': function (response) {
-            var errorDescription = new ErrorDescription();
+            var appMetadataSet = dataStorage.getAppMetadaSet();
+            if(appMetadataSet){
+                var errorDescriptions = appMetadataSet.interface.errorDescriptions;
+                if(errorDescriptions){
+                    errorDescriptions.handleResponse(response);
+                }
+            }
+
+/*
+            var errorDescription = new appInterface.ErrorDescription();
             errorDescription.SetNoError();
             if (response.status = 200){
                 var objectResponse = response.data;
-                /*if (!(response.data instanceof Object)){
+                */
+/*if (!(response.data instanceof Object)){
                  var objectResponse=eval("("+response.data+")");
-                 }*/
+                 }*//*
+
                 if (objectResponse instanceof Object){
                     if ("message" in objectResponse && "status" in objectResponse) { //ToDo
                         if (response.data.status != 200) {
@@ -527,13 +1140,21 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
                 var errorDescriptions = dataStorage.getErrorDescriptions();
                 errorDescriptions.addErrorDescription(errorDescription);
                 errorDescriptions.show = true;
-                /*$location.path("/error");*/
             }
+*/
             return response;
         },
 
         'responseError': function(response) {
-            var errorDescription = new ErrorDescription();
+            var appMetadataSet = dataStorage.getAppMetadaSet();
+            if(appMetadataSet){
+                var errorDescriptions = appMetadataSet.interface.errorDescriptions;
+                if(errorDescriptions) {
+                    errorDescriptions.handleResponse(response);
+                }
+            }
+/*
+            var errorDescription = new appInterface.ErrorDescription();
             errorDescription.SetNoError();
             if (response.status = 200){
                 var objectResponse = response.data;
@@ -554,24 +1175,17 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
                 var errorDescriptions = dataStorage.getErrorDescriptions();
                 errorDescriptions.addErrorDescription(errorDescription);
                 errorDescriptions.show = true;
-                /*$location.path("/error");*/
             }
+*/
             return $q.reject(response);
         }
     };
 }
 
-function getAppHttpUrl($location, urlSufix){
-    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
-
-    return appAddress + urlSufix;
-}
-
 function setRoute(routeProvider){
     routeProvider
         .when('/login', {
-            templateUrl : '/login',
-            controller: 'workPlaceController'
+            templateUrl : '/login'
         })
         .when("/user", {
             templateUrl: "/security/usersList"
@@ -586,8 +1200,7 @@ function setRoute(routeProvider){
             templateUrl: "/tasksList"
         })
         .when("/currentPrincipalInformation", {
-            templateUrl: "/currentPrincipalInformation",
-            controller: 'workPlaceController'
+            templateUrl: "/currentPrincipalInformation"
         });
     return routeProvider;
 }
@@ -673,309 +1286,6 @@ function resourceService(_entityEditService, _systemService, _securityService, _
             return operationService;
         }
     };
-}
-
-function dataStorage() {
-
-    var appMetadataSet = null;
-    var principal = {};
-
-    var userList = {};
-    var roleList = {};
-    var projectList = {};
-    var taskList = {};
-    var errorDescriptions = {};
-
-    var currentUser = null;
-    var currentRole = null;
-    var currentProject = null
-    var currentTask = null;
-    var appEnums = [];
-
-    return {
-
-        getAppMetadaSet: function(){
-            return appMetadataSet;
-        },
-        setAppMetadataSet: function(metadataSet){
-            appMetadataSet = metadataSet;
-        },
-        getPrincipal: function(){
-            if(!(principal instanceof Principal)){
-                principal = new Principal();
-            }
-            return principal;
-        },
-
-        getErrorDescriptions: function(){
-            if (!(errorDescriptions instanceof ErrorDescriptions)) {
-                errorDescriptions = new ErrorDescriptions();
-            }
-            return errorDescriptions;
-        },
-
-        getEnumValues: function(resourceService, _entityId){
-            if(appEnums[_entityId] == undefined) {
-                var appEnum = new AppEnum(_entityId);
-                appEnums[_entityId] = appEnum;
-                appEnum.update(resourceService);
-            }
-            return appEnums[_entityId];
-        },
-
-        setUserList: function (_data) {
-            userList = _data;
-        },
-        getUserList: function () {
-            return appMetadataSet.getEntityList("user");
-        },
-        setProjectList: function (_data) {
-            projectList = _data;
-        },
-        getProjectList: function () {
-            return appMetadataSet.getEntityList("project");
-        },
-        setRoleList: function (_data){
-            roleList = _data;
-        },
-        getRoleList: function (){
-            return appMetadataSet.getEntityList("role");
-        },
-        setTaskList: function (_data) {
-            taskList = _data;
-        },
-        getTaskList: function () {
-            return appMetadataSet.getEntityList("task");
-        },
-
-        setCurrentUser: function (_data) {
-            currentUser = _data;
-        },
-        getCurrentUser: function () {
-            if (currentUser == null) {
-                currentUser = this.getNewEntityByName('user');
-            }
-            return currentUser;
-        },
-        setCurrentRole: function (_data) {
-            currentRole = _data;
-        },
-        getCurrentRole: function () {
-            if (currentRole == null) {
-                currentRole = this.getNewEntityByName('role');
-            }
-            return currentRole;
-        },
-        setCurrentProject: function (_data) {
-            currentProject = _data;
-        },
-        getCurrentProject: function () {
-            if (currentProject == null) {
-                currentProject = this.getNewEntityByName('project');
-            }
-            return currentProject;
-        },
-        setCurrentTask: function (_data) {
-            currentTask = _data;
-        },
-        getCurrentTask: function () {
-            if (currentTask == null) {
-                currentTask = this.getNewEntityByName('task');
-            }
-            return currentTask;
-        },
-
-        setCurrentEntityByName: function (entityName, _date) {
-            switch (entityName) {
-                case 'user':
-                    currentUser = _date;
-                    break;
-                case 'role':
-                    currentRole = _date;
-                    break;
-                case 'project':
-                    currentProject = _date;
-                    break;
-                case 'task':
-                    currentTask = _date;
-                    break;
-                default:
-                    return undefined;
-            }
-        },
-        getCurrentEntityByName: function (entityName) {
-            switch (entityName) {
-                case 'user':
-                    return this.getCurrentUser();
-                    break;
-                case 'role':
-                    return this.getCurrentRole();
-                    break;
-                case 'project':
-                    return this.getCurrentProject();
-                    break;
-                case 'task':
-                    return this.getCurrentTask();
-                    break;
-                default:
-                    return undefined;
-            }
-        },
-        getNewEntityByName: function (entityName) {
-            this.getNewEntityByName(entityName)
-        }
-    };
-}
-
-function ErrorDescription(){
-    this.error = false;
-    this.status = 0;
-    this.statusText = "";
-    this.type = 'success';
-
-    this.SetNoError = function(){
-        this.error = false;
-        this.status = 200;
-        this.statusText = "";
-    };
-    this.SetHTTPError = function(statusText, status){
-        this.error = true;
-        this.status = status;
-        this.statusText = "HTTP error: "+statusText;
-    };
-    this.SetAppError = function(statusText){
-        this.error = true;
-        this.status = 0;
-        this.statusText = "App error: "+statusText;
-    }
-
-}
-
-function ErrorDescriptions(){
-    this.errorDescriptions = [];
-    this.show = false;
-
-    this.addErrorDescription = function(_data){
-        this.errorDescriptions.push(_data);
-    };
-
-    this.delErrorDescription = function(index){
-        this.errorDescriptions.splice(index, 1);
-    };
-    this.getErrorDescriptions = function(){
-        return this.errorDescriptions;
-    };
-    this.errorsCount = function(){
-        return this.errorDescriptions.length;
-    }
-}
-
-function MenuCommand(){
-    this.dropdownMenu = false;
-
-    this.text = "";
-    this.command = "#";
-
-    this.list = [];
-
-    this.addElement = function(menuElement){
-        this.list.push(menuElement);
-
-        return this;
-    };
-
-}
-
-function updateCurrentUserForPrincipal(dataStorage, resourceService){
-    var currentPrincipal = dataStorage.getPrincipal();
-    var userList = dataStorage.getUserList();
-    userList.update(function(){
-        currentPrincipal.currentUser = dataStorage.getUserList().findEntityById(currentPrincipal.currentUserId);
-    });
-}
-
-function Principal(){
-    this.authenticated = false;
-    this.name = 'NO_Authentication';
-    this.sessionId = null;
-    this.authorities = [];
-    this.currentUserId = 0;
-    this.currentUser = {};
-
-    this.logout = function($http) {
-        var self = this;
-        $http.post('\logout', {}).finally(function() {
-            self.authenticated = false;
-            setNotAuthenticated(self);
-        });
-    };
-    this.login = function($http, credentials, callback) {
-        var self = this;
-        authenticate($http, credentials, function(data) {
-            if (data.authenticated) {
-                console.log("Login succeeded");
-                credentials.error = false;
-            } else {
-                console.log("Login failed");
-                credentials.error = true;
-            }
-            self.setAuthenticated(data.principal);
-            callback && callback(self);
-        })
-    };
-    this.getSessionInformation = function(resourceService, $cookies){
-        var securityService = resourceService.getSecurityService();
-
-        var currentPrincipal = this;
-        securityService.getSessionInformation({}, {}, function(response){
-            if (response.status == 200) {
-                var data = response.data;
-                currentPrincipal.setAuthenticated(data);
-            }
-        })
-    };
-
-    var setNotAuthenticated = function(currentPrincipal){
-        currentPrincipal.authenticated  = false;
-        currentPrincipal.name           = 'NO_Authentication';
-        currentPrincipal.sessionId      = null;
-        currentPrincipal.authorities    = [];
-        currentPrincipal.currentUserId  = 0;
-        currentPrincipal.currentUser    = {};
-    };
-    this.setAuthenticated = function(data){
-        setNotAuthenticated(self);
-        if(data != undefined){
-            this.authenticated  = true;
-            this.name           = data.userName;
-            this.sessionId      = data.sessionId;
-            this.authorities    = data.authorities;
-            this.currentUserId  = data.currentUserId;
-        }
-    };
-    var authenticate = function($http, credentials, callback) {
-
-        var principal  = undefined;
-        var headers = credentials ? {
-            authorization : "Basic "
-            + btoa(credentials.username + ":"
-            + credentials.password)
-        } : {};
-
-        $http.get('/service/authenticate', {
-                    headers : headers
-                })
-            .then(function(response){
-                if (response.data.status == 200){
-                    var principal = response.data.data;
-                }
-                callback && callback({authenticated: true, principal: principal});
-                }, function() {
-                callback && callback({authenticated: false, principal: principal});
-                }
-            );
-    };
-
 }
 
 ////////////////////////////////////

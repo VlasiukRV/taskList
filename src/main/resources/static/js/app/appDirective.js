@@ -9,15 +9,19 @@ function directiveLoginPage(){
             eventAfterLogin: "&"
         },
         controller:['$http', '$rootScope', '$scope', 'dataStorage', function($http, $rootScope, $scope, dataStorage){
-            var self = $scope;
             $scope.credentials = {};
             $scope.login = function(){
-                var principal = dataStorage.getPrincipal();
-                principal.login($http, $scope.credentials, function(data){
-                    if(data.authenticated){
-                        $scope.eventAfterLogin();
+                var appMetadataSet = dataStorage.getAppMetadaSet()
+                if(appMetadataSet) {
+                    var principal = appMetadataSet.interface.security.principal;
+                    if(principal) {
+                        principal.login($http, $scope.credentials, function (data) {
+                            if (data.authenticated) {
+                                $scope.eventAfterLogin();
+                            }
+                        });
                     }
-                });
+                }
             };
        }]
     }

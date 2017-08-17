@@ -52,7 +52,7 @@
 
             <!-- Menu -->
             <br>
-            <menu-bar menu-bar="menuBar"></menu-bar>
+            <menu-bar menu-bar="commandBar"></menu-bar>
 
             <!-- App -->
             <div>
@@ -80,23 +80,24 @@
         <script src="//rawgit.com/tamtakoe/oi.select/master/dist/select-tpls.js"></script>
 
         <!-- Application Files -->
+        <script src="/js/app/appUtils.js"></script>
+
         <script src="/js/app/Forms/formsDirective.js"></script>
         <script src="/js/app/Forms/formsService.js"></script>
 
-        <script src="/js/app/User/userController.js"></script>
-        <script src="/js/app/User/userModel.js"></script>
-        <script src="/js/app/Project/projectController.js"></script>
-        <script src="/js/app/Project/projectModel.js"></script>
-        <script src="/js/app/Task/taskController.js"></script>
-        <script src="/js/app/Task/taskModel.js"></script>
+        <script src="/js/app/domain/user/userController.js"></script>
+
+        <script src="/js/app/domain/project/projectController.js"></script>
+        <script src="/js/app/domain/task/taskController.js"></script>
 
         <script src="/js/app/appController.js"></script>
         <script src="/js/app/appDirective.js"></script>
         <script src="/js/app/appService.js"></script>
-        <script src="/js/app/appUtils.js"></script>
         <script src="/js/app/app.js"></script>
 
-        <script src="/js/app/INPROGRESS.js"></script>
+        <script src="/js/app/domain/user/userModel.js"></script>
+        <script src="/js/app/domain/project/projectModel.js"></script>
+        <script src="/js/app/domain/task/taskModel.js"></script>
 
     </body>
 

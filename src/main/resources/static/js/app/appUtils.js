@@ -3,6 +3,7 @@
  // UTILS
  ////////////////////////////////////
  */
+
 var appUtils = Object.create(null);
 (function () {
     appUtils.Class = function (Parent) {

@@ -1,41 +1,49 @@
 
 workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter){
-
     var cookies = $cookies;
 
     var appMetadataSet = getMetadataSet(resourceService);
     dataStorage.setAppMetadataSet(appMetadataSet);
-    $scope.errorDescriptions = dataStorage.getErrorDescriptions();
-    $scope.menuBar = getMenuBar(resourceService);
-    $scope.principal = dataStorage.getPrincipal();
+    $scope.errorDescriptions    = appMetadataSet.interface.errorDescriptions;
+    $scope.commandBar           = appMetadataSet.interface.commandBar;
+    $scope.principal            = appMetadataSet.interface.security.principal;
+    var selfScope = $scope;
 
     $scope.getCurrentTime = function() {
         return dateFilter(new Date(), 'M/d/yy h:mm:ss a');
     };
 
     $scope.login = function(){
-        $scope.showLogin = true;
+        selfScope.showLogin = true;
         $location.url("login");
     };
     $scope.eventAfterLogin = function(){
-        if($scope.principal.authenticated){
-            $scope.principal.getSessionInformation(resourceService, cookies);
-            updateCurrentUserForPrincipal(dataStorage, resourceService);
+        var appMetadataSet = dataStorage.getAppMetadaSet();
+        appMetadataSet.loadAllEntities();
+
+        var currentPrincipal = appMetadataSet.interface.security.principal;
+        if(currentPrincipal.authenticated){
+            currentPrincipal.getSessionInformation(resourceService, cookies);
+            currentPrincipal.updatePrincipalUser(appMetadataSet);
+            selfScope.principal = currentPrincipal;
             $location.path("/task");
         }else{
             $location.path("/");
         }
     };
     $scope.logout = function(){
-        if($scope.principal.authenticated) {
-            $scope.principal.logout($http);
+        var appMetadataSet = dataStorage.getAppMetadaSet();
+        var currentPrincipal = appMetadataSet.interface.security.principal;
+
+        if(currentPrincipal.authenticated) {
+            currentPrincipal.logout($http);
             $location.path("/");
         }
     };
 
     $scope.proba = function(){
-
-        window.status = "Load objects...";
-        appMetadataSet.metadataEvents.publish("ev:entityList:" +"taskState"+ ":update")
+        var d = dataStorage;
+        var m = appMetadataSet;
+        $scope.errorDescriptions.show = true;
     };
 };

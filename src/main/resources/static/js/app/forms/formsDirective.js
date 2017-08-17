@@ -52,14 +52,13 @@ function directiveDatePicker(dateFilter){
 
 var refreshSelectList = function(scope, resourceService){
     if(scope.property.inputType == "enum"){
-        scope.selectList = scope.property.entityListService().list;
+        if(scope.property.entityListService()) {
+            scope.selectList = scope.property.entityListService().list
+        }
     }else if(scope.property.inputType == "select" || scope.property.inputType == "multiselect"){
-        scope.selectList = scope.property.entityListService().list;
-/*
-        scope.property.entityList.update(resourceService, function (data) {
-            scope.selectList = data.list;
-        })
-*/
+        if(scope.property.entityListService()) {
+            scope.selectList = scope.property.entityListService().list
+        }
     }
 };
 
@@ -67,7 +66,7 @@ function directiveEntityProperty(resourceService, dataStorage){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/js/app/Forms/directive/entity-property.html ',
+        templateUrl: '/templates/directive/entityEditDirective/entity-property.html ',
         scope:{
             entity: '= entity',
             property: '= property'
@@ -87,7 +86,7 @@ function directiveEntityEditForm(resourceService){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/js/app/Forms/directive/entity-edit-form.html ',
+        templateUrl: '/templates/directive/entityEditDirective/entity-edit-form.html ',
         scope:{
             entityEditForm: "="
         },
@@ -112,7 +111,7 @@ function directiveEntityListForm(resourceService){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/js/app/Forms/directive/entity-list-form.html ',
+        templateUrl: '/templates/directive/entityEditDirective/entity-list-form.html ',
         scope:{
             entityListForm: "="
         },
