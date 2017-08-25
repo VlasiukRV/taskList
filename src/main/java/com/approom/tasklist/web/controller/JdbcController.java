@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/system/jdbc")
+@RequestMapping("/appTaskList/system/jdbc")
 public class JdbcController {
     @Autowired
     JdbcService jdbcService;

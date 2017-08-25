@@ -20,14 +20,21 @@ public class ConfigWebMvc extends WebMvcConfigurerAdapter {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+
         registry.addViewController("/").setViewName("templates/index.html");
+        registry.addViewController("/appRoom").setViewName("templates/index.html");
         registry.addViewController("/login").setViewName("templates/login.html");
 
+        String taskListUrl = "/appTaskList";
+        registry.addViewController("/taskList").setViewName("templates/taskList.html");
+        registry.addViewController(taskListUrl).setViewName("templates/taskListApp.html");
+        registry.addViewController(taskListUrl+"/security/usersList").setViewName("/templates/usersListEdit.html");
+        registry.addViewController(taskListUrl+"/security/roleList").setViewName("/templates/rolesListEdit.html");
+        registry.addViewController(taskListUrl+"/currentPrincipalInformation").setViewName("templates/viewCurrentPrincipalInformation.html");
+        // ????? Todo
         registry.addViewController("/projectsList").setViewName("templates/projectsListEdit.html");
-        registry.addViewController("/security/usersList").setViewName("/templates/usersListEdit.html");
-        registry.addViewController("/security/roleList").setViewName("/templates/rolesListEdit.html");
         registry.addViewController("/tasksList").setViewName("templates/tasksListEdit.html");
-        registry.addViewController("/currentPrincipalInformation").setViewName("templates/viewCurrentPrincipalInformation.html");
+
     }
 
     @Override

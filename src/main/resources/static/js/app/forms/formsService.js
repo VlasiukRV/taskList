@@ -119,6 +119,7 @@ function EditEntityController($scope, dataStorage){
 
     this.openEditForm = function(){
         $scope.$parent.showEditForm = true;
+        this.updateForm();
     };
 
     this.closeEditForm = function(){

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/entity/enum")
+@RequestMapping(value = "/appTaskList/entity/enum")
 public class EnumController {
 
     @RequestMapping(value = "/{entityId}")

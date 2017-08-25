@@ -9,7 +9,7 @@ function dataStorage() {
 
     var currentUser = null;
     var currentRole = null;
-    var currentProject = null
+    var currentProject = null;
     var currentTask = null;
 
     return {
@@ -103,26 +103,24 @@ function dataStorage() {
 function getAppHttpUrl($location, urlSufix){
     var appAddress = "http://"+$location.$$host+":"+$location.$$port;
 
-    return appAddress + urlSufix;
+    return appAddress + "/appTaskList" + urlSufix;
 }
 
 function getMetadataSet(resourceService) {
 
     appModel.resourceService = resourceService;
-    var appMetadataSet = new appModel.MetadataSet();
 
     appInitialization
-        .setMetadataSet(appMetadataSet)
+        .setMetadataSet()
 
         .InitEnumsModel()
-
-        .InitUserModel()
         .InitProjectModel()
+        .InitUserModel()
         .InitTaskModel()
         
         .initMetadataSet();
     
-    return appMetadataSet;
+    return appInitialization.getMetadataSet();
 }
 
 var appInitialization = Object.create(null);
@@ -135,9 +133,16 @@ var appInitialization = Object.create(null);
     };
 
     appInitialization.setMetadataSet = function(metadataSet){
-        appInitialization.metadataSet = metadataSet;
+        if(metadataSet === undefined){
+            appInitialization.metadataSet = new appModel.MetadataSet();
+        }else {
+            appInitialization.metadataSet = metadataSet;
+        }
         
         return appInitialization;
+    };
+    appInitialization.getMetadataSet = function(){
+        return appInitialization.metadataSet;
     };
     appInitialization.initMetadataSet = function(){
         var appMetadataSet = appInitialization.metadataSet;
@@ -203,7 +208,7 @@ var appInterface = Object.create(null);
                 + credentials.password)
             } : {};
 
-            $http.get('/service/authenticate', {
+            $http.get('/appTaskList/service/authenticate', {
                 headers: headers
             })
                 .then(function (response) {
@@ -219,7 +224,7 @@ var appInterface = Object.create(null);
         Principal.includeMthd({
             logout: function ($http) {
                 var self = this;
-                $http.post('\logout', {}).finally(function () {
+                $http.post('/appTaskList/logout', {}).finally(function () {
                     self.authenticated = false;
                     setNotAuthenticated(self);
                 });
@@ -312,7 +317,7 @@ var appInterface = Object.create(null);
             handleResponse: function (response) {
                 var errorDescription = new ErrorDescription();
                 errorDescription.SetNoError();
-                if (response.status = 200) {
+                if ((response.status = 200) || (response.status = 404)) {
                     var objectResponse = response.data;
                     /*
                      if (!(response.data instanceof Object)){
@@ -626,6 +631,7 @@ var appModel = Object.create(null);
                         this.addEntity(entity);
                     }, this);
                 }
+                console.log("Update "+this.metadataObject.metadataName);
             }
 
             if(fCallBack) {
@@ -1103,7 +1109,7 @@ var appModel = Object.create(null);
 function appHttpResponseInterceptor($q, $location, dataStorage){
     return {
         'request': function(config) {
-            config.url = config.url.split('%2F').join('/');
+            /*config.url = config.url.split('%2F').join('/');*/
             return config;
         },
 
@@ -1115,33 +1121,6 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
                     errorDescriptions.handleResponse(response);
                 }
             }
-
-/*
-            var errorDescription = new appInterface.ErrorDescription();
-            errorDescription.SetNoError();
-            if (response.status = 200){
-                var objectResponse = response.data;
-                */
-/*if (!(response.data instanceof Object)){
-                 var objectResponse=eval("("+response.data+")");
-                 }*//*
-
-                if (objectResponse instanceof Object){
-                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
-                        if (response.data.status != 200) {
-                            errorDescription.SetAppError(objectResponse.message);
-                        }
-                    }
-                }
-            } else {
-                errorDescription.SetHTTPError(response.statusText, response.status);
-            }
-            if (errorDescription.error) {
-                var errorDescriptions = dataStorage.getErrorDescriptions();
-                errorDescriptions.addErrorDescription(errorDescription);
-                errorDescriptions.show = true;
-            }
-*/
             return response;
         },
 
@@ -1153,30 +1132,6 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
                     errorDescriptions.handleResponse(response);
                 }
             }
-/*
-            var errorDescription = new appInterface.ErrorDescription();
-            errorDescription.SetNoError();
-            if (response.status = 200){
-                var objectResponse = response.data;
-                if (!(response.data instanceof Object)){
-                    objectResponse=eval("("+response.data+")");
-                }
-                if (objectResponse instanceof Object){
-                    if ("message" in objectResponse && "status" in objectResponse) { //ToDo
-                        if (response.data.status != 200){
-                            errorDescription.SetAppError(objectResponse.message);
-                        }
-                    }
-                }
-            } else {
-                errorDescription.SetHTTPError(response.statusText, response.status);
-            }
-            if (errorDescription.error) {
-                var errorDescriptions = dataStorage.getErrorDescriptions();
-                errorDescriptions.addErrorDescription(errorDescription);
-                errorDescriptions.show = true;
-            }
-*/
             return $q.reject(response);
         }
     };
@@ -1188,19 +1143,19 @@ function setRoute(routeProvider){
             templateUrl : '/login'
         })
         .when("/user", {
-            templateUrl: "/security/usersList"
+            templateUrl: "/appTaskList/security/usersList"
         })
         .when("/role", {
-            templateUrl: "/security/roleList"
+            templateUrl: "/appTaskList/security/roleList"
         })
         .when("/project", {
-            templateUrl: "/projectsList"
+            templateUrl: '/projectsList'
         })
         .when("/task", {
             templateUrl: "/tasksList"
         })
         .when("/currentPrincipalInformation", {
-            templateUrl: "/currentPrincipalInformation"
+            templateUrl: "/appTaskList/currentPrincipalInformation"
         });
     return routeProvider;
 }

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/service")
+@RequestMapping("/appTaskList/service")
 public class ServiceController {
 
     @Autowired

@@ -66,12 +66,14 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
                     .antMatchers(
                             "/",
                             "/css/**",
+                            "/img/**",
                             "/js/**",
                             "/templates/**",
-                            "/service/**"
+                            "/service/**",
+                            "/appTaskList"
                     ).permitAll()
-                    .antMatchers("/security/**", "/system/task/**").access("hasRole('ROLE_ADMIN')")
-                    .anyRequest().access("hasRole('ROLE_USER')")
+                    .antMatchers("/appTaskList/security/**", "/appTaskList/system/task/**").access("hasRole('ROLE_ADMIN')")
+                    .anyRequest().authenticated()
                 .and()
                     .formLogin()
                     .loginPage("/login")

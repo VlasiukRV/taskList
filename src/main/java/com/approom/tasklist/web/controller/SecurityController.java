@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/system/security")
+@RequestMapping("/appTaskList/system/security")
 public class SecurityController {
 
     @Autowired

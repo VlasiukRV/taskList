@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/system/taskScheduler")
+@RequestMapping("/appTaskList/system/taskScheduler")
 public class TaskSchedulerController {
     @Autowired
     TaskService taskService;

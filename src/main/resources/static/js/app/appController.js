@@ -15,7 +15,7 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
 
     $scope.login = function(){
         selfScope.showLogin = true;
-        $location.url("login");
+        $location.url("/login");
     };
     $scope.eventAfterLogin = function(){
         var appMetadataSet = dataStorage.getAppMetadaSet();
@@ -26,9 +26,10 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
             currentPrincipal.getSessionInformation(resourceService, cookies);
             currentPrincipal.updatePrincipalUser(appMetadataSet);
             selfScope.principal = currentPrincipal;
-            $location.path("/task");
+            selfScope.showLogin = false;
+            /*$location.url("/task");*/
         }else{
-            $location.path("/");
+            /*$location.url("/appTaskList");*/
         }
     };
     $scope.logout = function(){
@@ -37,7 +38,7 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
 
         if(currentPrincipal.authenticated) {
             currentPrincipal.logout($http);
-            $location.path("/");
+            /*$location.url("/appTaskList");*/
         }
     };
 

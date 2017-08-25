@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/entity/user")
+@RequestMapping(value = "/appTaskList/entity/user")
 public class UserController extends BaseEntityController {
 
     @Autowired

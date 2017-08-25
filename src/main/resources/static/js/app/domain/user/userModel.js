@@ -141,8 +141,8 @@ appInitialization.InitUserModel = function(){
         }
     };
 
-    appInitialization.metadataSpecifications.entities.push(metadataEntitySpecification_User);
     appInitialization.metadataSpecifications.entities.push(metadataEntitySpecification_Role);
+    appInitialization.metadataSpecifications.entities.push(metadataEntitySpecification_User);
 
     return appInitialization;
 };
