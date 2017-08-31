@@ -4,14 +4,14 @@ function directiveLoginPage(){
         restrict: 'E',
         require: '',
         replace: true,
-        templateUrl: '/templates/directive/login-page.html',
+        templateUrl: '/templates/appRoom/tasklist/directive/login-page.html',
         scope:{
             eventAfterLogin: "&"
         },
         controller:['$http', '$rootScope', '$scope', 'dataStorage', function($http, $rootScope, $scope, dataStorage){
             $scope.credentials = {};
             $scope.login = function(){
-                var appMetadataSet = dataStorage.getAppMetadaSet()
+                var appMetadataSet = dataStorage.getAppMetadaSet();
                 if(appMetadataSet) {
                     var principal = appMetadataSet.interface.security.principal;
                     if(principal) {
@@ -31,7 +31,7 @@ function directiveMessageLine(){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/templates/directive/message-line.html',
+        templateUrl: '/templates/appRoom/tasklist/directive/message-line.html',
         scope:{
             errorDescriptions: "="
         },
@@ -57,7 +57,7 @@ function directiveMenuBar(){
         restrict: 'E',
         require: '',
         replace: true,
-        templateUrl: '/templates/directive/menu-bar.html',
+        templateUrl: '/templates/appRoom/tasklist/directive/menu-bar.html',
         scope:{
             menuBar: "="
         }
@@ -69,7 +69,7 @@ function directiveMenuCollection(){
         restrict: 'E',
         require: '',
         replace: true,
-        templateUrl: '/templates/directive/menu-collection.html',
+        templateUrl: '/templates/appRoom/tasklist/directive/menu-collection.html',
         scope:{
             menuCollection: "=",
             command: "="
@@ -82,7 +82,7 @@ function directiveMenuItem($compile){
         restrict: 'E',
         require: '',
         replace: true,
-        templateUrl: '/templates/directive/menu-item.html',
+        templateUrl: '/templates/appRoom/tasklist/directive/menu-item.html',
         scope:{
             command: "="
         },

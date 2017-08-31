@@ -1,0 +1,16 @@
+<div ng-show="errorDescriptions.show">
+    <div class="row">
+        <button ng-click="errorDescriptions.show=false;" class="btn btn-primary" title="cancel">
+            <span class="glyphicon glyphicon-remove-circle"></span>
+        </button>
+    </div>
+    <div class="row" ng-repeat="errorDescription in errorDescriptions.errorDescriptions track by $index">
+        <p class="alert alert-danger">
+            Error: {{errorDescription.statusText}}
+            <button ng-click="deleteErrorDescription($index)" type="button" size="sm" title="ok">
+                <span class="glyphicon glyphicon-ok-circle"></span>
+            </button>
+            <br>
+        </p>
+    </div>
+</div>

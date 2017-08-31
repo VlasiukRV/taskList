@@ -134,13 +134,3 @@ app.controller('roleListController', ['$scope', 'dataStorage',
 app.controller('editRoleController', ['$scope', 'dataStorage',
     editRoleController($scope, dataStorage)]);
 
-/*
- ////////////////////////////////////
- // Function for test and lorn class and prototype
- ////////////////////////////////////
- */
-(function () {
-    var o = {};
-    var f = function () {};
-    var map = Object.create(null);
-})();

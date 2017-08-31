@@ -1,6 +1,7 @@
-<div class="col-lg-6">
+<div >
 
-    <div class="tableName">
+    <div class="row tableName">
+        <p>
         <button ng-click="closeForm()" type="button" size="sm" title="close form">
             <span class="glyphicon glyphicon-remove"></span>
         </button>
@@ -12,22 +13,16 @@
         </button>
 
         <b> {{entityEditForm.editFormName}} </b>
+        </p>
     </div>
 
-    <div class="window">
-
-        <table width="900" class="dataTable">
-            <tr class="tableHeader" ng-repeat="entityProperty in entityEditForm.formProperties track by $index">
-                <td width="800" align="left">
-                    <entity-property
-                            entity="entityEditForm.currentEntity"
-                            property="entityProperty">
-                    </entity-property>
-                </td>
-                <td align="center"></td>
-            </tr>
-        </table>
-
+    <div class="row">
+        <div class="row" ng-repeat="entityProperty in entityEditForm.formProperties track by $index">
+            <entity-property
+                    entity="entityEditForm.currentEntity"
+                    property="entityProperty">
+            </entity-property>
+        </div>
     </div>
 
 </div>

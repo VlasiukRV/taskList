@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Raleway:400, 600" rel="stylesheet">
-    <link href="css/main.css" type="text/css" rel="stylesheet">
+    <title>Task list</title>
+
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
+    <link href="../css/main.css" type="text/css" rel="stylesheet">
+
+    <link href="../css/taskList.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 
@@ -10,48 +17,32 @@
     <div class="row">
         <h1 class="col-sm-4">Task list</h1>
         <nav class="col-sm-8 text-right">
+            <p><a href="/"/>Home</a></p>
             <p><a href="/appRoom"/>App room</a></p>
             <p><a href="/appTaskList"/>TaskList</a></p>
-            <p><a href="team.html">Team</a></p>
+            <p><a href="/service/team">Team</a></p>
         </nav>
     </div>
 </header>
 
-<div class="header">
+<section class="jumbotron">
     <div class="container">
-        <ul class="nav">
-            <a href="index.html">
-                <li>Home</li>
-            </a>
-            <a href="http://localhost:8080/appTaskList">
-                <li>TaskList</li>
-            </a>
-            <a href="team.html">
-                <li>Team</li>
-            </a>
-            <li>Contact</li>
-        </ul>
-    </div>
-</div>
-
-<div class="jumbotron">
-    <div class="container">
-        <div class="main">
-            <h1>Task list</h1>
-            <a class="btn btn-main" href="http://localhost:8080/appTaskList">Get started</a>
+        <div class="row text-center">
+            <h2>Task list</h2>
+            <a class="btn btn-primary btn-lg" href="/appTaskList">Get started</a>
         </div>
     </div>
-</div>
+</section>
 
-<div class="context">
-    <div class="supporting">
-        <div class="container">
-            <h1>Used skills:</h1>
-
-            <div class="coldiv">
-                <div class="col">
-                    <img src="img/backend.png">
-
+<section class="container">
+    <div class="row text-center">
+        <h1>Used skills:</h1>
+    </div>
+    <div class="row">
+        <div class="usedSkills">
+            <div class="row">
+                <figure class="col-sm-2">
+                    <img src="../img/backend.png">
                     <div class="skill">
                         <ul>
                             <li>Java.</li>
@@ -64,11 +55,9 @@
                         </ul>
                     </div>
                     <a class="btn btn-default" href="#">Learn more</a>
-                </div>
-
-                <div class="col">
-                    <img src="img/frontend.png">
-
+                </figure>
+                <figure class="col-sm-2">
+                    <img src="../img/frontend.png">
                     <div class="skill">
                         <ul>
                             <li>HTML.</li>
@@ -78,13 +67,11 @@
                             <li>Angular.js.</li>
                             <li>React.js.</li>
                         </ul>
-                    </div>
-                    <a class="btn btn-default" href="#">Learn more</a>
                 </div>
-
-                <div class="col">
-                    <img src="img/deploy.png">
-
+                    <a class="btn btn-default" href="#">Learn more</a>
+                </figure>
+                <figure class="col-sm-2">
+                    <img src="../img/deploy.png">
                     <div class="skill">
                         <ul>
                             <li>git.</li>
@@ -95,19 +82,25 @@
                         </ul>
                     </div>
                     <a class="btn btn-default" href="#">Learn more</a>
+                </figure>
             </div>
-            </div>
-
         </div>
-        <div class="clearfix"></div>
     </div>
-</div>
+</section>
 
-<div class="footer">
-    <div class="container">
-        <p>&copy; vRoma 2017</p>
+<footer class="container">
+    <div class="row">
+        <p class="col-sm-4">&copy; 2017 vRoma</p>
+        <ul class="col-sm-8">
+            <li class="col-sm-1">...</li>
+            <li class="col-sm-1">...</li>
+            <li class="col-sm-1">...</li>
+        </ul>
     </div>
-</div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 </body>
 </html>

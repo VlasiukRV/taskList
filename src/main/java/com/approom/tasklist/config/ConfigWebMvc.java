@@ -21,19 +21,19 @@ public class ConfigWebMvc extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
 
-        registry.addViewController("/").setViewName("templates/index.html");
-        registry.addViewController("/appRoom").setViewName("templates/index.html");
-        registry.addViewController("/login").setViewName("templates/login.html");
+        registry.addViewController("/").setViewName("/templates/index.html");
+        registry.addViewController("/appRoom").setViewName("/templates/index.html");
+        registry.addViewController("/service/team").setViewName("/templates/team.html");
+        registry.addViewController("/login").setViewName("/templates/login.html");
 
-        String taskListUrl = "/appTaskList";
-        registry.addViewController("/taskList").setViewName("templates/taskList.html");
-        registry.addViewController(taskListUrl).setViewName("templates/taskListApp.html");
-        registry.addViewController(taskListUrl+"/security/usersList").setViewName("/templates/usersListEdit.html");
-        registry.addViewController(taskListUrl+"/security/roleList").setViewName("/templates/rolesListEdit.html");
-        registry.addViewController(taskListUrl+"/currentPrincipalInformation").setViewName("templates/viewCurrentPrincipalInformation.html");
-        // ????? Todo
-        registry.addViewController("/projectsList").setViewName("templates/projectsListEdit.html");
-        registry.addViewController("/tasksList").setViewName("templates/tasksListEdit.html");
+        String appTaskListUrl = "/appTaskList";
+        registry.addViewController("/taskList").setViewName("/templates/taskList.html");
+        registry.addViewController(appTaskListUrl)                                 .setViewName("/templates/appRoom/taskList/taskListApp.html");
+        registry.addViewController(appTaskListUrl+"/security/usersList")           .setViewName("/templates/appRoom/taskList/usersListEdit.html");
+        registry.addViewController(appTaskListUrl+"/security/roleList")            .setViewName("/templates/appRoom/taskList/rolesListEdit.html");
+        registry.addViewController(appTaskListUrl+"/currentPrincipalInformation")  .setViewName("/templates/appRoom/taskList/viewCurrentPrincipalInformation.html");
+        registry.addViewController(appTaskListUrl+"/projectsList")                 .setViewName("/templates/appRoom/taskList/projectsListEdit.html");
+        registry.addViewController(appTaskListUrl+"/tasksList")                    .setViewName("/templates/appRoom/taskList/tasksListEdit.html");
 
     }
 

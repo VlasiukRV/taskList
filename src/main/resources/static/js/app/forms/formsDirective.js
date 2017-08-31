@@ -66,7 +66,7 @@ function directiveEntityProperty(resourceService, dataStorage){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/templates/directive/entityEditDirective/entity-property.html ',
+        templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-property.html ',
         scope:{
             entity: '= entity',
             property: '= property'
@@ -86,7 +86,7 @@ function directiveEntityEditForm(resourceService){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/templates/directive/entityEditDirective/entity-edit-form.html ',
+        templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-edit-form.html ',
         scope:{
             entityEditForm: "="
         },
@@ -111,7 +111,7 @@ function directiveEntityListForm(resourceService){
     return{
         restrict: 'E',
         require: '',
-        templateUrl: '/templates/directive/entityEditDirective/entity-list-form.html ',
+        templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-list-form.html ',
         scope:{
             entityListForm: "="
         },
@@ -135,11 +135,6 @@ function directiveEntityListForm(resourceService){
             $scope.editEntity = function(id){
                 $scope.entityListForm.eventEditEntity(id);
             };
-/*
-            $scope._show = function(){
-                $scope.entityListForm._show(entity);
-            }
-*/
         }]
     }
 }

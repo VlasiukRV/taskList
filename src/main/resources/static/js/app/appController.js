@@ -27,9 +27,9 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
             currentPrincipal.updatePrincipalUser(appMetadataSet);
             selfScope.principal = currentPrincipal;
             selfScope.showLogin = false;
-            /*$location.url("/task");*/
+            $location.url("/task");
         }else{
-            /*$location.url("/appTaskList");*/
+            $location.url("/appTaskList");
         }
     };
     $scope.logout = function(){
@@ -38,7 +38,7 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
 
         if(currentPrincipal.authenticated) {
             currentPrincipal.logout($http);
-            /*$location.url("/appTaskList");*/
+            $location.url("/appTaskList");
         }
     };
 

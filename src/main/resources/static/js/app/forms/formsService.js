@@ -16,6 +16,12 @@ function ListEntityController($scope, dataStorage){
         entityListForm.formProperties = metadataSpecification.metadataObject.fmListForm.metadataEditFieldsSet;
         entityListForm.entities = metadataSpecification.list;
 
+        entityListForm.numPerPage = 10;
+        entityListForm.currentPage = 1;
+        entityListForm.totalItems = metadataSpecification.list.length;
+        entityListForm.entitiesFiltered =  new Array();
+        entityListForm.entitiesEmpty = new Array();
+
         entityListForm.eventCloseForm = this.closeListForm;
         entityListForm.eventUpdateForm = this.updateForm;
         entityListForm.eventAddNewEntity = this.addNewEntity;
@@ -25,10 +31,18 @@ function ListEntityController($scope, dataStorage){
         entityListForm.openEditForm = this.openEditForm;
         entityListForm.updateViewEntityList = this.updateViewEntityList;
         entityListForm.closeListForm = this.closeListForm;
+        entityListForm.eventPageChanged = this.pageChanged;
 
         $scope.entityListForm = entityListForm;
 
-        this.updateForm();
+        entityListForm.eventUpdateForm();
+    };
+
+    this.pageChanged = function() {
+        var begin = ((this.currentPage - 1) * this.numPerPage)
+            , end = begin + this.numPerPage;
+        this.entitiesFiltered = this.entities.slice(begin, end);
+        this.entitiesEmpty = new Array(this.numPerPage - this.entitiesFiltered.length);
     };
 
     this.addNewEntity = function(){
@@ -51,7 +65,11 @@ function ListEntityController($scope, dataStorage){
     };
 
     this.updateViewEntityList = function(){
-        this.appMetadataSet.metadataEvents.publish("ev:entityList:" +this.metadataName+ ":update");
+        var self = this;
+        this.appMetadataSet.metadataEvents.publish("ev:entityList:" +this.metadataName+ ":update", function(){
+            self.totalItems = self.entities.length;
+            self.eventPageChanged();
+        });
     };
 
     this.openEditForm = function(currentEntity){
