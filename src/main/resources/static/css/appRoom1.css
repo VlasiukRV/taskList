@@ -1,0 +1,21 @@
+
+.appDescription {
+    border: 1px solid #466995;
+    display: inline-block;
+    height: 200px;
+    margin: 20px;
+    padding-top: 40px;
+    width: 180px;
+    color: #000000;
+}
+
+.appDescription:hover {
+    background: #C0D6DF;
+    color: #FFF;
+}
+
+#appDescriptionTaskList{
+    background-image: url('../img/To-do_list.jpg');
+    background-position: center top;
+    background-size: cover;
+}
