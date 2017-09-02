@@ -70,6 +70,7 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
                             "/js/**",
                             "/templates/**",
                             "/service/**",
+                            "/info/**",
 
                             "/taskList",
                             "/appTaskList"

@@ -1,16 +1,18 @@
 package com.approom.tasklist.app.domain.task;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.approom.tasklist.app.domain.BaseEntity;
 import com.approom.tasklist.app.domain.project.Project;
 import com.approom.tasklist.app.domain.user.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Entity
@@ -23,21 +25,20 @@ public class Task extends BaseEntity<Integer> {
     @Column
     private @Getter @Setter Date date;
 
-    @Column
     @JsonProperty
+    @Column
     private @Getter @Setter String title;
 
     @JsonProperty
-    @ManyToOne(cascade={CascadeType.PERSIST})
-    @JoinColumn
+    @ManyToOne
     private @Getter @Setter User author;
 
     @JsonProperty
-    @ManyToMany(cascade={CascadeType.ALL, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinTable(
             name="task_executor_detail",
-            joinColumns = @JoinColumn( name="task_id"),
-            inverseJoinColumns = @JoinColumn( name="user_id")
+            joinColumns = {@JoinColumn( name="task_id")},
+            inverseJoinColumns = {@JoinColumn( name="user_id")}
     )
     private @Getter @Setter Set<User> executor = new HashSet<>();
 
@@ -56,11 +57,10 @@ public class Task extends BaseEntity<Integer> {
         if (this == o) return true;
         if (!(o instanceof Task)) return false;
 
-        Task task = (Task) o;
+        Task entity = (Task) o;
 
-        if (id!=task.getId()) return false;
+        return this.id == entity.getId();
 
-        return true;
     }
 
     @Override

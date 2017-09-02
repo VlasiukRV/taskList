@@ -12,13 +12,14 @@ import java.io.Serializable;
 
 @NoArgsConstructor
 public abstract class BaseEntity<ID> implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column
+
     @JsonProperty
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column
     protected @Getter @Setter ID id;
-    @Column
+
     @JsonProperty
+    @Column
     protected @Getter @Setter String description;
 
 }

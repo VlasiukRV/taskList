@@ -15,10 +15,11 @@ import java.io.*;
  */
 public class AppUtils {
 
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     public static <T extends BaseEntity> T getEntityByJSON(Class<T> className, String strJSONEntity) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(strJSONEntity, className);
+            return OBJECT_MAPPER.readValue(strJSONEntity, className);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

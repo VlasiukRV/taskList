@@ -176,6 +176,324 @@ var appInitialization = Object.create(null);
     
 })(appInitialization)
 
+// Abstract model of application interface
+var appInterface = Object.create(null);
+(function (appInterface){
+
+    var Principal = appUtils.Class();
+    (function () {
+        Principal.prototype.$_buildObject = function () {
+            this.includeFd({
+                authenticated: false,
+                name: 'NO_Authentication',
+                sessionId: null,
+                authorities: [],
+                currentUserId: 0,
+                currentUser: {}
+            })
+        };
+        var setNotAuthenticated = function (currentPrincipal) {
+            currentPrincipal.authenticated = false;
+            currentPrincipal.name = 'NO_Authentication';
+            currentPrincipal.sessionId = null;
+            currentPrincipal.authorities = [];
+            currentPrincipal.currentUserId = 0;
+            currentPrincipal.currentUser = {};
+        };
+        var authenticate = function ($http, credentials, callback) {
+
+            var principal = undefined;
+            var headers = credentials ? {
+                authorization: "Basic "
+                + btoa(credentials.username + ":"
+                + credentials.password)
+            } : {};
+
+            $http.get('/appTaskList/service/authenticate', {
+                headers: headers
+            })
+                .then(function (response) {
+                    if (response.data.status == 200) {
+                        var principal = response.data.data;
+                    }
+                    callback && callback({authenticated: true, principal: principal});
+                }, function () {
+                    callback && callback({authenticated: false, principal: principal});
+                }
+            );
+        };
+        Principal.includeMthd({
+            logout: function ($http) {
+                var self = this;
+                $http.post('/appTaskList/logout', {}).finally(function () {
+                    self.authenticated = false;
+                    setNotAuthenticated(self);
+                });
+            },
+            login: function ($http, credentials, callback) {
+                var self = this;
+                authenticate($http, credentials, function (data) {
+                    if (data.authenticated) {
+                        console.log("Login succeeded");
+                        credentials.error = false;
+                    } else {
+                        console.log("Login failed");
+                        credentials.error = true;
+                    }
+                    self.setAuthenticated(data.principal);
+                    callback && callback(self);
+                })
+            },
+            getSessionInformation: function (resourceService, $cookies) {
+                var securityService = resourceService.getSecurityService();
+
+                var currentPrincipal = this;
+                securityService.getSessionInformation({}, {}, function (response) {
+                    if (response.status == 200) {
+                        var data = response.data;
+                        currentPrincipal.setAuthenticated(data);
+                    }
+                })
+            },
+            updatePrincipalUser: function(appMetadataSet){
+                var self = this;
+                appMetadataSet.metadataEvents.publish("ev:entityList:" +"user"+ ":update", function(){
+                    var entityList = appMetadataSet.getEntityList("user");
+                    if(entityList){
+                        self.currentUser = entityList.findEntityById(self.currentUserId);
+                    }
+                });
+            },
+            setAuthenticated: function (data) {
+                setNotAuthenticated(self);
+                if (data != undefined) {
+                    this.authenticated = true;
+                    this.name = data.userName;
+                    this.sessionId = data.sessionId;
+                    this.authorities = data.authorities;
+                    this.currentUserId = data.currentUserId;
+                }
+            }
+        });
+    })();
+
+    var ErrorDescription = appUtils.Class();
+    (function () {
+        ErrorDescription.prototype.$_buildObject = function () {
+            this.includeFd({
+                error: false,
+                status: 0,
+                statusText: "",
+                type: 'success'
+            })
+        };
+        ErrorDescription.includeMthd({
+            SetHTTPError: function (statusText, status) {
+                this.error = true;
+                this.status = status;
+                this.statusText = "HTTP error: " + statusText;
+            },
+            SetNoError: function () {
+                this.error = false;
+                this.status = 200;
+                this.statusText = "";
+            },
+            SetAppError: function (statusText) {
+                this.error = true;
+                this.status = 0;
+                this.statusText = "App error: " + statusText;
+            }
+        });
+    })();
+
+    var ErrorDescriptions = appUtils.Class();
+    (function () {
+        ErrorDescriptions.prototype.$_buildObject = function () {
+            this.includeFd({
+                errorDescriptions: [],
+                show: false
+            });
+        };
+        ErrorDescriptions.includeMthd({
+            handleResponse: function (response) {
+                var errorDescription = new ErrorDescription();
+                errorDescription.SetNoError();
+                if ((response.status == 200) ||
+                    (response.status == 404) ||
+                    (response.status == 403)
+                ){
+                    var objectResponse = response.data;
+                    if (objectResponse instanceof Object) {
+                        if ("message" in objectResponse && "status" in objectResponse) { //ToDo
+                            if (response.data.status != 200) {
+                                errorDescription.SetAppError(objectResponse.message);
+                            }
+                        }
+                    }else if(response.status != 200){
+                        objectResponse=eval("("+response.data+")");
+                        errorDescription.SetAppError(objectResponse.message);
+                    }
+                } else {
+                    errorDescription.SetHTTPError(response.statusText, response.status);
+                }
+                if (errorDescription.error) {
+                    this.addErrorDescription(errorDescription);
+                    this.show = true;
+                }
+            },
+            addErrorDescription: function (_data) {
+                this.errorDescriptions.push(_data);
+            },
+            delErrorDescription: function (index) {
+                this.errorDescriptions.splice(index, 1);
+            },
+            getErrorDescriptions: function () {
+                return this.errorDescriptions;
+            },
+            errorsCount: function () {
+                return this.errorDescriptions.length;
+            }
+        });
+    })();
+
+    var EditForm = appUtils.Class();
+    (function () {
+        EditForm.prototype.$_buildObject = function () {
+            this.includeFd({
+                editFormName: "<--label for form-->",
+                formProperties: {},
+
+                eventCloseForm: function () {
+                },
+                eventUpdateForm: function () {
+                }
+            });
+        };
+    })();
+
+    var EntityEditForm = appUtils.Class(EditForm);
+    (function () {
+        EntityEditForm.prototype.$_buildObject = function () {
+            this.includeFd({
+                currentEntity: {},
+
+                eventCreateEntity: function () {
+                }
+            });
+        };
+    })();
+
+    var EntityListForm = appUtils.Class(EditForm);
+    (function () {
+        EntityListForm.prototype.$_buildObject = function () {
+            this.includeFd({
+                entities: [],
+
+                eventAddNewEntity: function () {
+                },
+                eventDeleteEntity: function (id) {
+                },
+                eventEditEntity: function (id) {
+                }
+            });
+        };
+    })();
+
+    var MenuCommand = appUtils.Class();
+    (function(){
+        MenuCommand.prototype.$_buildObject = function(){
+            this.includeFd({
+                commandName: "",
+
+                dropdownMenu: false,
+                text: "",
+                command: null,
+                commandList: []
+            })
+        };
+        MenuCommand.includeMthd({
+            addCommand: function(command){
+                this.commandList.push(command);
+                return this;
+            },
+            getSubMenu: function(commandName){
+                for (var i = 0; i < this.commandList.length; i++) {
+                    var currentCommand = this.commandList[i];
+                    if (currentCommand.commandName === commandName){
+                        return currentCommand;
+                    }
+                    if(currentCommand.commandList.length > 0){
+                        return currentCommand.getSubMenu(commandName);
+                    }
+                }
+                return undefined;
+            }
+        });
+
+    }());
+
+    var Interface = appUtils.Class();
+    (function () {
+        Interface.prototype.$_buildObject = function () {
+            this.includeFd({
+                security: {
+                    principal: new Principal()
+                },
+                errorDescriptions: new ErrorDescriptions(),
+                commandBar: {
+                    mainUrl: '#',
+                    commandBar: new MenuCommand()
+                },
+                appMetadataSet: null
+            });
+        };
+        Interface.includeMthd({
+            commandBarSetMainUrl: function (mainUrl) {
+                this.commandBar.mainUrl = mainUrl;
+                return this;
+            },
+            commandBarAddCommand: function (command) {
+                this.commandBar.commandList.push(command);
+                return this;
+            },
+            editFormGetEntityEditForm: function () {
+                return new EntityEditForm();
+            },
+            editFormGetEntityListForm: function () {
+                return new EntityListForm();
+            }
+        })
+    }());
+
+    appInterface.Interface = Interface;
+    appInterface.getNewEntityCommand = function(commandName, text){
+        var command = new MenuCommand();
+        command.dropdownMenu = false;
+        command.commandName = commandName;
+        command.text = text;
+        command.command = commandName;
+
+        return command;
+    };
+    appInterface.getNewDropdownCommand = function(commandName, text){
+        var command = new MenuCommand();
+        command.dropdownMenu = true;
+        command.commandName = commandName;
+        command.text = text;
+        return command;
+    };
+    appInterface.getNewCommand = function(commandName, text, functionCommand){
+        var command = new MenuCommand();
+        command.dropdownMenu = false;
+        command.commandName = commandName;
+        command.text = text;
+        command.command = functionCommand;
+
+        return command;
+    };
+
+}(appInterface));
+
 // Abstract model of application
 var appModel = Object.create(null);
 (function (appModel, appInterface) {
@@ -790,324 +1108,6 @@ var appModel = Object.create(null);
      */
 
 })(appModel, appInterface);
-
-// Abstract model of application interface
-var appInterface = Object.create(null);
-(function (appInterface){
-
-    var Principal = appUtils.Class();
-    (function () {
-        Principal.prototype.$_buildObject = function () {
-            this.includeFd({
-                authenticated: false,
-                name: 'NO_Authentication',
-                sessionId: null,
-                authorities: [],
-                currentUserId: 0,
-                currentUser: {}
-            })
-        };
-        var setNotAuthenticated = function (currentPrincipal) {
-            currentPrincipal.authenticated = false;
-            currentPrincipal.name = 'NO_Authentication';
-            currentPrincipal.sessionId = null;
-            currentPrincipal.authorities = [];
-            currentPrincipal.currentUserId = 0;
-            currentPrincipal.currentUser = {};
-        };
-        var authenticate = function ($http, credentials, callback) {
-
-            var principal = undefined;
-            var headers = credentials ? {
-                authorization: "Basic "
-                + btoa(credentials.username + ":"
-                + credentials.password)
-            } : {};
-
-            $http.get('/appTaskList/service/authenticate', {
-                headers: headers
-            })
-                .then(function (response) {
-                    if (response.data.status == 200) {
-                        var principal = response.data.data;
-                    }
-                    callback && callback({authenticated: true, principal: principal});
-                }, function () {
-                    callback && callback({authenticated: false, principal: principal});
-                }
-            );
-        };
-        Principal.includeMthd({
-            logout: function ($http) {
-                var self = this;
-                $http.post('/appTaskList/logout', {}).finally(function () {
-                    self.authenticated = false;
-                    setNotAuthenticated(self);
-                });
-            },
-            login: function ($http, credentials, callback) {
-                var self = this;
-                authenticate($http, credentials, function (data) {
-                    if (data.authenticated) {
-                        console.log("Login succeeded");
-                        credentials.error = false;
-                    } else {
-                        console.log("Login failed");
-                        credentials.error = true;
-                    }
-                    self.setAuthenticated(data.principal);
-                    callback && callback(self);
-                })
-            },
-            getSessionInformation: function (resourceService, $cookies) {
-                var securityService = resourceService.getSecurityService();
-
-                var currentPrincipal = this;
-                securityService.getSessionInformation({}, {}, function (response) {
-                    if (response.status == 200) {
-                        var data = response.data;
-                        currentPrincipal.setAuthenticated(data);
-                    }
-                })
-            },
-            updatePrincipalUser: function(appMetadataSet){
-                var self = this;
-                appMetadataSet.metadataEvents.publish("ev:entityList:" +"user"+ ":update", function(){
-                    var entityList = appMetadataSet.getEntityList("user");
-                    if(entityList){
-                        self.currentUser = entityList.findEntityById(self.currentUserId);
-                    }
-                });
-            },
-            setAuthenticated: function (data) {
-                setNotAuthenticated(self);
-                if (data != undefined) {
-                    this.authenticated = true;
-                    this.name = data.userName;
-                    this.sessionId = data.sessionId;
-                    this.authorities = data.authorities;
-                    this.currentUserId = data.currentUserId;
-                }
-            }
-        });
-    })();
-
-    var ErrorDescription = appUtils.Class();
-    (function () {
-        ErrorDescription.prototype.$_buildObject = function () {
-            this.includeFd({
-                error: false,
-                status: 0,
-                statusText: "",
-                type: 'success'
-            })
-        };
-        ErrorDescription.includeMthd({
-            SetHTTPError: function (statusText, status) {
-                this.error = true;
-                this.status = status;
-                this.statusText = "HTTP error: " + statusText;
-            },
-            SetNoError: function () {
-                this.error = false;
-                this.status = 200;
-                this.statusText = "";
-            },
-            SetAppError: function (statusText) {
-                this.error = true;
-                this.status = 0;
-                this.statusText = "App error: " + statusText;
-            }
-        });
-    })();
-
-    var ErrorDescriptions = appUtils.Class();
-    (function () {
-        ErrorDescriptions.prototype.$_buildObject = function () {
-            this.includeFd({
-                errorDescriptions: [],
-                show: false
-            });
-        };
-        ErrorDescriptions.includeMthd({
-            handleResponse: function (response) {
-                var errorDescription = new ErrorDescription();
-                errorDescription.SetNoError();
-                if ((response.status == 200) ||
-                    (response.status == 404) ||
-                    (response.status == 403)
-                ){
-                    var objectResponse = response.data;
-                    if (objectResponse instanceof Object) {
-                        if ("message" in objectResponse && "status" in objectResponse) { //ToDo
-                            if (response.data.status != 200) {
-                                errorDescription.SetAppError(objectResponse.message);
-                            }
-                        }
-                    }else if(response.status != 200){
-                        objectResponse=eval("("+response.data+")");
-                        errorDescription.SetAppError(objectResponse.message);
-                    }
-                } else {
-                    errorDescription.SetHTTPError(response.statusText, response.status);
-                }
-                if (errorDescription.error) {
-                    this.addErrorDescription(errorDescription);
-                    this.show = true;
-                }
-            },
-            addErrorDescription: function (_data) {
-                this.errorDescriptions.push(_data);
-            },
-            delErrorDescription: function (index) {
-                this.errorDescriptions.splice(index, 1);
-            },
-            getErrorDescriptions: function () {
-                return this.errorDescriptions;
-            },
-            errorsCount: function () {
-                return this.errorDescriptions.length;
-            }
-        });
-    })();
-
-    var EditForm = appUtils.Class();
-    (function () {
-        EditForm.prototype.$_buildObject = function () {
-            this.includeFd({
-                editFormName: "<--label for form-->",
-                formProperties: {},
-
-                eventCloseForm: function () {
-                },
-                eventUpdateForm: function () {
-                }
-            });
-        };
-    })();
-
-    var EntityEditForm = appUtils.Class(EditForm);
-    (function () {
-        EntityEditForm.prototype.$_buildObject = function () {
-            this.includeFd({
-                currentEntity: {},
-
-                eventCreateEntity: function () {
-                }
-            });
-        };
-    })();
-
-    var EntityListForm = appUtils.Class(EditForm);
-    (function () {
-        EntityListForm.prototype.$_buildObject = function () {
-            this.includeFd({
-                entities: [],
-
-                eventAddNewEntity: function () {
-                },
-                eventDeleteEntity: function (id) {
-                },
-                eventEditEntity: function (id) {
-                }
-            });
-        };
-    })();
-
-    var MenuCommand = appUtils.Class();
-    (function(){
-        MenuCommand.prototype.$_buildObject = function(){
-            this.includeFd({
-                commandName: "",
-
-                dropdownMenu: false,
-                text: "",
-                command: null,
-                commandList: []
-            })
-        };
-        MenuCommand.includeMthd({
-            addCommand: function(command){
-                this.commandList.push(command);
-                return this;
-            },
-            getSubMenu: function(commandName){
-                for (var i = 0; i < this.commandList.length; i++) {
-                    var currentCommand = this.commandList[i];
-                    if (currentCommand.commandName === commandName){
-                        return currentCommand;
-                    }
-                    if(currentCommand.commandList.length > 0){
-                        return currentCommand.getSubMenu(commandName);
-                    }
-                }
-                return undefined;
-            }
-        });
-
-    }());
-
-    var Interface = appUtils.Class();
-    (function () {
-        Interface.prototype.$_buildObject = function () {
-            this.includeFd({
-                security: {
-                    principal: new Principal()
-                },
-                errorDescriptions: new ErrorDescriptions(),
-                commandBar: {
-                    mainUrl: '#',
-                    commandBar: new MenuCommand()
-                },
-                appMetadataSet: null
-            });
-        };
-        Interface.includeMthd({
-            commandBarSetMainUrl: function (mainUrl) {
-                this.commandBar.mainUrl = mainUrl;
-                return this;
-            },
-            commandBarAddCommand: function (command) {
-                this.commandBar.commandList.push(command);
-                return this;
-            },
-            editFormGetEntityEditForm: function () {
-                return new EntityEditForm();
-            },
-            editFormGetEntityListForm: function () {
-                return new EntityListForm();
-            }
-        })
-    }());
-
-    appInterface.Interface = Interface;
-    appInterface.getNewEntityCommand = function(commandName, text){
-        var command = new MenuCommand();
-        command.dropdownMenu = false;
-        command.commandName = commandName;
-        command.text = text;
-        command.command = commandName;
-
-        return command;
-    };
-    appInterface.getNewDropdownCommand = function(commandName, text){
-        var command = new MenuCommand();
-        command.dropdownMenu = true;
-        command.commandName = commandName;
-        command.text = text;
-        return command;
-    };
-    appInterface.getNewCommand = function(commandName, text, functionCommand){
-        var command = new MenuCommand();
-        command.dropdownMenu = false;
-        command.commandName = commandName;
-        command.text = text;
-        command.command = functionCommand;
-
-        return command;
-    };
-
-}(appInterface));
 
 ////////////////////////////////////
 // angular SERVICEs

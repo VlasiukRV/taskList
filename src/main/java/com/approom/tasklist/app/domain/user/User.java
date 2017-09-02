@@ -20,7 +20,7 @@ import java.util.Set;
 public class User extends BaseEntity<Integer> {
 
     @JsonProperty
-    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name="user_roles",
             joinColumns = @JoinColumn( name="user_id"),
@@ -76,7 +76,7 @@ public class User extends BaseEntity<Integer> {
 
         User entity = (User) o;
 
-        return entity.getId() == id;
+        return entity.getId() == this.id;
 
     }
 
