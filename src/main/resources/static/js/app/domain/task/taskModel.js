@@ -39,6 +39,9 @@ appInitialization.InitTaskModel = function(){
                         inputType: "select",
                         label: "author",
                         availability: true,
+                        getInstance: function(){
+                            return appMetadataSet.getEntityInstance("user");
+                        },
                         entityListService: function () {
                             return appMetadataSet.getEntityList("user");
                         }
@@ -61,6 +64,9 @@ appInitialization.InitTaskModel = function(){
                         inputType: "select",
                         label: "project",
                         availability: true,
+                        getInstance: function(){
+                            return appMetadataSet.getEntityInstance("project");
+                        },
                         entityListService: function () {
                             return appMetadataSet.getEntityList("project")
                         }

@@ -30,11 +30,11 @@ public class Task extends BaseEntity<Integer> {
     private @Getter @Setter String title;
 
     @JsonProperty
-    @ManyToOne
+    @ManyToOne(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
     private @Getter @Setter User author;
 
     @JsonProperty
-    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(
             name="task_executor_detail",
             joinColumns = {@JoinColumn( name="task_id")},
@@ -53,18 +53,16 @@ public class Task extends BaseEntity<Integer> {
     protected @Getter @Setter TaskState state;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
-
-        Task entity = (Task) o;
-
-        return this.id == entity.getId();
-
+    public boolean equals(Object other) {
+        if (this==other) return true;
+        if (id==null) return false;
+        if ( !(other instanceof Task) ) return false;
+        final Task that = (Task) other;
+        return this.id.equals( that.getId() );
     }
 
     @Override
     public int hashCode() {
-        return ("Task"+id).hashCode();
+        return id==null ? System.identityHashCode(this) : id.hashCode();
     }
 }

@@ -1,16 +1,10 @@
 package com.approom.tasklist.app.domain.task;
 
-import com.approom.tasklist.AppUtils;
 import com.approom.tasklist.app.domain.BaseEntityService;
-import com.approom.tasklist.app.domain.project.Project;
 import com.approom.tasklist.app.domain.project.ProjectService;
-import com.approom.tasklist.app.domain.user.User;
 import com.approom.tasklist.app.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 public class TaskService extends BaseEntityService<Task, Integer> {
@@ -25,7 +19,7 @@ public class TaskService extends BaseEntityService<Task, Integer> {
         super(Task.class, taskRepository);
     }
 
-    public Task saveEntity(String strJSONEntity){
+    /*public Task saveEntity(String strJSONEntity){
         Task entity = AppUtils.getEntityByJSON(Task.class, strJSONEntity);
         if (entity == null){
             return null;
@@ -48,5 +42,5 @@ public class TaskService extends BaseEntityService<Task, Integer> {
         }
         return rez;
     }
-
+*/
 }

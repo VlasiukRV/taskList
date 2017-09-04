@@ -33,20 +33,17 @@ public class Role extends BaseEntity<Integer> {
 */
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Role)) return false;
-
-        Role entity = (Role) o;
-
-        if (id != entity.getId()) return false;
-
-        return true;
+    public boolean equals(Object other) {
+        if (this==other) return true;
+        if (id==null) return false;
+        if ( !(other instanceof Role) ) return false;
+        final Role that = (Role) other;
+        return this.id.equals( that.getId() );
     }
 
     @Override
     public int hashCode() {
-        return ("Role"+id).hashCode();
+        return id==null ? System.identityHashCode(this) : id.hashCode();
     }
 
 }

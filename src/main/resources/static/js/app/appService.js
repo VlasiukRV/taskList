@@ -913,7 +913,11 @@ var appModel = Object.create(null);
                             /*entityFields[key].representationList = source[key].representationList;*/
                         }
                     } else if (typeof source[key].value === 'object') {
-                        entityFields[key] = {};
+                        if(source[key].fieldDescription && source[key].fieldDescription.getInstance){
+                            entityFields[key] = source[key].fieldDescription.getInstance();
+                        }else {
+                            entityFields[key] = {};
+                        }
                     }
                     else {
                         entityFields[key] = source[key].value;

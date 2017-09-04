@@ -1,7 +1,6 @@
 package com.approom.tasklist.app.domain.project;
 
 import com.approom.tasklist.app.domain.BaseEntity;
-import com.approom.tasklist.app.domain.task.Task;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -9,9 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Component
 @Entity
@@ -20,11 +19,15 @@ import java.util.Set;
 
 @NoArgsConstructor
 public class Project extends BaseEntity<Integer> {
+
     @Column
     @JsonProperty
     private @Getter @Setter String name;
+
+/*
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private @Getter @Setter Set<Task> tasks = new HashSet<>();
+*/
 
     public Project(String name) {
         super();
@@ -32,6 +35,7 @@ public class Project extends BaseEntity<Integer> {
         this.name = name;
     }
 
+/*
     public boolean addTask(Task task){
         if (tasks.contains(task)){
             return false;
@@ -39,22 +43,20 @@ public class Project extends BaseEntity<Integer> {
         this.tasks.add(task);
         return true;
     }
+*/
 
     @Override
-    public int hashCode() {
-        return ("Project"+id).hashCode();
+    public boolean equals(Object other) {
+        if (this==other) return true;
+        if (id==null) return false;
+        if ( !(other instanceof Project) ) return false;
+        final Project that = (Project) other;
+        return this.id.equals( that.getId() );
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Project)) return false;
-
-        Project project = (Project) o;
-
-        if (id!=project.getId()) return false;
-
-        return true;
+    public int hashCode() {
+        return id==null ? System.identityHashCode(this) : id.hashCode();
     }
 
 }

@@ -34,6 +34,7 @@ function ListEntityController($scope, dataStorage){
         entityListForm.eventPageChanged = this.pageChanged;
 
         $scope.entityListForm = entityListForm;
+        $scope.$parent.entityListForm = entityListForm;
 
         entityListForm.eventUpdateForm();
     };
@@ -59,8 +60,9 @@ function ListEntityController($scope, dataStorage){
     };
 
     this.deleteEntity = function(id){
+        var self = this;
         this.appMetadataSet.getEntityList(this.metadataName).deleteEntity(id, function(data){
-            this.updateViewEntityList();
+            self.updateViewEntityList();
         });
     };
 
@@ -119,6 +121,7 @@ function EditEntityController($scope, dataStorage){
         entityEditForm.createEntity = this.createEntity;
 
         $scope.entityEditForm = entityEditForm;
+        $scope.$parent.entityEditForm = entityEditForm;
     };
 
     this.updateForm = function(){
@@ -137,7 +140,7 @@ function EditEntityController($scope, dataStorage){
 
     this.openEditForm = function(){
         $scope.$parent.showEditForm = true;
-        this.updateForm();
+        this.entityEditForm.updateForm();
     };
 
     this.closeEditForm = function(){

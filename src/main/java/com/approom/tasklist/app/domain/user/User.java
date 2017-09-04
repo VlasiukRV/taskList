@@ -20,7 +20,7 @@ import java.util.Set;
 public class User extends BaseEntity<Integer> {
 
     @JsonProperty
-    @ManyToMany
+    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(
             name="user_roles",
             joinColumns = @JoinColumn( name="user_id"),
@@ -70,18 +70,16 @@ public class User extends BaseEntity<Integer> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-
-        User entity = (User) o;
-
-        return entity.getId() == this.id;
-
+    public boolean equals(Object other) {
+        if (this==other) return true;
+        if (id==null) return false;
+        if ( !(other instanceof User) ) return false;
+        final User that = (User) other;
+        return this.id.equals( that.getId() );
     }
 
     @Override
     public int hashCode() {
-        return ("User"+id).hashCode();
+        return id==null ? System.identityHashCode(this) : id.hashCode();
     }
 }

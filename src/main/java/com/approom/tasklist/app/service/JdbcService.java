@@ -60,6 +60,7 @@ public class JdbcService {
         jdbc.execute("insert into user(name, description)values('admin','admin')");
 */
 
+/*
         logger.info("Init data base");
         System.out.println("		---- Load user's: admin password admin; user password user");
 
@@ -74,23 +75,26 @@ public class JdbcService {
         userAdmin.setUsername("admin");
         userAdmin.setPassword("admin");
         userAdmin.setMailAddress("vlasiukrv@gmail.com");
-        userAdmin.addRole(roleAdmin);
-        userAdmin.addRole(roleUser);
+*/
+/*
+        userAdmin.addRole(roleService.getEntityById(1));
+        userAdmin.addRole(roleService.getEntityById(2));
+*//*
+
         userService.saveEntity(userAdmin);
         User userUser = new User();
         userUser.setUsername("user");
         userUser.setPassword("user");
         userUser.setMailAddress("alyona.lisitsyna@gmail.com ");
-        userUser.addRole(roleUser);
-        userService.saveEntity(userUser);
+*/
+/*        userUser.addRole(roleUser);*//*
 
-        HashSet<User> users = new HashSet<>();
-        users.add(userAdmin);
-        users.add(userUser);
+        userService.saveEntity(userUser);
 
         Project project1 = new Project();
         project1.setName("Work");
         projectService.saveEntity(project1);
+*/
 
         return true;
     }

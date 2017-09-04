@@ -112,11 +112,31 @@ var appUtils = Object.create(null);
             if (angular.isDate(sourceProperty)){
                 receiver[key] = sourceProperty;
             } else if (angular.isArray(sourceProperty)) {
-                receiver[key].fillByTemplate(sourceProperty);
+                if(receiver[key]){
+                    if(receiver[key].fillByTemplate) {
+                        receiver[key].fillByTemplate(sourceProperty);
+                    }
+                }else {
+                    receiver[key] = [];
+                }
+                if(sourceProperty.fillByTemplate){
+                    receiver[key].fillByTemplate = sourceProperty.fillByTemplate;
+                    receiver[key].fillByTemplate(sourceProperty);
+                }else{
+                    receiver[key] = sourceProperty;
+                }
+                if(sourceProperty.representationList){
+                    receiver[key].representationList = sourceProperty.representationList;
+                }
+
             } else if(sourceProperty == null){
                 receiver[key] = sourceProperty;
             } else if (typeof sourceProperty === 'object') {
-                receiver[key] = {};
+                if(receiver[key]){
+
+                }else {
+                    receiver[key] = {};
+                }
                 appUtils.fillValuesProperty(sourceProperty, receiver[key]);
             } else {
                 receiver[key] = sourceProperty;
@@ -136,10 +156,16 @@ var appUtils = Object.create(null);
             if (angular.isDate(sourceProperty)){
                 receiver[key] = sourceProperty;
             } else if (angular.isArray(sourceProperty)) {
-                receiver[key] = [];
-                // ToDo
+                if(receiver[key]){
+
+                }else {
+                    receiver[key] = [];
+                }
                 if(sourceProperty.fillByTemplate){
                     receiver[key].fillByTemplate = sourceProperty.fillByTemplate;
+                    receiver[key].fillByTemplate(sourceProperty);
+                }else{
+                    receiver[key] = sourceProperty;
                 }
                 if(sourceProperty.representationList){
                     receiver[key].representationList = sourceProperty.representationList;
@@ -147,7 +173,11 @@ var appUtils = Object.create(null);
             } else if(sourceProperty == null){
                 receiver[key] = sourceProperty;
             } else if (typeof sourceProperty === 'object') {
-                receiver[key] = {};
+                if(receiver[key]){
+
+                }else {
+                    receiver[key] = {};
+                }
                 appUtils.fillAllValuesProperty(sourceProperty, receiver[key]);
             } else {
                 receiver[key] = sourceProperty;
