@@ -30,11 +30,11 @@ public class Task extends BaseEntity<Integer> {
     private @Getter @Setter String title;
 
     @JsonProperty
-    @ManyToOne(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToOne(cascade={CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private @Getter @Setter User author;
 
     @JsonProperty
-    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade={CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @JoinTable(
             name="task_executor_detail",
             joinColumns = {@JoinColumn( name="task_id")},
@@ -43,7 +43,7 @@ public class Task extends BaseEntity<Integer> {
     private @Getter @Setter Set<User> executor = new HashSet<>();
 
     @JsonProperty
-    @ManyToOne(cascade={CascadeType.ALL})
+    @ManyToOne(cascade={CascadeType.REMOVE})
     @JoinColumn
     private @Getter @Setter Project project;
 

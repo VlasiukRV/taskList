@@ -1,8 +1,8 @@
 
-function getAppHttpUrl($location, urlSufix){
+function getAppHttpUrl($location, urlSuffix){
     var appAddress = "http://"+$location.$$host+":"+$location.$$port;
 
-    return appAddress + "/appTaskList" + urlSufix;
+    return appAddress + "/appTaskList" + urlSuffix;
 }
 
 ////////////////////////////////////

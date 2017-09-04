@@ -56,11 +56,9 @@ public class JdbcService {
     }
 
     public Boolean initDataBase() {
-/*
-        jdbc.execute("insert into user(name, description)values('admin','admin')");
-*/
 
-/*
+        /*jdbc.execute("insert into user(name, description)values('admin','admin')");*/
+
         logger.info("Init data base");
         System.out.println("		---- Load user's: admin password admin; user password user");
 
@@ -75,26 +73,25 @@ public class JdbcService {
         userAdmin.setUsername("admin");
         userAdmin.setPassword("admin");
         userAdmin.setMailAddress("vlasiukrv@gmail.com");
-*/
+
 /*
         userAdmin.addRole(roleService.getEntityById(1));
         userAdmin.addRole(roleService.getEntityById(2));
-*//*
+*/
 
         userService.saveEntity(userAdmin);
         User userUser = new User();
         userUser.setUsername("user");
         userUser.setPassword("user");
-        userUser.setMailAddress("alyona.lisitsyna@gmail.com ");
-*/
-/*        userUser.addRole(roleUser);*//*
+        userUser.setMailAddress("alyona.lisitsyna@gmail.com");
+/*        userUser.addRole(roleUser);*/
 
         userService.saveEntity(userUser);
 
         Project project1 = new Project();
         project1.setName("Work");
         projectService.saveEntity(project1);
-*/
+
 
         return true;
     }

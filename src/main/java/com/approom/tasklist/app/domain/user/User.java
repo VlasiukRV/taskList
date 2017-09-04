@@ -20,7 +20,7 @@ import java.util.Set;
 public class User extends BaseEntity<Integer> {
 
     @JsonProperty
-    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade={CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @JoinTable(
             name="user_roles",
             joinColumns = @JoinColumn( name="user_id"),

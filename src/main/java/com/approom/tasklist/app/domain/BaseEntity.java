@@ -19,7 +19,7 @@ public abstract class BaseEntity<ID> implements Serializable {
     protected @Getter @Setter ID id;
 
     @JsonProperty
-    @Column
+    @Lob
     protected @Getter @Setter String description;
 
 }

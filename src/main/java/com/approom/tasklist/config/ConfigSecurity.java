@@ -67,6 +67,7 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
                             "/",
                             "/css/**",
                             "/img/**",
+                            "/fonts/**",
                             "/js/**",
                             "/templates/**",
                             "/service/**",
