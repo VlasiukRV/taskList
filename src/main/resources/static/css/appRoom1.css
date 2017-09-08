@@ -14,8 +14,7 @@
     color: #FFF;
 }
 
-#appDescriptionTaskList{
-    background-image: url('../img/To-do_list.jpg');
-    background-position: center top;
+#appDescriptionTaskList {
+    background: url('../img/To-do_list.jpg') center top;
     background-size: cover;
 }

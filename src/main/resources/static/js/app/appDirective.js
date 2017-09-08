@@ -13,7 +13,7 @@ function directiveLoginPage(){
             $scope.login = function(){
                 var appMetadataSet = dataStorage.getAppMetadaSet();
                 if(appMetadataSet) {
-                    var principal = appMetadataSet.interface.security.principal;
+                    var principal = appMetadataSet.userInterface.security.principal;
                     if(principal) {
                         principal.login($http, $scope.credentials, function (data) {
                             if (data.authenticated) {
@@ -110,7 +110,6 @@ function directiveUpdatableText($interval){
             fCallBack: "&"
         },
         link: function link(scope, element, attrs) {
-            var format = 'M/d/yy h:mm:ss a';
             var timeoutId;
 
             var updateText = function updateText(){
@@ -137,7 +136,7 @@ function directiveUpdatableText($interval){
 function directiveCurrentTime($interval, dateFilter) {
     return {
         link: function link(scope, element, attrs) {
-
+            var format = 'M/d/yy h:mm:ss a';
             var timeoutId;
 
             var updateTimer = function() {

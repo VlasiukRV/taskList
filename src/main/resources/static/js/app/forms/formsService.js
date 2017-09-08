@@ -1,13 +1,14 @@
 
 function ListEntityController($scope, dataStorage){
     this.appMetadataSet = dataStorage.getAppMetadaSet();
+    this.numPerpage = 10;
 
     this.initController = function(){
         $scope.$parent.openListForm = this.openListForm;
         $scope.$parent.closeListForm = this.closeListForm;
 
         var metadataSpecification = this.appMetadataSet.getEntityList(this.metadataName);
-        var entityListForm = this.appMetadataSet.interface.editFormGetEntityListForm();
+        var entityListForm = this.appMetadataSet.userInterface.editFormGetEntityListForm();
 
         entityListForm.metadataName = this.metadataName;
         entityListForm.appMetadataSet = this.appMetadataSet;
@@ -16,11 +17,11 @@ function ListEntityController($scope, dataStorage){
         entityListForm.formProperties = metadataSpecification.metadataObject.fmListForm.metadataEditFieldsSet;
         entityListForm.entities = metadataSpecification.list;
 
-        entityListForm.numPerPage = 10;
+        entityListForm.numPerPage = this.numPerpage;
         entityListForm.currentPage = 1;
         entityListForm.totalItems = metadataSpecification.list.length;
-        entityListForm.entitiesFiltered =  new Array();
-        entityListForm.entitiesEmpty = new Array();
+        entityListForm.entitiesFiltered =  [];
+        entityListForm.entitiesEmpty = [];
 
         entityListForm.eventCloseForm = this.closeListForm;
         entityListForm.eventUpdateForm = this.updateForm;
@@ -86,6 +87,7 @@ function ListEntityController($scope, dataStorage){
 
     this.openListForm = function(){
         $scope.$parent.showListForm = true;
+        this.updateViewEntityList();
     };
 
     this.updateForm = function(){
@@ -104,12 +106,13 @@ function EditEntityController($scope, dataStorage){
 
         var metadataSpecification = this.appMetadataSet.getEntityList(this.metadataName);
 
-        var entityEditForm = this.appMetadataSet.interface.editFormGetEntityEditForm();
+        var entityEditForm = this.appMetadataSet.userInterface.editFormGetEntityEditForm();
         entityEditForm.metadataName = this.metadataName;
         entityEditForm.appMetadataSet = this.appMetadataSet;
         entityEditForm.metadataSpecification = metadataSpecification;
         entityEditForm.editFormName = "New " +this.metadataName+ ":";
         entityEditForm.formProperties = metadataSpecification.metadataObject.fmEditForm.metadataEditFieldsSet;
+        entityEditForm.entityFieldsPlacing = metadataSpecification.metadataObject.fmEditForm.metadataEditFieldsPlacing;
 
         entityEditForm.eventCloseForm = this.closeEditForm;
         entityEditForm.eventUpdateForm = this.updateForm;

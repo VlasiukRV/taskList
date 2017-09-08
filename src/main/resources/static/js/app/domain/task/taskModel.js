@@ -95,7 +95,22 @@ appInitialization.InitTaskModel = function(){
                 }
 
             }
-        }
+        },
+
+        entityFieldsPlacing: [
+            /*{editFieldId: [*/
+                {editFieldId: [
+                    {editFieldId: [{editFieldId: "id", fieldLength: 12}], fieldLength: 12},
+                    {editFieldId: [{editFieldId: "date", fieldLength: 12}], fieldLength: 12},
+                ], fieldLength: 5},
+
+                {editFieldId: [
+                    {editFieldId: [{editFieldId: "title", fieldLength: 12}], fieldLength: 12},
+                    {editFieldId: [{editFieldId: "project", fieldLength: 12}], fieldLength: 12},
+                ], fieldLength: 7}
+            /*], fieldLength: 12}*/
+        ]
+
     };
     metadataEntitySpecification_Task.entityField.entityField.executor.value.representationList = function() {
         var str = "";

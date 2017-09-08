@@ -1,6 +1,5 @@
-
-function getAppHttpUrl($location, urlSuffix){
-    var appAddress = "http://"+$location.$$host+":"+$location.$$port;
+function getAppHttpUrl($location, urlSuffix) {
+    var appAddress = "http://" + $location.$$host + ":" + $location.$$port;
 
     return appAddress + "/appTaskList" + urlSuffix;
 }
@@ -19,11 +18,10 @@ function dataStorage() {
     var currentTask = null;
 
     return {
-
-        getAppMetadaSet: function(){
+        getAppMetadaSet: function () {
             return appMetadataSet;
         },
-        setAppMetadataSet: function(metadataSet){
+        setAppMetadataSet: function (metadataSet) {
             appMetadataSet = metadataSet;
         },
 
@@ -117,68 +115,15 @@ function getMetadataSet(resourceService) {
         .InitProjectModel()
         .InitUserModel()
         .InitTaskModel()
-        
+
         .initMetadataSet();
-    
+
     return appInitialization.getMetadataSet();
 }
 
-var appInitialization = Object.create(null);
-(function(){
-    appInitialization.metadataSet = undefined;
-
-    appInitialization.metadataSpecifications = {
-        enums: [],
-        entities: []
-    };
-
-    appInitialization.setMetadataSet = function(metadataSet){
-        if(metadataSet === undefined){
-            appInitialization.metadataSet = new appModel.MetadataSet();
-        }else {
-            appInitialization.metadataSet = metadataSet;
-        }
-        
-        return appInitialization;
-    };
-    appInitialization.getMetadataSet = function(){
-        return appInitialization.metadataSet;
-    };
-    appInitialization.initMetadataSet = function(){
-        var appMetadataSet = appInitialization.metadataSet;
-        
-        // EditBar
-        var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model");
-        var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
-            .addCommand(appInterface.getNewCommand("initDataBase",          "initDataBase",         function(){ExecuteSystemCommand(resourceService, "jdbc/initDataBase")}))
-            .addCommand(appInterface.getNewCommand("runArchiveService",     "runArchiveService",    function(){ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")}))
-            .addCommand(appInterface.getNewCommand("stopArchiveService",    "stopArchiveService",   function(){ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")}))
-            .addCommand(appInterface.getNewCommand("sendMail",              "sendMail",             function(){ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")}))
-            .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor",function(){ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")}));
-
-        var interface = new appInterface.Interface();
-        interface.appMetadataSet = appMetadataSet;
-        interface
-            .commandBarSetMainUrl("#/task")
-            .commandBar.commandBar
-                .addCommand(menuModel)
-                .addCommand(menuSystem);
-
-        appMetadataSet.interface = interface;
-        for(var i=0; i < appInitialization.metadataSpecifications.enums.length; i++){
-            appMetadataSet.installMetadataObjectEnum(appInitialization.metadataSpecifications.enums[i]);
-        }
-        for(var i=0; i < appInitialization.metadataSpecifications.entities.length; i++){
-            appMetadataSet.installMetadataObjectEntity(appInitialization.metadataSpecifications.entities[i]);
-        }
-        return appInitialization;
-    }
-    
-})(appInitialization)
-
 // Abstract model of application interface
 var appInterface = Object.create(null);
-(function (appInterface){
+(function (appInterface) {
 
     var Principal = appUtils.Class();
     (function () {
@@ -255,11 +200,11 @@ var appInterface = Object.create(null);
                     }
                 })
             },
-            updatePrincipalUser: function(appMetadataSet){
+            updatePrincipalUser: function (appMetadataSet) {
                 var self = this;
-                appMetadataSet.metadataEvents.publish("ev:entityList:" +"user"+ ":update", function(){
+                appMetadataSet.metadataEvents.publish("ev:entityList:" + "user" + ":update", function () {
                     var entityList = appMetadataSet.getEntityList("user");
-                    if(entityList){
+                    if (entityList) {
                         self.currentUser = entityList.findEntityById(self.currentUserId);
                     }
                 });
@@ -321,7 +266,7 @@ var appInterface = Object.create(null);
                 if ((response.status == 200) ||
                     (response.status == 404) ||
                     (response.status == 403)
-                ){
+                ) {
                     var objectResponse = response.data;
                     if (objectResponse instanceof Object) {
                         if ("message" in objectResponse && "status" in objectResponse) { //ToDo
@@ -329,8 +274,8 @@ var appInterface = Object.create(null);
                                 errorDescription.SetAppError(objectResponse.message);
                             }
                         }
-                    }else if(response.status != 200){
-                        objectResponse=eval("("+response.data+")");
+                    } else if (response.status != 200) {
+                        objectResponse = eval("(" + response.data + ")");
                         errorDescription.SetAppError(objectResponse.message);
                     }
                 } else {
@@ -362,6 +307,7 @@ var appInterface = Object.create(null);
             this.includeFd({
                 editFormName: "<--label for form-->",
                 formProperties: {},
+                formPropertiesPlacing: {},
 
                 eventCloseForm: function () {
                 },
@@ -400,8 +346,8 @@ var appInterface = Object.create(null);
     })();
 
     var MenuCommand = appUtils.Class();
-    (function(){
-        MenuCommand.prototype.$_buildObject = function(){
+    (function () {
+        MenuCommand.prototype.$_buildObject = function () {
             this.includeFd({
                 commandName: "",
 
@@ -412,17 +358,17 @@ var appInterface = Object.create(null);
             })
         };
         MenuCommand.includeMthd({
-            addCommand: function(command){
+            addCommand: function (command) {
                 this.commandList.push(command);
                 return this;
             },
-            getSubMenu: function(commandName){
+            getSubMenu: function (commandName) {
                 for (var i = 0; i < this.commandList.length; i++) {
                     var currentCommand = this.commandList[i];
-                    if (currentCommand.commandName === commandName){
+                    if (currentCommand.commandName === commandName) {
                         return currentCommand;
                     }
-                    if(currentCommand.commandList.length > 0){
+                    if (currentCommand.commandList.length > 0) {
                         return currentCommand.getSubMenu(commandName);
                     }
                 }
@@ -432,9 +378,9 @@ var appInterface = Object.create(null);
 
     }());
 
-    var Interface = appUtils.Class();
+    var UserInterface = appUtils.Class();
     (function () {
-        Interface.prototype.$_buildObject = function () {
+        UserInterface.prototype.$_buildObject = function () {
             this.includeFd({
                 security: {
                     principal: new Principal()
@@ -447,7 +393,7 @@ var appInterface = Object.create(null);
                 appMetadataSet: null
             });
         };
-        Interface.includeMthd({
+        UserInterface.includeMthd({
             commandBarSetMainUrl: function (mainUrl) {
                 this.commandBar.mainUrl = mainUrl;
                 return this;
@@ -465,8 +411,8 @@ var appInterface = Object.create(null);
         })
     }());
 
-    appInterface.Interface = Interface;
-    appInterface.getNewEntityCommand = function(commandName, text){
+    appInterface.UserInterface = UserInterface;
+    appInterface.getNewEntityCommand = function (commandName, text) {
         var command = new MenuCommand();
         command.dropdownMenu = false;
         command.commandName = commandName;
@@ -475,14 +421,14 @@ var appInterface = Object.create(null);
 
         return command;
     };
-    appInterface.getNewDropdownCommand = function(commandName, text){
+    appInterface.getNewDropdownCommand = function (commandName, text) {
         var command = new MenuCommand();
         command.dropdownMenu = true;
         command.commandName = commandName;
         command.text = text;
         return command;
     };
-    appInterface.getNewCommand = function(commandName, text, functionCommand){
+    appInterface.getNewCommand = function (commandName, text, functionCommand) {
         var command = new MenuCommand();
         command.dropdownMenu = false;
         command.commandName = commandName;
@@ -497,23 +443,22 @@ var appInterface = Object.create(null);
 // Abstract model of application
 var appModel = Object.create(null);
 (function (appModel, appInterface) {
-    appModel.resourceService = undefined;
 
     var MetadataEvents = appUtils.Class();
-    (function (){
+    (function () {
         MetadataEvents.prototype.$_buildObject = function () {
             this.includeFd({
                 events: $({})
             });
         };
         MetadataEvents.includeMthd({
-            subscribe: function(){
+            subscribe: function () {
                 this.events.bind.apply(this.events, arguments);
             },
-            unSubscribe: function(){
+            unSubscribe: function () {
                 this.events.unbind.apply(this.events, arguments);
             },
-            publish: function(){
+            publish: function () {
                 this.events.trigger.apply(this.events, arguments);
             }
         });
@@ -636,10 +581,10 @@ var appModel = Object.create(null);
                         this.addEntity(entity);
                     }, this);
                 }
-                console.log("Update "+this.metadataObject.metadataName);
+                console.log("Update " + this.metadataObject.metadataName);
             }
 
-            if(fCallBack) {
+            if (fCallBack) {
                 fCallBack(this);
             }
         };
@@ -658,7 +603,7 @@ var appModel = Object.create(null);
                 }, this);
             }
 
-            if(fCallBack) {
+            if (fCallBack) {
                 fCallBack(this);
             }
         };
@@ -707,7 +652,7 @@ var appModel = Object.create(null);
                 self.list = [];
                 appModel.resourceService.getEntityEditService()
                     .getEntity({entityName: this.metadataName}, {},
-                    function (data){
+                    function (data) {
                         updateEnt.call(self, fCallBack, data)
                     },
                     function (httpResponse) {
@@ -815,7 +760,8 @@ var appModel = Object.create(null);
 
                 metadataEditFieldsSet: [],
                 fmEditForm: {
-                    metadataEditFieldsSet: []
+                    metadataEditFieldsSet: {},
+                    metadataEditFieldsPlacing: []
                 },
                 fmListForm: {
                     metadataEditFieldsSet: [],
@@ -842,12 +788,15 @@ var appModel = Object.create(null);
                 }
 
             },
-            bookEntityForms: function (_metadataEditFieldsSet, _metadataFilterFieldsSet) {
-
+            bookEntityForms: function (_metadataEditFieldsSet, _metadataFilterFieldsSet, _editFieldsPlacing) {
+                var i;
+                if(_editFieldsPlacing){
+                    this.fmEditForm.metadataEditFieldsPlacing = _editFieldsPlacing;
+                }
                 if (_metadataEditFieldsSet) {
                     var editField = undefined;
 
-                    for (var i = 0; i < _metadataEditFieldsSet.length; i++) {
+                    for (i = 0; i < _metadataEditFieldsSet.length; i++) {
                         editField = _metadataEditFieldsSet[i];
 
                         if (editField.availability) {
@@ -855,11 +804,11 @@ var appModel = Object.create(null);
                         }
                     }
 
-                    for (var i = 0; i < this.metadataEditFieldsSet.length; i++) {
+                    for (i = 0; i < this.metadataEditFieldsSet.length; i++) {
                         editField = this.metadataEditFieldsSet[i];
 
                         if (editField.availabilityInEditForm) {
-                            this.fmEditForm.metadataEditFieldsSet.push(editField);
+                            this.fmEditForm.metadataEditFieldsSet[editField.name] = editField;
                         }
                         if (editField.availabilityInListForm) {
                             this.fmListForm.metadataEditFieldsSet.push(editField);
@@ -867,7 +816,7 @@ var appModel = Object.create(null);
                     }
                 }
                 if (_metadataFilterFieldsSet) {
-                    for (var i = 0; i < _metadataEditFieldsSet.length; i++) {
+                    for (i = 0; i < _metadataEditFieldsSet.length; i++) {
                         editField = _metadataEditFieldsSet[i];
                         /*if (appUtils.find(this.fmListForm.metadataEditFieldsSet, editField) > 0) {*/
                         this.fmListForm.metadataFilterFieldsSet.push(editField);
@@ -889,7 +838,8 @@ var appModel = Object.create(null);
                     objectField: {},
                     entityField: {},
                     defineField: {}
-                }
+                },
+                entityFieldsPlacing:[]
             })
         };
         MetadataEntitySpecification.includeMthd({
@@ -913,9 +863,9 @@ var appModel = Object.create(null);
                             /*entityFields[key].representationList = source[key].representationList;*/
                         }
                     } else if (typeof source[key].value === 'object') {
-                        if(source[key].fieldDescription && source[key].fieldDescription.getInstance){
+                        if (source[key].fieldDescription && source[key].fieldDescription.getInstance) {
                             entityFields[key] = source[key].fieldDescription.getInstance();
-                        }else {
+                        } else {
                             entityFields[key] = {};
                         }
                     }
@@ -934,6 +884,9 @@ var appModel = Object.create(null);
                     entityFieldsDescription.push(metadataEditField);
                 }
                 return entityFieldsDescription;
+            },
+            getEntityFieldsPlacing: function () {
+                return this.entityFieldsPlacing;
             }
         });
     })();
@@ -946,12 +899,12 @@ var appModel = Object.create(null);
                 entityList: Object.create(null),
                 metadataEvents: metadataEventsImpl,
 
-                // interface
-                interface: new appInterface.Interface()
+                // user interface
+                userInterface: new appInterface.UserInterface()
             });
         };
         MetadataSet.includeMthd({
-            installMetadataObjectEnum: function(metadataEnumSpecification){
+            installMetadataObjectEnum: function (metadataEnumSpecification) {
                 var EnumClass = metadataEnumSpecification.enumClass;
                 EnumClass.metadataName = metadataEnumSpecification.metadataName;
                 var metadataSet = this;
@@ -966,7 +919,7 @@ var appModel = Object.create(null);
 
                 return metadataSet;
             },
-            installMetadataObjectEntity:function (entitySpecification) {
+            installMetadataObjectEntity: function (entitySpecification) {
                 var metadataSet = this;
                 var EntityClass = entitySpecification.entityClass;
 
@@ -997,6 +950,7 @@ var appModel = Object.create(null);
                         entityListService: null
                     }
                 };
+                metadataEntitySpecification.entityFieldsPlacing = entitySpecification.entityFieldsPlacing;
 
                 (function () {
                     // field
@@ -1021,26 +975,27 @@ var appModel = Object.create(null);
                 );
 
                 var metadataEditFieldsSet = metadataEntitySpecification.getEntityFieldsDescription();
-                metadataObject.bookEntityForms(metadataEditFieldsSet);
+                var editFieldsPlacing = metadataEntitySpecification.getEntityFieldsPlacing();
+                metadataObject.bookEntityForms(metadataEditFieldsSet, undefined, editFieldsPlacing);
 
                 metadataSet.bookMetadataObject(metadataObject);
                 metadataSet.bookEntityList(entityList);
 
                 // event
-                metadataEventsImpl.subscribe("ev:entityList:" +metadataEntitySpecification.metadataName+ ":update",
-                    function(event, fCallBack){
+                metadataEventsImpl.subscribe("ev:entityList:" + metadataEntitySpecification.metadataName + ":update",
+                    function (event, fCallBack) {
                         entityList.update(fCallBack)
                     }
                 );
-                metadataEventsImpl.subscribe("ev:entityList:" +metadataEntitySpecification.metadataName+ ":deleteEntity",
-                    function(event, id, fCallBack){
+                metadataEventsImpl.subscribe("ev:entityList:" + metadataEntitySpecification.metadataName + ":deleteEntity",
+                    function (event, id, fCallBack) {
                         entityList.deleteEntity(id, fCallBack);
                     }
                 );
 
                 // EditMenu
-                var entitySubMenu = metadataSet.interface.commandBar.commandBar.getSubMenu('modelDD');
-                if(entitySubMenu != undefined){
+                var entitySubMenu = metadataSet.userInterface.commandBar.commandBar.getSubMenu('modelDD');
+                if (entitySubMenu != undefined) {
                     entitySubMenu.addCommand(appInterface.getNewEntityCommand(entitySpecification.metadataName, entitySpecification.metadataRepresentation))
                 }
 
@@ -1089,12 +1044,12 @@ var appModel = Object.create(null);
                 return null;
             },
             getInterface: function () {
-                this.interface;
+                return this.userInterface;
             },
 
             loadAllEntities: function () {
                 window.status = "Load objects...";
-                var entityName = undefined;
+                var entityName;
                 for (entityName in this.entityList) {
                     this.metadataEvents.publish("ev:entityList:" + entityName + ":update")
                 }
@@ -1102,25 +1057,84 @@ var appModel = Object.create(null);
         })
     })();
 
+    appModel.resourceService = undefined;
     appModel.Entity = Entity;
     appModel.Enum = Enum;
     appModel.MetadataSet = MetadataSet;
-    
-    /*
-     appModel.MetadataObject = MetadataObject;
-     appModel.MetadataEditField = MetadataEditField;
-     */
 
 })(appModel, appInterface);
+
+var appInitialization = Object.create(null);
+(function () {
+    appInitialization.metadataSet = undefined;
+    appInitialization.metadataSpecifications = {
+        enums: [],
+        entities: []
+    };
+
+    appInitialization.setMetadataSet = function (metadataSet) {
+        if (metadataSet === undefined) {
+            appInitialization.metadataSet = new appModel.MetadataSet();
+        } else {
+            appInitialization.metadataSet = metadataSet;
+        }
+
+        return appInitialization;
+    };
+    appInitialization.getMetadataSet = function () {
+        return appInitialization.metadataSet;
+    };
+    appInitialization.initMetadataSet = function () {
+        var appMetadataSet = appInitialization.metadataSet;
+
+        // EditBar
+        var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model");
+        var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
+            .addCommand(appInterface.getNewCommand("initDataBase", "initDataBase", function () {
+                ExecuteSystemCommand(resourceService, "jdbc/initDataBase")
+            }))
+            .addCommand(appInterface.getNewCommand("runArchiveService", "runArchiveService", function () {
+                ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")
+            }))
+            .addCommand(appInterface.getNewCommand("stopArchiveService", "stopArchiveService", function () {
+                ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")
+            }))
+            .addCommand(appInterface.getNewCommand("sendMail", "sendMail", function () {
+                ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")
+            }))
+            .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor", function () {
+                ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")
+            }));
+
+        var userInterface = new appInterface.UserInterface();
+        userInterface.appMetadataSet = appMetadataSet;
+        userInterface
+            .commandBarSetMainUrl("#/task")
+            .commandBar.commandBar
+            .addCommand(menuModel)
+            .addCommand(menuSystem);
+
+        appMetadataSet.userInterface = userInterface;
+        var i;
+        for (i = 0; i < appInitialization.metadataSpecifications.enums.length; i++) {
+            appMetadataSet.installMetadataObjectEnum(appInitialization.metadataSpecifications.enums[i]);
+        }
+        for (i = 0; i < appInitialization.metadataSpecifications.entities.length; i++) {
+            appMetadataSet.installMetadataObjectEntity(appInitialization.metadataSpecifications.entities[i]);
+        }
+        return appInitialization;
+    }
+
+})(appInitialization);
 
 ////////////////////////////////////
 // angular SERVICEs
 ////////////////////////////////////
 
-function setRoute(routeProvider){
+function setRoute(routeProvider) {
     routeProvider
         .when('/login', {
-            templateUrl : '/login'
+            templateUrl: '/login'
         })
         .when("/user", {
             templateUrl: "/appTaskList/security/usersList"
@@ -1141,29 +1155,29 @@ function setRoute(routeProvider){
     return routeProvider;
 }
 
-function appHttpResponseInterceptor($q, $location, dataStorage){
+function appHttpResponseInterceptor($q, dataStorage) {
     return {
-        'request': function(config) {
+        'request': function (config) {
             /*config.url = config.url.split('%2F').join('/');*/
             return config;
         },
 
         'response': function (response) {
             var appMetadataSet = dataStorage.getAppMetadaSet();
-            if(appMetadataSet){
-                var errorDescriptions = appMetadataSet.interface.errorDescriptions;
-                if(errorDescriptions){
+            if (appMetadataSet) {
+                var errorDescriptions = appMetadataSet.userInterface.errorDescriptions;
+                if (errorDescriptions) {
                     errorDescriptions.handleResponse(response);
                 }
             }
             return response;
         },
 
-        'responseError': function(response) {
+        'responseError': function (response) {
             var appMetadataSet = dataStorage.getAppMetadaSet();
-            if(appMetadataSet){
-                var errorDescriptions = appMetadataSet.interface.errorDescriptions;
-                if(errorDescriptions) {
+            if (appMetadataSet) {
+                var errorDescriptions = appMetadataSet.userInterface.errorDescriptions;
+                if (errorDescriptions) {
                     errorDescriptions.handleResponse(response);
                 }
             }
@@ -1172,8 +1186,10 @@ function appHttpResponseInterceptor($q, $location, dataStorage){
     };
 }
 
-function entityEditService($location, resource){
-    return resource(getAppHttpUrl($location, '/entity/:entityName/:entityId'), {
+function entityEditService($location, resource) {
+    return resource(
+        getAppHttpUrl($location, '/entity/:entityName/:entityId'),
+        {
             entityName: "@entityName",
             entityId: "@entityId"
         },
@@ -1187,11 +1203,14 @@ function entityEditService($location, resource){
             deleteEntity: {
                 method: "DELETE"
             }
-        });
+        }
+    );
 }
 
-function securityService($location, resource){
-    return resource(getAppHttpUrl($location, '/system/security/:command'), {
+function securityService($location, resource) {
+    return resource(
+        getAppHttpUrl($location, '/system/security/:command'),
+        {
             sessionID: "@sessionID"
         },
         {
@@ -1207,49 +1226,56 @@ function securityService($location, resource){
                     command: "getSessionInformation"
                 }
             }
-        });
+        }
+    );
 }
 
-function operationService($location, resource){
-    return resource(getAppHttpUrl($location, '/service/:command'), {
+function operationService($location, resource) {
+    return resource(
+        getAppHttpUrl($location, '/service/:command'),
+        {
             command: "@command"
         },
         {
             executeCommand: {
                 method: "GET"
             }
-        });
+        }
+    );
 }
 
-function systemService($location, resource){
-    return resource(getAppHttpUrl($location, '/system/:command'), {
+function systemService($location, resource) {
+    return resource(
+        getAppHttpUrl($location, '/system/:command'),
+        {
             command: "@command"
         },
         {
             executeCommand: {
                 method: "GET"
             }
-        });
+            }
+    );
 }
 
 function resourceService(_entityEditService, _systemService, _securityService, _operationService) {
 
-    var entityEditService   = _entityEditService;
-    var systemService       = _systemService;
-    var securityService    = _securityService;
-    var operationService    = _operationService;
+    var entityEditService = _entityEditService;
+    var systemService = _systemService;
+    var securityService = _securityService;
+    var operationService = _operationService;
 
     return {
         getEntityEditService: function () {
             return entityEditService;
         },
-        getSystemService: function(){
+        getSystemService: function () {
             return systemService;
         },
-        getSecurityService: function(){
+        getSecurityService: function () {
             return securityService;
         },
-        getOperationService: function(){
+        getOperationService: function () {
             return operationService;
         }
     };
@@ -1259,11 +1285,11 @@ function resourceService(_entityEditService, _systemService, _securityService, _
 // UTILS
 ////////////////////////////////////
 
-function ExecuteSystemCommand(resourceService, command){
+function ExecuteSystemCommand(resourceService, command) {
     var systemService = resourceService.getSystemService();
     systemService.executeCommand({command: command}, {});
 }
-function ExecuteServiceCommand(resourceService, command){
+function ExecuteServiceCommand(resourceService, command) {
     var operationService = resourceService.getOperationService();
     operationService.executeCommand({command: command}, {});
 }

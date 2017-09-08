@@ -4,9 +4,9 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
 
     var appMetadataSet = getMetadataSet(resourceService);
     dataStorage.setAppMetadataSet(appMetadataSet);
-    $scope.errorDescriptions    = appMetadataSet.interface.errorDescriptions;
-    $scope.commandBar           = appMetadataSet.interface.commandBar;
-    $scope.principal            = appMetadataSet.interface.security.principal;
+    $scope.errorDescriptions = appMetadataSet.userInterface.errorDescriptions;
+    $scope.commandBar = appMetadataSet.userInterface.commandBar;
+    $scope.principal = appMetadataSet.userInterface.security.principal;
     var selfScope = $scope;
 
     $scope.getCurrentTime = function() {
@@ -21,7 +21,7 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
         var appMetadataSet = dataStorage.getAppMetadaSet();
         appMetadataSet.loadAllEntities();
 
-        var currentPrincipal = appMetadataSet.interface.security.principal;
+        var currentPrincipal = appMetadataSet.userInterface.security.principal;
         if(currentPrincipal.authenticated){
             currentPrincipal.getSessionInformation(resourceService, cookies);
             currentPrincipal.updatePrincipalUser(appMetadataSet);
@@ -34,17 +34,11 @@ workPlaceController = function($window, $http, $cookies, $rootScope, $scope, $lo
     };
     $scope.logout = function(){
         var appMetadataSet = dataStorage.getAppMetadaSet();
-        var currentPrincipal = appMetadataSet.interface.security.principal;
+        var currentPrincipal = appMetadataSet.userInterface.security.principal;
 
         if(currentPrincipal.authenticated) {
             currentPrincipal.logout($http);
             $location.url("/appTaskList");
         }
-    };
-
-    $scope.proba = function(){
-        var d = dataStorage;
-        var m = appMetadataSet;
-        $scope.errorDescriptions.show = true;
     };
 };

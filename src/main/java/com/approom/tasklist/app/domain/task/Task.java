@@ -23,6 +23,7 @@ public class Task extends BaseEntity<Integer> {
 
     @JsonProperty
     @Column
+    @Temporal(TemporalType.DATE)
     private @Getter @Setter Date date;
 
     @JsonProperty

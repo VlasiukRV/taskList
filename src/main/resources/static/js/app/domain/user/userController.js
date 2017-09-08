@@ -1,9 +1,5 @@
 
-////////////////////////////////////
-// CONTROLLERs
-////////////////////////////////////
-
-userController = function($scope, dataStorage){
+userController = function($scope) {
     $scope.showEditForm = false;
     $scope.showListForm = true;
 
@@ -14,7 +10,7 @@ userController = function($scope, dataStorage){
     $scope.closeListForm = function(){};
 };
 
-editUserController = function($scope, dataStorage){
+editUserController = function($scope, dataStorage) {
 
     EditEntityController.apply(this, arguments);
     this.metadataName = "user";
@@ -22,13 +18,13 @@ editUserController = function($scope, dataStorage){
 
 };
 
-userListController = function($scope, dataStorage){
+userListController = function($scope, dataStorage) {
     ListEntityController.apply(this, arguments);
     this.metadataName = "user";
     this.initController();
 };
 
-roleController = function($scope, dataStorage){
+roleController = function($scope){
     $scope.showEditForm = false;
     $scope.showListForm = true;
 
@@ -40,14 +36,12 @@ roleController = function($scope, dataStorage){
 };
 
 editRoleController = function($scope, dataStorage){
-
     EditEntityController.apply(this, arguments);
     this.metadataName = "role";
     this.initController();
-
 };
 
-roleListController = function($scope, dataStorage){
+roleListController = function($scope, dataStorage) {
     ListEntityController.apply(this, arguments);
     this.metadataName = "role";
     this.initController();

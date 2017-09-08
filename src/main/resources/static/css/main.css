@@ -1,10 +1,3 @@
-/*
-{
-    border: dotted;
-    border-bottom-width: thin;
-}
-*/
-
 html, body {
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
@@ -13,20 +6,13 @@ html, body {
 }
 
 header {
-/*
-    padding: 20px 0;
-    z-index: 1000;
-    position: fixed;
-*/
     background-image: url('https://s3.amazonaws.com/codecademy-content/projects/make-a-website/lesson-3/background.jpg');
 }
 
 .container {
-    margin-top:     0px;
-    margin-left:    0px;
-    margin-right:   0px;
-    margin-bottom:  10px;
+    margin: 0 0 10px;
 }
+
 header .row,
 footer .row {
     display: flex;
@@ -46,19 +32,15 @@ header nav {
 
 header p {
     padding: 0 20px;
-    margin: 0px 0px 0px 0px;
+    margin: 0  0 0;
 }
 
 .jumbotron {
     display: flex;
     align-items: center;
-    background-color: #ffffff;
-    text-shadow: 0.25px 0.25px 0.25px #000000;
-    background-color: transparent;
+    text-shadow: 0 0 0 #000000;
     background-size: contain;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: transparent no-repeat fixed center;
     height: 500px;
 }
 
@@ -81,27 +63,6 @@ section .row {
 .col-md-6 {
     margin: 0 0 30px;
 }
-
-/*
-.btn.btn-primary {
-    border-radius: 2px;
-    border: 0px;
-    color: #fbd1d5;
-    text-shadow: none;
-    background-color: #ffffff;
-}
-
-.btn.btn-primary:hover {
-    color: #ffffff;
-    background-color: #fbd1d5;
-}
-
-.btn-secondary {
-    background-color: #E8DFE0;
-    color: #ffffff;
-    margin: 0 0 30px;
-}
-*/
 
 footer {
     font-size: 12px;

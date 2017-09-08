@@ -1,7 +1,3 @@
-////////////////////////////////////
-// DIRECTIVEs
-////////////////////////////////////
-
 function directiveButton(){
     return{
         restrict: 'E',
@@ -19,9 +15,7 @@ function directiveButton(){
     }
 }
 
-function directiveDatePicker(dateFilter){
-
-    var format = 'dd.MM.yyyy';
+function directiveDatePicker(){
 
     return{
         require: 'ngModel',
@@ -35,22 +29,23 @@ function directiveDatePicker(dateFilter){
                         !angular.isDate(date)){
                         throw new Error('ng-Model value must be a Date object');
                     }
-                    /*date = dateFilter(date, format);*/
                     return date;
                 }
             );
 
             //view -> model
             ngModelCtrl.$parsers.push(function(viewValue){
-                    viewValue = new Date(viewValue);
-                    return viewValue;
+                    return viewValue.getTime();
                 }
             );
          }
     };
 }
 
-var refreshSelectList = function(scope, resourceService){
+var refreshSelectList = function(scope){
+    if(scope.property == undefined){
+        return;
+    }
     if(scope.property.inputType == "enum"){
         if(scope.property.entityListService()) {
             scope.selectList = scope.property.entityListService().list
@@ -62,28 +57,28 @@ var refreshSelectList = function(scope, resourceService){
     }
 };
 
-function directiveEntityProperty(resourceService, dataStorage){
+function directiveEntityProperty(){
     return{
         restrict: 'E',
         require: '',
         templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-property.html ',
         scope:{
-            entity: '= entity',
-            property: '= property'
+            entity: '=',
+            property: '='
         },
         link: function (scope, element, attrs) {
-            refreshSelectList(scope, resourceService);
+            refreshSelectList(scope);
         },
         controller: ['$scope', function ($scope) {
-            $scope.refreshSelectList = refreshSelectList($scope, resourceService);
+            $scope.refreshSelectList = refreshSelectList($scope);
             $scope.propertyChanged = function(){
             }
         }]
     }
 }
 
-function directiveEntityEditForm(resourceService){
-    return{
+function directiveEntityEditForm(){
+    return {
         restrict: 'E',
         require: '',
         templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-edit-form.html ',
@@ -106,8 +101,39 @@ function directiveEntityEditForm(resourceService){
         }]
     }
 }
+function directiveEntityEditFormRow(){
+    return {
+        restrict: 'E',
+        require: '',
+        templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-edit-form-row.html ',
+        scope:{
+            entityfieldsrow: "=",
+            entityeditform: "="
+        },
+        link: function(scope, element, attrs){
+        }
+    }
+}
 
-function directiveEntityListForm(resourceService){
+function directiveEntityEditFormCol($compile){
+    return {
+        restrict: 'E',
+        require: '',
+        templateUrl: '/templates/appRoom/tasklist/directive/entityEditDirective/entity-edit-form-col.html ',
+        scope:{
+            fieldplacing: "=",
+            entityeditform: "="
+        },
+        link: function(scope, element, attrs){
+            if(angular.isArray(scope.fieldplacing.editFieldId)){
+                var e =$compile("<entity-edit-form-row entityfieldsrow='fieldplacing.editFieldId' entityeditform='entityeditform'> </entity-edit-form-row>")(scope);
+                element.replaceWith(e);
+            }
+        }
+    }
+}
+
+function directiveEntityListForm(){
     return{
         restrict: 'E',
         require: '',

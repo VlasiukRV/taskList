@@ -1,4 +1,3 @@
-
 var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCookies', 'oi.select'])
 
         .config(['$controllerProvider', function ($controllerProvider) {
@@ -22,8 +21,8 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCoo
 
         }])
 
-        .factory('myHttpResponseInterceptor', ['$q', '$location', 'dataStorage', function ($q, $location, dataStorage) {
-            return appHttpResponseInterceptor($q, $location, dataStorage);
+        .factory('myHttpResponseInterceptor', ['$q', 'dataStorage', function ($q, dataStorage) {
+            return appHttpResponseInterceptor($q, dataStorage);
         }])
         .factory('entityEditService', function ($location, $resource) {
             return entityEditService($location, $resource);
@@ -47,21 +46,27 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCoo
             return dataStorage();
         }])
 
-        .directive('smDatepicker', ['dateFilter', function (dateFilter) {
-            return directiveDatePicker(dateFilter);
-        }])
+        .directive('smDatepicker', function () {
+            return directiveDatePicker();
+        })
         .directive('button', function () {
             return directiveButton();
         })
-        .directive('entityProperty', ['resourceService', 'dataStorage', function (resourceService, dataStorage) {
-            return directiveEntityProperty(resourceService, dataStorage);
+        .directive('entityProperty', function () {
+            return directiveEntityProperty();
+        })
+        .directive('entityEditForm', function () {
+            return directiveEntityEditForm();
+        })
+        .directive('entityEditFormCol', ['$compile', function ($compile) {
+            return directiveEntityEditFormCol($compile);
         }])
-        .directive('entityEditForm', ['resourceService', function (resourceService) {
-            return directiveEntityEditForm(resourceService);
-        }])
-        .directive('entityListForm', ['resourceService', function (resourceService) {
-            return directiveEntityListForm(resourceService);
-        }])
+        .directive('entityEditFormRow', function () {
+            return directiveEntityEditFormRow();
+        })
+        .directive('entityListForm', function () {
+            return directiveEntityListForm();
+        })
         .directive('updatableText', ['$interval', function ($interval) {
             return directiveUpdatableText($interval);
         }])
@@ -98,8 +103,8 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCoo
 app.controller('workPlaceController', ['$window', '$http', '$cookies', '$rootScope', '$scope', '$location', 'dataStorage', 'resourceService', 'dateFilter',
     workPlaceController($window, $http, $cookies, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter)]);
 
-app.controller('projectController', ['$scope', 'dataStorage',
-    projectController($scope, dataStorage)]);
+app.controller('projectController', ['$scope',
+    projectController($scope)]);
 
 app.controller('projectListController', ['$scope', 'dataStorage',
     projectListController($scope, dataStorage)]);
@@ -107,8 +112,8 @@ app.controller('projectListController', ['$scope', 'dataStorage',
 app.controller('editProjectController', ['$scope', 'dataStorage',
     editProjectController($scope, dataStorage)]);
 
-app.controller('taskController', ['$scope', 'dataStorage',
-    taskController($scope, dataStorage)]);
+app.controller('taskController', ['$scope',
+    taskController($scope)]);
 
 app.controller('taskListController', ['$scope', 'dataStorage',
     taskListController($scope, dataStorage)]);
@@ -116,8 +121,8 @@ app.controller('taskListController', ['$scope', 'dataStorage',
 app.controller('editTaskController', ['$scope', 'dataStorage',
     editTaskController($scope, dataStorage)]);
 
-app.controller('userController', ['$scope', 'dataStorage',
-    userController($scope, dataStorage)]);
+app.controller('userController', ['$scope',
+    userController($scope)]);
 
 app.controller('userListController', ['$scope', 'dataStorage',
     userListController($scope, dataStorage)]);
@@ -125,12 +130,11 @@ app.controller('userListController', ['$scope', 'dataStorage',
 app.controller('editUserController', ['$scope', 'dataStorage',
     editUserController($scope, dataStorage)]);
 
-app.controller('roleController', ['$scope', 'dataStorage',
-    roleController($scope, dataStorage)]);
+app.controller('roleController', ['$scope',
+    roleController($scope)]);
 
 app.controller('roleListController', ['$scope', 'dataStorage',
     roleListController($scope, dataStorage)]);
 
 app.controller('editRoleController', ['$scope', 'dataStorage',
     editRoleController($scope, dataStorage)]);
-

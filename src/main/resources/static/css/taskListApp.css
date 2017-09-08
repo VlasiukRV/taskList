@@ -2,53 +2,73 @@ header {
     position: inherit;
 }
 
-.appWorkPlace{
+.appWorkPlace {
     height:500px;
     overflow:auto;
     background-image: url('../img/To-do_list.jpg');
     background-size: cover;
     background-blend-mode: overlay;
+    opacity: 0.8;
 }
 
-table{
+table {
     border-collapse: collapse;
-    width: 600px;
+    /*width: 600px;*/
     overflow:auto;
-    border-top: 2px solid #000; /* Линия сверху таблицы */
-    border-bottom: 2px solid #000; /* Линия внизу таблицы */
+    border-top: 2px solid #12858f;
+    border-bottom: 2px solid #12858f;
 }
 
-th, td{
+th, td {
     border: none;
 }
 
-th{
+th {
     background-color: #000;
     color: #fff;
 }
 
-tr:nth-last-of-type(even){
+tr:nth-last-of-type(even) {
     background-color: #F3F3F3;
 }
 
-tr:nth-of-type(odd){
+tr:nth-of-type(odd) {
     background-color: #ddd;
 }
 
-.app-popup{
+.app-popup {
     width:100%;
     min-height:100%;
     background-color: rgba(0,0,0,0.5);
     overflow:hidden;
     position:fixed;
-    top:0px;
+    top:0;
 }
-.app-popup .app-popup-content{
+
+.app-popup .app-popup-content {
     margin:20%;
     width:300px;
     height: auto;
     padding:10px;
     background-color: #c5c5c5;
     border-radius:5px;
-    box-shadow: 0px 0px 10px #000;
+    box-shadow: 0 0 10px #000;
+}
+
+tr {
+    height: 30px;
+}
+
+tr:hover ~ button {
+    opacity: 1;
+    -webkit-transition: opacity 1s linear;
+}
+
+.fade {
+    opacity: 0.1;
+}
+
+.fade:hover {
+    opacity: 1;
+    -webkit-transition: opacity 1s linear;
 }

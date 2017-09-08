@@ -1,9 +1,4 @@
-
-////////////////////////////////////
-// CONTROLLERs
-////////////////////////////////////
-
-projectController = function($scope, dataStorage){
+projectController = function($scope) {
     $scope.showEditForm = false;
     $scope.showListForm = true;
 
@@ -14,15 +9,13 @@ projectController = function($scope, dataStorage){
     $scope.closeListForm = function(){};
 };
 
-editProjectController = function($scope, dataStorage){
-
-    EditEntityController.apply(this, arguments)
+editProjectController = function($scope, dataStorage) {
+    EditEntityController.apply(this, arguments);
     this.metadataName = "project";
     this.initController();
-
 };
 
-projectListController = function($scope, dataStorage){
+projectListController = function($scope, dataStorage) {
     ListEntityController.apply(this, arguments);
     this.metadataName = "project";
     this.initController();

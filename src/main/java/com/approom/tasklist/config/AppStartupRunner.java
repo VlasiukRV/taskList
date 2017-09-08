@@ -24,7 +24,7 @@ public class AppStartupRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         logger.info("Init data base");
-        jdbcService.initDataBase();
+        /*jdbcService.initDataBase();*/
 
     }
 

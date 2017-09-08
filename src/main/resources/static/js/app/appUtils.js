@@ -10,7 +10,6 @@ var appUtils = Object.create(null);
 
         // prototype есть только в функции
         // При создании объекта через new, в его прототип __proto__ записывается ссылка из prototype
-
         var klass = function () {
             if (Parent) {
                 // call object builder of parent
@@ -26,7 +25,6 @@ var appUtils = Object.create(null);
         if (Parent) {
             // Inherit
             klass.prototype = Object.create(Parent.prototype);
-
             // save parent
             klass.prototype.$_parentClass = Parent;
         }
@@ -36,8 +34,6 @@ var appUtils = Object.create(null);
             var extended = obj.extended;
             for (var key in obj) {
                 klass[key] = obj[key];
-
-                installSettersGettersForKey(key);
             }
             if (extended) extended(klass);
         };
@@ -109,32 +105,32 @@ var appUtils = Object.create(null);
                 continue;
             }
 
-            if (angular.isDate(sourceProperty)){
+            if (angular.isDate(sourceProperty)) {
                 receiver[key] = sourceProperty;
             } else if (angular.isArray(sourceProperty)) {
                 if(receiver[key]){
-                    if(receiver[key].fillByTemplate) {
+                    if (receiver[key].fillByTemplate) {
                         receiver[key].fillByTemplate(sourceProperty);
                     }
-                }else {
+                } else {
                     receiver[key] = [];
                 }
-                if(sourceProperty.fillByTemplate){
+                if (sourceProperty.fillByTemplate) {
                     receiver[key].fillByTemplate = sourceProperty.fillByTemplate;
                     receiver[key].fillByTemplate(sourceProperty);
-                }else{
+                } else {
                     receiver[key] = sourceProperty;
                 }
-                if(sourceProperty.representationList){
+                if (sourceProperty.representationList) {
                     receiver[key].representationList = sourceProperty.representationList;
                 }
 
-            } else if(sourceProperty == null){
+            } else if (sourceProperty == null) {
                 receiver[key] = sourceProperty;
             } else if (typeof sourceProperty === 'object') {
-                if(receiver[key]){
+                if (receiver[key]) {
 
-                }else {
+                } else {
                     receiver[key] = {};
                 }
                 appUtils.fillValuesProperty(sourceProperty, receiver[key]);
@@ -153,29 +149,29 @@ var appUtils = Object.create(null);
                 continue;
             }
 
-            if (angular.isDate(sourceProperty)){
+            if (angular.isDate(sourceProperty)) {
                 receiver[key] = sourceProperty;
             } else if (angular.isArray(sourceProperty)) {
-                if(receiver[key]){
+                if (receiver[key]) {
 
                 }else {
                     receiver[key] = [];
                 }
-                if(sourceProperty.fillByTemplate){
+                if (sourceProperty.fillByTemplate) {
                     receiver[key].fillByTemplate = sourceProperty.fillByTemplate;
                     receiver[key].fillByTemplate(sourceProperty);
-                }else{
+                } else {
                     receiver[key] = sourceProperty;
                 }
-                if(sourceProperty.representationList){
+                if (sourceProperty.representationList) {
                     receiver[key].representationList = sourceProperty.representationList;
                 }
-            } else if(sourceProperty == null){
+            } else if (sourceProperty == null) {
                 receiver[key] = sourceProperty;
             } else if (typeof sourceProperty === 'object') {
-                if(receiver[key]){
+                if (receiver[key]) {
 
-                }else {
+                } else {
                     receiver[key] = {};
                 }
                 appUtils.fillAllValuesProperty(sourceProperty, receiver[key]);
@@ -212,12 +208,16 @@ var appUtils = Object.create(null);
             for (var i = 0; i < array.length; i++) {
                 if (array[i] === value) return i;
             }
+
             return -1;
         };
     }
 
     appUtils.ucFirst = function (str) {
-        if (!str) return str;
+        if (!str) {
+            return str;
+        }
+
         return str[0].toUpperCase() + str.slice(1);
     };
 

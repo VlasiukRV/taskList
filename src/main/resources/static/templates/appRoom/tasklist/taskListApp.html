@@ -12,17 +12,17 @@
     <link rel="stylesheet" href="//rawgit.com/tamtakoe/oi.select/master/dist/select.css"/>
 <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-2.5.0-csp.css"/>-->
 
-    <link href="../../../css/main.css" type="text/css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../css/taskListApp.css"/>
+    <link href="../../../css/main.css" type="text/css" rel="stylesheet"/>
+    <link href="../../../css/taskListApp.css" type="text/css" rel="stylesheet" />
 
     <!--javascript-->
     <script src="../../../js/lib/jquery.min.js"></script>
     <!--angular-->
-    <script src="/js/lib/angular.js"></script>
-    <script src="/js/lib/angular-route.js"></script>
-    <script src="/js/lib/angular-sanitize.js"></script>
-    <script src="/js/lib/angular-resource.js"></script>
-    <script src="/js/lib/angular-cookies.js"></script>
+    <script src="../../../js/lib/angular.js"></script>
+    <script src="../../../js/lib/angular-route.js"></script>
+    <script src="../../../js/lib/angular-sanitize.js"></script>
+    <script src="../../../js/lib/angular-resource.js"></script>
+    <script src="../../../js/lib/angular-cookies.js"></script>
 
 </head>
 
@@ -58,64 +58,37 @@
                         <span class="glyphicon glyphicon-log-out"></span>
                     </button>
                 </p>
-<!--
-                <p>
-                    <button ng-click="proba()" type="button" size="sm" title="log-out">
-
-                    </button>
-                </p>
--->
             </nav>
         </div>
     </header>
 
     <section class="container">
         <div class="row">
-
-            <div class="col-sm-2 align-self-start">
-                <!-- Menu -->
+            <!-- Menu -->
+            <div class="col-sm-2">
                 <p>
                     <menu-bar class="commandBar" menu-bar="commandBar"></menu-bar>
                 </p>
             </div>
-            <div class="col-sm-10 align-self-start">
+            <!-- App -->
+            <div class="col-sm-10">
+                <uib-tabset active="active">
+                    <uib-tab index="0" heading="Work place">
 
-                <!-- App -->
-                <div class="alert alert-success appWorkPlace" role="alert">
-                    <div id="accordion" role="tablist" aria-multiselectable="true">
-                        <div class="card">
-                            <div class="card-header" role="tab" id="headingOne">
-                                <h5 class="mb-0">
-                                    <a data-toggle="collapse" data-parent="#accordion" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        <h4 class="alert-heading">Work place</h4>
-                                    </a>
-                                </h5>
-                            </div>
-
-                            <div ng-view id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
-
-                            </div>
+                        <div ng-view class="appWorkPlace alert alert-success" role="alert">
 
                         </div>
-                        <div class="card">
-                            <div class="card-header" role="tab" id="headingTwo">
-                                <h5 class="mb-0">
-                                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        <h4 class="alert-heading">Message</h4>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
-                                <div class="card-block">
-                                    <div class="card-block">
-                                        <message-line error-descriptions="errorDescriptions"></message-line>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
+                    </uib-tab>
+                    <uib-tab index="1">
+                        <uib-tab-heading>
+                            <i class="glyphicon glyphicon-bell"></i> Message
+                        </uib-tab-heading>
+                        <div class="appWorkPlace alert alert-danger" role="alert">
+                            <message-line error-descriptions="errorDescriptions"></message-line>
+                        </div>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
     </section>
