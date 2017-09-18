@@ -108,9 +108,11 @@ var appUtils = Object.create(null);
             if (angular.isDate(sourceProperty)) {
                 receiver[key] = sourceProperty;
             } else if (angular.isArray(sourceProperty)) {
+                var  isload = false;
                 if(receiver[key]){
                     if (receiver[key].fillByTemplate) {
                         receiver[key].fillByTemplate(sourceProperty);
+                        isload = true;
                     }
                 } else {
                     receiver[key] = [];
@@ -119,7 +121,9 @@ var appUtils = Object.create(null);
                     receiver[key].fillByTemplate = sourceProperty.fillByTemplate;
                     receiver[key].fillByTemplate(sourceProperty);
                 } else {
-                    receiver[key] = sourceProperty;
+                    if (!isload) {
+                        receiver[key] = sourceProperty;
+                    }
                 }
                 if (sourceProperty.representationList) {
                     receiver[key].representationList = sourceProperty.representationList;

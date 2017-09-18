@@ -42,17 +42,6 @@ appInitialization.InitUserModel = function(){
                         entityListService: null
                     }
                 },
-                role: {
-                    value: [],
-                    fieldDescription: {
-                        inputType: "multiselect",
-                        label: "role",
-                        availability: true,
-                        entityListService: function () {
-                            return appMetadataSet.getEntityList("role");
-                        }
-                    }
-                },
                 enabled: {
                     value: false,
                     fieldDescription: {
@@ -74,33 +63,27 @@ appInitialization.InitUserModel = function(){
                 }
 
             }
-        }
-    };
-    metadataEntitySpecification_User.entityField.entityField.role.value.representationList = function() {
-        var str = "";
-        var k=0;
-        while (true) {
-            if(k == this.length){
-                break;
-            }
-            str = str+"; "+this[k].representation;
-            k = k+1;
+        },
 
-        }
-        return str;
-    };
-    metadataEntitySpecification_User.entityField.entityField.role.value.fillByTemplate = function(template) {
-        this.length=0;
-        var k=0;
-        while (true) {
-            if(k == template.length){
-                break;
-            }
-            var entity = appMetadataSet.getEntityInstance("role");
-            appUtils.fillValuesProperty(template[k], entity);
-            this.push(entity);
-            k = k+1;
-        }
+        entityFieldsPlacing: [
+            [
+                {editFieldId: "id", fieldLength: 3}
+            ],
+            [
+                {
+                    editFieldId: [
+                        [{editFieldId: "username", fieldLength: 12}],
+                        [{editFieldId: "password", fieldLength: 12}],
+                        [{editFieldId: "mailAddress", fieldLength: 12}]
+                    ],
+                    fieldLength: 5
+                }
+            ],
+            [
+                {editFieldId: "description", fieldLength: 12}
+            ]
+        ]
+
     };
 
     var Role = appUtils.Class(appModel.Entity);
@@ -125,7 +108,19 @@ appInitialization.InitUserModel = function(){
                         availability: true,
                         entityListService: null
                     }
+                },
+                users: {
+                    value: [],
+                    fieldDescription: {
+                        inputType: "multiselect",
+                        label: "users",
+                        availability: true,
+                        entityListService: function () {
+                            return appMetadataSet.getEntityList("user");
+                        }
+                    }
                 }
+
 
             },
             defineField: {
@@ -138,6 +133,47 @@ appInitialization.InitUserModel = function(){
                 }
 
             }
+        },
+        entityFieldsPlacing: [
+            [
+                {editFieldId: "id", fieldLength: 3},
+                {
+                    editFieldId: [
+                        [{editFieldId: "role", fieldLength: 12}]
+                    ],
+                    fieldLength: 5
+                }
+            ],
+            [
+                {editFieldId: "users", fieldLength: 5},
+                {editFieldId: "description", fieldLength: 12}
+            ]
+        ]
+    };
+    metadataEntitySpecification_Role.entityField.entityField.users.value.representationList = function() {
+        var str = "";
+        var k=0;
+        while (true) {
+            if(k == this.length){
+                break;
+            }
+            str = str+"; "+this[k].representation;
+            k = k+1;
+
+        }
+        return str;
+    };
+    metadataEntitySpecification_Role.entityField.entityField.users.value.fillByTemplate = function(template) {
+        this.length=0;
+        var k=0;
+        while (true) {
+            if(k == template.length){
+                break;
+            }
+            var entity = appMetadataSet.getEntityInstance("user");
+            appUtils.fillValuesProperty(template[k], entity);
+            this.push(entity);
+            k = k+1;
         }
     };
 

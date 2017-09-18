@@ -98,17 +98,29 @@ appInitialization.InitTaskModel = function(){
         },
 
         entityFieldsPlacing: [
-            /*{editFieldId: [*/
-                {editFieldId: [
-                    {editFieldId: [{editFieldId: "id", fieldLength: 12}], fieldLength: 12},
-                    {editFieldId: [{editFieldId: "date", fieldLength: 12}], fieldLength: 12},
-                ], fieldLength: 5},
-
-                {editFieldId: [
-                    {editFieldId: [{editFieldId: "title", fieldLength: 12}], fieldLength: 12},
-                    {editFieldId: [{editFieldId: "project", fieldLength: 12}], fieldLength: 12},
-                ], fieldLength: 7}
-            /*], fieldLength: 12}*/
+            [
+                    {editFieldId: "id", fieldLength: 3},
+                    {
+                        editFieldId: [
+                            [
+                                {editFieldId: "date", fieldLength: 4},
+                                {editFieldId: "state", fieldLength: 4}
+                            ],
+                            [{editFieldId: "title", fieldLength: 12}],
+                            [
+                                {editFieldId: "project", fieldLength: 7},
+                                {editFieldId: "executor", fieldLength: 5}
+                            ]
+                        ],
+                        fieldLength: 9
+                    }
+            ],
+            [
+                {editFieldId: "description", fieldLength: 12}
+            ],
+            [
+                {editFieldId: "author", fieldLength: 3}
+            ]
         ]
 
     };

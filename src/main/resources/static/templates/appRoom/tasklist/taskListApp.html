@@ -17,6 +17,13 @@
 
     <!--javascript-->
     <script src="../../../js/lib/jquery.min.js"></script>
+    <script type="text/javascript">$(window).on('load', function () {
+        var $preloader = $('#p_prldr'),
+                $svg_anm   = $preloader.find('.svg_anm');
+        $svg_anm.fadeOut();
+        $preloader.delay(500).fadeOut('slow');
+    });
+    </script>
     <!--angular-->
     <script src="../../../js/lib/angular.js"></script>
     <script src="../../../js/lib/angular-route.js"></script>
@@ -27,6 +34,13 @@
 </head>
 
 <body>
+
+<div id="p_prldr">
+    <div class="contpre">
+        Please wait<br><small> while downloading</small>
+        <div class="spinner"></div><br>
+    </div>
+</div>
 
 <div ng-controller="workPlaceController">
 

@@ -126,7 +126,12 @@ function directiveEntityEditFormCol($compile){
         },
         link: function(scope, element, attrs){
             if(angular.isArray(scope.fieldplacing.editFieldId)){
-                var e =$compile("<entity-edit-form-row entityfieldsrow='fieldplacing.editFieldId' entityeditform='entityeditform'> </entity-edit-form-row>")(scope);
+                var e =$compile("" +
+                    "<div ng-repeat='entityfieldsrow in fieldplacing.editFieldId track by $index'>"+
+                        "<entity-edit-form-row entityfieldsrow='entityfieldsrow' entityeditform='entityeditform'> " +
+                        "</entity-edit-form-row>" +
+                    "</div>"
+                )(scope);
                 element.replaceWith(e);
             }
         }

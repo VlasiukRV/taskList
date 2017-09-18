@@ -39,21 +39,20 @@ appInitialization.InitProjectModel = function() {
             }
         },
 
-/*
         entityFieldsPlacing: [
-            {editFieldId: "description", fieldLength: 6}, {editFieldId: "id", fieldLength: 3}, {editFieldId: "name", fieldLength: 3}
+            [
+                {editFieldId: "id", fieldLength: 3},
+                {
+                    editFieldId: [
+                        [{editFieldId: "name", fieldLength: 12}]
+                    ],
+                    fieldLength: 5
+                }
+            ],
+            [
+                {editFieldId: "description", fieldLength: 12}
+            ]
         ]
-*/
-
-        entityFieldsPlacing: [
-            {editFieldId: [
-                {editFieldId: [{editFieldId: "id", fieldLength: 12}], fieldLength: 12},
-                {editFieldId: [{editFieldId: "name", fieldLength: 12}], fieldLength: 12},
-            ], fieldLength: 5},
-
-            {editFieldId: "description", fieldLength: 7}
-        ]
-
     };
 
     appInitialization.metadataSpecifications.entities.push(metadataEntitySpecification_Project);
