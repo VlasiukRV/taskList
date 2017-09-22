@@ -31,8 +31,7 @@ public class Task extends BaseEntity<Integer> {
 
     @JsonProperty
     @ManyToOne(cascade={CascadeType.DETACH}, fetch = FetchType.EAGER)
-    private @Getter @Setter
-    User author;
+    private @Getter @Setter User author;
 
     @JsonProperty
     @ManyToMany(cascade={CascadeType.DETACH}, fetch = FetchType.EAGER)
