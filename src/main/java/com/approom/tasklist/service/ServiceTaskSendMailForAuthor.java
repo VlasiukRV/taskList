@@ -8,11 +8,14 @@ import com.service.taskScheduler.AbstractServiceTask;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
 import java.util.*;
 
+@Component
 public class ServiceTaskSendMailForAuthor extends AbstractServiceTask {
 
     private Configuration freemarkerConfig;
@@ -20,6 +23,13 @@ public class ServiceTaskSendMailForAuthor extends AbstractServiceTask {
     private MailSender appMailSender;
 
     private Set<Task> tasksWithSendMail = new HashSet<>();
+
+    @Value("#{config['mailSenderService.link_app'] ?: 'http://192.168.0.110:8080'}")
+    static private String link_app = "http://192.168.0.110:8080";
+
+    public ServiceTaskSendMailForAuthor(){
+
+    }
 
     public ServiceTaskSendMailForAuthor(TaskService entityService, MailSender appMailSender, Configuration freemarkerConfig) {
         super();
@@ -64,7 +74,7 @@ public class ServiceTaskSendMailForAuthor extends AbstractServiceTask {
         model.put("userName", task.getAuthor().getUsername());
         model.put("projectName", task.getProject().getName());
         model.put("taskName", task.getTitle());
-        model.put("link_app", "http://192.168.0.110:8080");
+        model.put("link_app", link_app.toString());
 
         freemarkerConfig.setClassForTemplateLoading(this.getClass(), "/mailTemplates");
         Template t = freemarkerConfig.getTemplate("messageForAuthorTaskDone.ftl");

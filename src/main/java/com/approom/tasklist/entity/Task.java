@@ -51,8 +51,11 @@ public class Task extends BaseEntity<Integer> {
     @JsonProperty
     @Column
     @Enumerated(EnumType.ORDINAL)
-    protected @Getter @Setter
-    TaskState state;
+    protected @Getter @Setter TaskState state;
+
+    @JsonProperty
+    @Column
+    private @Getter @Setter int plainTime;
 
     @Override
     public boolean equals(Object other) {

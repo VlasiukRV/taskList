@@ -1,21 +1,20 @@
-package com.controller;
+package com.approom.cashaccounting.controller;
 
-import com.service.UserService;
+import com.approom.cashaccounting.service.CashFlowItemService;
+import com.controller.BaseEntityController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/appTaskList/entity/user")
-public class UserController extends BaseEntityController {
-
+@RequestMapping(value = "/appCashAccounting/entity/cashFlowItem")
+public class CashFlowItemController extends BaseEntityController {
     @Autowired
-    public UserController(UserService entityService) {
-        this.entityName = "user";
+    public CashFlowItemController(CashFlowItemService entityService) {
+        entityName = "cashFlowItem";
         this.entityService = entityService;
     }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public Map<String, Object> getEntityById(@PathVariable Integer id) {
         return super.getEntityById(id);

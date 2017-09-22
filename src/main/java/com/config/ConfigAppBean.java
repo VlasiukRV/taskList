@@ -4,6 +4,7 @@ import com.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import javax.servlet.http.HttpSessionListener;
@@ -30,5 +31,9 @@ public class ConfigAppBean {
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setPackagesToScan("com.entity", "com.approom.tasklist.entity");
         return sessionFactory;
+    }
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 }

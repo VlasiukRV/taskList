@@ -1,5 +1,4 @@
-var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCookies', 'oi.select'])
-
+app
         .config(['$controllerProvider', function ($controllerProvider) {
             $controllerProvider.allowGlobals();
         }])
@@ -24,26 +23,26 @@ var app = angular.module('app', ['ui.bootstrap', 'ngResource', 'ngRoute', 'ngCoo
         .factory('myHttpResponseInterceptor', ['$q', 'dataStorage', function ($q, dataStorage) {
             return appHttpResponseInterceptor($q, dataStorage);
         }])
-        .factory('entityEditService', function ($location, $resource) {
-            return entityEditService($location, $resource);
-        })
-        .factory('securityService', function ($location, $resource) {
-            return securityService($location, $resource);
-        })
-        .factory('operationService', function ($location, $resource) {
-            return operationService($location, $resource);
-        })
-        .factory('systemService', function ($location, $resource) {
-            return systemService($location, $resource);
-        })
+        .factory('entityEditService', ['$resource', 'appEnvironment', function ($resource, appEnvironment) {
+            return entityEditService($resource, appEnvironment);
+        }])
+        .factory('securityService', ['$resource', 'appEnvironment', function ($resource, appEnvironment) {
+            return securityService($resource, appEnvironment);
+        }])
+        .factory('operationService', ['$resource', 'appEnvironment', function ($resource, appEnvironment) {
+            return operationService($resource, appEnvironment);
+        }])
+        .factory('systemService', ['$resource', 'appEnvironment', function ($resource, appEnvironment) {
+            return systemService($resource, appEnvironment);
+        }])
         .factory('resourceService', function (entityEditService, systemService, securityService, operationService) {
             return resourceService(entityEditService, systemService, securityService, operationService)
         })
-        .service('appMetadataSet', function (resourceService) {
-            return getMetadataSet(resourceService);
-        })
-        .service('dataStorage', [function () {
-            return dataStorage();
+        .service('appEnvironment', ['$location', 'appConfig', function($location, appConfig){
+            return appEnvironment($location, appConfig);
+        }])
+        .service('dataStorage', ['appConfig', function (appConfig) {
+            return dataStorage(appConfig);
         }])
 
         .directive('smDatepicker', function () {

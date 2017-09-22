@@ -157,6 +157,10 @@ function directiveEntityListForm(){
                 $scope.entityListForm.eventUpdateForm();
                 $scope.entityListForm.entities = $scope.entityListForm.appMetadataSet.getEntityList($scope.entityListForm.metadataName).list;
             };
+            $scope.findEntity = function(searchEx){
+                $scope.entityListForm.eventFindEntity(searchEx);
+                $scope.entityListForm.entities = $scope.entityListForm.appMetadataSet.getEntityList($scope.entityListForm.metadataName).list;
+            };
             $scope.addNewEntity = function(){
                 $scope.entityListForm.eventAddNewEntity();
             };

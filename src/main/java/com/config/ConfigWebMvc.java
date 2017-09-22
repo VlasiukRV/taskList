@@ -35,6 +35,10 @@ public class ConfigWebMvc extends WebMvcConfigurerAdapter {
         registry.addViewController(appTaskListUrl+"/projectsList")                 .setViewName("/templates/appRoom/taskList/projectsListEdit.html");
         registry.addViewController(appTaskListUrl+"/tasksList")                    .setViewName("/templates/appRoom/taskList/tasksListEdit.html");
 
+        String appCashAccounting = "/appCashAccounting";
+        registry.addViewController(appCashAccounting)                              .setViewName("/templates/appRoom/appCashAccounting/cashFlowApp.html");
+        registry.addViewController(appCashAccounting+"/cashFlowList")              .setViewName("/templates/appRoom/appCashAccounting/cashFlowEdit.html");
+        registry.addViewController(appCashAccounting+"/cashFlowItemList")          .setViewName("/templates/appRoom/appCashAccounting/cashFlowItemEdit.html");
     }
 
     @Override

@@ -20,7 +20,11 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-12" hotkey="{
+                                        'alt+ins': addNewEntity,
+                                        'alt+x': closeForm
+                                        }">
+            <b> {{entityListForm.editFormName}} </b>
         <p>
             <button ng-click="closeForm()" type="button" size="sm" title="close form">
                 <span class="glyphicon glyphicon-remove"></span>
@@ -31,17 +35,33 @@
             <button ng-click="addNewEntity()" type="button" size="sm" title="refresh report">
                 <span class="glyphicon glyphicon-plus"></span>
             </button>
-            <b> {{entityListForm.editFormName}} </b>
+            <button ng-click="flagShowSearch = !flagShowSearch" type="button" size="sm" title="refresh report">
+                <span class="glyphicon glyphicon-filter"></span>
+            </button>
         </p>
+        </div>
+    </div>
+
+    <div class="row" ng-show="flagShowSearch">
+        <div class="col-sm-12">
+            <div class="row">
+                <label>Search expression:</label>
+                <input
+                        type="text"
+                        ng-model="searchEx"
+                        class="form-control"
+                        ng-change="findEntity(searchEx)"
+                        />
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-12">
-            <table class="col-sm-12 table-hover">
-                <tr class="info text-center">
+            <table class="col-sm-12 table">
+                <tr class="text-center">
                     <td align="center" ng-repeat="entityProperty in entityListForm.formProperties track by $index">
-                        <b>{{entityProperty.label}}: </b>
+                        <h5 class="">{{entityProperty.label}}: </h5>
                     </td>
                     <td></td>
                     <td></td>

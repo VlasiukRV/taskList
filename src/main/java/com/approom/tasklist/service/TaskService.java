@@ -17,10 +17,10 @@ public class TaskService extends BaseEntityService<Task, Integer, TaskRepository
         super(Task.class, taskRepository);
     }
 
+    // Test
     public List<Task> getAll(){
         List<Task> tasks = super.getAll();
         tasks.forEach(Task::getExecutor);
         return tasks;
     }
-
 }

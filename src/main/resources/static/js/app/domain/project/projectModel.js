@@ -1,4 +1,4 @@
-appInitialization.InitProjectModel = function() {
+appInitialization.initProjectModel = function() {
 
     var appMetadataSet = appInitialization.metadataSet;
 

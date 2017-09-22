@@ -1,4 +1,4 @@
-appInitialization.InitTaskModel = function(){
+appInitialization.initTaskModel = function(){
 
     var appMetadataSet = appInitialization.metadataSet;
 
@@ -14,6 +14,16 @@ appInitialization.InitTaskModel = function(){
         entityField: {
             objectField: {},
             entityField: {
+
+                plainTime:{
+                    value: 0,
+                    fieldDescription: {
+                        inputType: "number",
+                        label: "plain time",
+                        availability: true,
+                        entityListService: null
+                    }
+                },
 
                 date: {
                     value: "",
@@ -114,6 +124,9 @@ appInitialization.InitTaskModel = function(){
                         ],
                         fieldLength: 9
                     }
+            ],
+            [
+                {editFieldId: "plainTime", fieldLength: 3}
             ],
             [
                 {editFieldId: "description", fieldLength: 12}

@@ -1,15 +1,22 @@
-function getAppHttpUrl($location, urlSuffix) {
-    var appAddress = "http://" + $location.$$host + ":" + $location.$$port;
 
-    return appAddress + "/appTaskList" + urlSuffix;
+function appEnvironment($location, appConfig){
+    var location = $location;
+    return{
+        getAppHttpUrl: function getAppHttpUrl(urlSuffix) {
+            var appAddress = "http://" + location.$$host + ":" + location.$$port;
+
+            return appAddress + "/" + appConfig.appName + urlSuffix;
+        }
+    }
 }
 
 ////////////////////////////////////
 // app SERVICEs
 ////////////////////////////////////
 
-function dataStorage() {
+function dataStorage(_appConfig) {
 
+    var appConfig = _appConfig;
     var appMetadataSet = null;
 
     var currentUser = null;
@@ -18,6 +25,9 @@ function dataStorage() {
     var currentTask = null;
 
     return {
+        getAppConfig: function(){
+          return appConfig;
+        },
         getAppMetadaSet: function () {
             return appMetadataSet;
         },
@@ -111,10 +121,16 @@ function getMetadataSet(resourceService) {
     appInitialization
         .setMetadataSet()
 
-        .InitEnumsModel()
-        .InitProjectModel()
-        .InitUserModel()
-        .InitTaskModel()
+        .initEnumsModel()
+
+        .initProjectModel()
+        .initUserModel()
+        .initTaskModel()
+
+/*
+        .initCashFlowItem()
+        .initCashFlow()
+*/
 
         .initMetadataSet();
 
@@ -340,6 +356,9 @@ var appInterface = Object.create(null);
                 eventDeleteEntity: function (id) {
                 },
                 eventEditEntity: function (id) {
+                },
+                eventFindEntity: function(){
+
                 }
             });
         };
@@ -652,6 +671,19 @@ var appModel = Object.create(null);
                 self.list = [];
                 appModel.resourceService.getEntityEditService()
                     .getEntity({entityName: this.metadataName}, {},
+                    function (data) {
+                        updateEnt.call(self, fCallBack, data)
+                    },
+                    function (httpResponse) {
+                        /*resourceService.collError(httpResponse)*/
+                    }
+                );
+            },
+            findEntity: function(searchEx, fCallBack) {
+                var self = this;
+                self.list = [];
+                appModel.resourceService.getEntityEditService()
+                    .getEntity({entityName: this.metadataName, search: searchEx}, {},
                     function (data) {
                         updateEnt.call(self, fCallBack, data)
                     },
@@ -1065,7 +1097,7 @@ var appModel = Object.create(null);
 })(appModel, appInterface);
 
 var appInitialization = Object.create(null);
-(function () {
+(function (appInitialization, appModel) {
     appInitialization.metadataSet = undefined;
     appInitialization.metadataSpecifications = {
         enums: [],
@@ -1091,19 +1123,19 @@ var appInitialization = Object.create(null);
         var menuModel = appInterface.getNewDropdownCommand("modelDD", "Model");
         var menuSystem = appInterface.getNewDropdownCommand("systemDD", "System")
             .addCommand(appInterface.getNewCommand("initDataBase", "initDataBase", function () {
-                ExecuteSystemCommand(resourceService, "jdbc/initDataBase")
+                ExecuteSystemCommand(appModel.resourceService, "jdbc/initDataBase")
             }))
             .addCommand(appInterface.getNewCommand("runArchiveService", "runArchiveService", function () {
-                ExecuteSystemCommand(resourceService, "taskScheduler/runArchiveService")
+                ExecuteSystemCommand(appModel.resourceService, "taskScheduler/runArchiveService")
             }))
             .addCommand(appInterface.getNewCommand("stopArchiveService", "stopArchiveService", function () {
-                ExecuteSystemCommand(resourceService, "taskScheduler/stopArchiveService")
+                ExecuteSystemCommand(appModel.resourceService, "taskScheduler/stopArchiveService")
             }))
             .addCommand(appInterface.getNewCommand("sendMail", "sendMail", function () {
-                ExecuteSystemCommand(resourceService, "taskScheduler/sendMail")
+                ExecuteSystemCommand(appModel.resourceService, "taskScheduler/sendMail")
             }))
             .addCommand(appInterface.getNewCommand("interruptTaskExecutor", "interruptTaskExecutor", function () {
-                ExecuteSystemCommand(resourceService, "taskScheduler/interruptTaskExecutor")
+                ExecuteSystemCommand(appModel.resourceService, "taskScheduler/interruptTaskExecutor")
             }));
 
         var userInterface = new appInterface.UserInterface();
@@ -1125,7 +1157,7 @@ var appInitialization = Object.create(null);
         return appInitialization;
     }
 
-})(appInitialization);
+})(appInitialization, appModel);
 
 ////////////////////////////////////
 // angular SERVICEs
@@ -1151,6 +1183,13 @@ function setRoute(routeProvider) {
         .when("/currentPrincipalInformation", {
             templateUrl: "/appTaskList/currentPrincipalInformation"
         })
+        .when("/cashFlow", {
+            templateUrl: "/appCashAccounting/cashFlowList"
+        })
+        .when("/cashFlowItem", {
+            templateUrl: "/appCashAccounting/cashFlowItemList"
+        })
+
     ;
     return routeProvider;
 }
@@ -1158,7 +1197,7 @@ function setRoute(routeProvider) {
 function appHttpResponseInterceptor($q, dataStorage) {
     return {
         'request': function (config) {
-            /*config.url = config.url.split('%2F').join('/');*/
+            config.url = config.url.split('%2F').join('/');
             return config;
         },
 
@@ -1186,9 +1225,9 @@ function appHttpResponseInterceptor($q, dataStorage) {
     };
 }
 
-function entityEditService($location, resource) {
+function entityEditService(resource, appEnvironment) {
     return resource(
-        getAppHttpUrl($location, '/entity/:entityName/:entityId'),
+        appEnvironment.getAppHttpUrl('/entity/:entityName/:entityId'),
         {
             entityName: "@entityName",
             entityId: "@entityId"
@@ -1207,9 +1246,9 @@ function entityEditService($location, resource) {
     );
 }
 
-function securityService($location, resource) {
+function securityService(resource, appEnvironment) {
     return resource(
-        getAppHttpUrl($location, '/system/security/:command'),
+        appEnvironment.getAppHttpUrl('/system/security/:command'),
         {
             sessionID: "@sessionID"
         },
@@ -1230,9 +1269,9 @@ function securityService($location, resource) {
     );
 }
 
-function operationService($location, resource) {
+function operationService(resource, appEnvironment) {
     return resource(
-        getAppHttpUrl($location, '/service/:command'),
+        appEnvironment.getAppHttpUrl('/service/:command'),
         {
             command: "@command"
         },
@@ -1244,9 +1283,9 @@ function operationService($location, resource) {
     );
 }
 
-function systemService($location, resource) {
+function systemService(resource, appEnvironment) {
     return resource(
-        getAppHttpUrl($location, '/system/:command'),
+        appEnvironment.getAppHttpUrl('/system/:command'),
         {
             command: "@command"
         },

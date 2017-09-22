@@ -1,7 +1,6 @@
 package com.controller;
 
 import com.service.RoleService;
-import com.controller.BaseEntityController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +22,12 @@ public class RoleController extends BaseEntityController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
-    public Map<String, Object> getEntity() {
-        return super.getEntity();
+    public Map<String, Object> getEntity(@RequestParam(value = "search", required = false) String search) {
+        if(search == null) {
+            return super.getEntity();
+        }else {
+            return super.findEntity(search);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = "application/json; charset=utf-8")

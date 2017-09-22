@@ -1,6 +1,7 @@
+
 /*
 * {
-    outline: 2px solid #000;
+    outline: 1px dotted #000;
 }
 */
 
@@ -69,3 +70,9 @@ tr:hover ~ button {
     opacity: 1;
     -webkit-transition: opacity 1s linear;
 }
+
+/*
+#navEntityBar{
+    display:none;
+    z-index: 1000;
+}*/

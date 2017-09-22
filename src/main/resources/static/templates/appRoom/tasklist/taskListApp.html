@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="//rawgit.com/tamtakoe/oi.select/master/dist/select.css"/>
 <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-2.5.0-csp.css"/>-->
+    <link href="../../../css/hotkeys.min.css" type="text/css" rel="stylesheet"/>
 
     <link href="../../../css/main.css" type="text/css" rel="stylesheet"/>
     <link href="../../../css/taskListApp.css" type="text/css" rel="stylesheet" />
@@ -42,7 +43,7 @@
     </div>
 </div>
 
-<div ng-controller="workPlaceController">
+<span ng-controller="workPlaceController">
 
     <header class="container">
         <div class="row">
@@ -51,16 +52,21 @@
                 <h1>Task list</h1>
                 <updatable-text f-call-back="getCurrentTime"></updatable-text>
             </div>
+            <!-- Menu -->
+            <div class="col-sm-3">
+                <p>
+                    <menu-bar class="commandBar" menu-bar="commandBar"></menu-bar>
+                </p>
+            </div>
 
-            <nav class="col-sm-10 text-right">
+            <nav class="col-sm-7 text-right">
+                <p><a href="/">App room</a></p>
 
-                <p><a href="/"/>App room</a></p>
-
-                <p><a href="/taskList"/>Description</a></p>
+                <p><a href="/taskList">Description</a></p>
 
                 <p><a href="/service/team">Team</a></p>
 
-                <p><a href="#/currentPrincipalInformation"/>{{principal.name}}</a> </p>
+                <p><a href="#/currentPrincipalInformation">{{principal.name}}</a> </p>
 
                 <p>
                     <button ng-show="!principal.authenticated" ng-click="login()" type="button" size="sm"
@@ -72,31 +78,32 @@
                         <span class="glyphicon glyphicon-log-out"></span>
                     </button>
                 </p>
+
             </nav>
+
         </div>
     </header>
 
     <section class="container">
         <div class="row">
-            <!-- Menu -->
-            <div class="col-sm-2">
-                <p>
-                    <menu-bar class="commandBar" menu-bar="commandBar"></menu-bar>
-                </p>
-            </div>
+        </div>
+
+        <div class="row">
             <!-- App -->
-            <div class="col-sm-10">
+            <div class="col-sm-12">
                 <uib-tabset active="active">
                     <uib-tab index="0" heading="Work place">
-
-                        <div ng-view class="appWorkPlace alert alert-success" role="alert">
-
+                        <div class="row">
                         </div>
+                        <div class="row">
+                            <div ng-view class="appWorkPlace alert alert-success" role="alert">
 
+                            </div>
+                        </div>
                     </uib-tab>
                     <uib-tab index="1">
                         <uib-tab-heading>
-                            <i class="glyphicon glyphicon-bell"></i> Message
+                            <i class="glyphicon glyphicon-bell"></i> Message ({{errorDescriptions.length}})
                         </uib-tab-heading>
                         <div class="appWorkPlace alert alert-danger" role="alert">
                             <message-line error-descriptions="errorDescriptions"></message-line>
@@ -104,10 +111,12 @@
                     </uib-tab>
                 </uib-tabset>
             </div>
+
         </div>
+
     </section>
 
-</div>
+</span>
 
 <footer class="container">
     <div class="row">
@@ -127,6 +136,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
 
 <script src="//rawgit.com/tamtakoe/oi.select/master/dist/select-tpls.js"></script>
+<script src="../../../js/lib/hotkeys.min.js"></script>
 
 <!-- Application Files -->
 <script src="../../../js/app/appUtils.js"></script>
@@ -142,6 +152,7 @@
 <script src="../../../js/app/appController.js"></script>
 <script src="../../../js/app/appDirective.js"></script>
 <script src="../../../js/app/appService.js"></script>
+<script src="../../../js/app/taskListApp.js"></script>
 <script src="../../../js/app/app.js"></script>
 
 <script src="../../../js/app/domain/enumModel.js"></script>

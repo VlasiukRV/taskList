@@ -1,13 +1,15 @@
 package com.service;
 
 import com.AppUtils;
+import com.dao.EntityRepositoryCastom;
+import com.dao.SearchCriteria;
 import com.entity.BaseEntity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class BaseEntityService<T extends BaseEntity<ID>, ID extends Serializable, R extends CrudRepository<T, ID>> {
+public abstract class BaseEntityService<T extends BaseEntity<ID>, ID extends Serializable, R extends CrudRepository<T, ID> & EntityRepositoryCastom> {
 
     protected R entityRepository;
 
@@ -30,6 +32,10 @@ public abstract class BaseEntityService<T extends BaseEntity<ID>, ID extends Ser
         return (List<T>)entityRepository.findAll();
     }
 
+    public List<T> search(List<SearchCriteria> params){
+        return (List<T>)entityRepository.search(baseEntityClass, params);
+    }
+
     public boolean deleteEntity(T entity){
         entityRepository.delete(entity);
         return entityRepository.exists(entity.getId());
@@ -44,6 +50,10 @@ public abstract class BaseEntityService<T extends BaseEntity<ID>, ID extends Ser
         return !entityRepository.exists(id);
     }
 
+    public T saveEntity(T entity){
+        return entityRepository.save(entity);
+    }
+
     public T getEntityByJSON(String strJSONEntity){
         T entity = AppUtils.getEntityByJSON(this.baseEntityClass, strJSONEntity);
         if (entity == null){
@@ -51,10 +61,6 @@ public abstract class BaseEntityService<T extends BaseEntity<ID>, ID extends Ser
         }
 
         return entity;
-    }
-
-    public T saveEntity(T entity){
-        return entityRepository.save(entity);
     }
 
     public T saveEntity(String strJSONEntity){

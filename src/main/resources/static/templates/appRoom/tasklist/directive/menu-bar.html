@@ -1,18 +1,20 @@
 <span>
+    <div class="container">
 
-    <!-- NavBar -->
-    <div class = "navbar-header">
-        <a class = "navbar-brand"href = "{{menuBar.mainUrl}}">
-            Home
-        </a>
+<!--
+        <div id="navEntityBarMain" class = "navbar-header">
+            <a class = "navbar-brand"href = "{{menuBar.mainUrl}}">
+                Home
+            </a>
+        </div>
+-->
+
+        <div>
+            <ul id="navEntityBar" class = "nav navbar-nav">
+                <menu-item command="command" ng-repeat="command in menuBar.commandBar.commandList track by $index"></menu-item>
+
+            </ul>
+        </div>
+
     </div>
-
-    <div>
-        <ul class = "nav navbar-nav">
-
-            <menu-item command="command" ng-repeat="command in menuBar.commandBar.commandList track by $index"></menu-item>
-
-        </ul>
-    </div>
-
 </span>

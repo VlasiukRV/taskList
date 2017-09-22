@@ -4,16 +4,26 @@ import com.AppUtils;
 import com.service.taskScheduler.AbstractServiceTask;
 import com.approom.tasklist.entity.Task;
 import com.approom.tasklist.entity.TaskState;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ServiceTaskArchiveTask extends AbstractServiceTask {
 
     TaskService entityService;
 
-    private String fileName = "E:\\Work\\archiveTask.yaml";
+    @Value("${mailSenderService.link_app}")
+    static private String fileName= "D:\\archiveTask.yaml";
+
+    public ServiceTaskArchiveTask(){
+
+    }
 
     public ServiceTaskArchiveTask(TaskService entityService) {
         super();
@@ -22,6 +32,16 @@ public class ServiceTaskArchiveTask extends AbstractServiceTask {
 
     @Override
     protected boolean runServiceTask() {
+
+        File file = new File(fileName);
+        if (!file.exists() && !file.canRead() && !file.isFile()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         List<Task> archiveTaskList = new ArrayList<>();
         try {
             archiveTaskList = (List<Task>) AppUtils.getObjectFromYaml(fileName);

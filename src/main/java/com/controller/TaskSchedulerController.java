@@ -32,34 +32,34 @@ public class TaskSchedulerController {
     @ResponseBody
     public Map<String, Object> runArchiveService(){
         taskExecutor.putTask(new ServiceTaskArchiveTask(taskService));
-        return AjaxResponse.successResponse("Don");
+        return AjaxResponse.successResponse("Done");
     }
 
     @RequestMapping("/stopArchiveService")
     @ResponseBody
     public Map<String, Object> stopArchiveService(){
         taskExecutor.interruptTask("ArchiveService");
-        return AjaxResponse.successResponse("Don");
+        return AjaxResponse.successResponse("Done");
     }
 
     @RequestMapping("/sendMail")
     @ResponseBody
     public Map<String, Object> sendMail(){
         taskExecutor.putTask(new ServiceTaskSendMailForAuthor(entityService, appMailSender, freemarkerConfig));
-        return AjaxResponse.successResponse("Don");
+        return AjaxResponse.successResponse("Done");
     }
     @RequestMapping("/stopSendMail")
     @ResponseBody
     public Map<String, Object> stopSendMail(){
         taskExecutor.interruptTask("MailSendService");
-        return AjaxResponse.successResponse("Don");
+        return AjaxResponse.successResponse("Done");
     }
 
     @RequestMapping("/interruptTaskExecutor")
     @ResponseBody
     public Map<String, Object> interruptTaskExecutor(){
         taskExecutor.interrupt();
-        return AjaxResponse.successResponse("Don");
+        return AjaxResponse.successResponse("Done");
     }
 
 }

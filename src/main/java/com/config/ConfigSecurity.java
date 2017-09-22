@@ -74,10 +74,12 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
                             "/info/**",
 
                             "/taskList",
-                            "/appTaskList"
+                            "/appTaskList",
+                            "/appCashAccounting"
                     ).permitAll()
                     .antMatchers("/appTaskList/security/**", "/appTaskList/system/task/**").hasRole("ADMIN")
                     .antMatchers("/appTaskList/**").hasRole("USER")
+                    .antMatchers("/appCashAccounting/**").hasRole("USER")
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()

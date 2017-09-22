@@ -1,4 +1,4 @@
-appInitialization.InitEnumsModel = function(){
+appInitialization.initEnumsModel = function(){
     var EnumTaskState = new appModel.Enum;
     var metadataEnumSpecification_TaskState = {
         enumClass: EnumTaskState,

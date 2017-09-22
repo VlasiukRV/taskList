@@ -4,6 +4,7 @@ function ListEntityController($scope, dataStorage){
     this.numPerpage = 10;
 
     this.initController = function(){
+        $scope.flagShowSearch = false;
         $scope.$parent.openListForm = this.openListForm;
         $scope.$parent.closeListForm = this.closeListForm;
 
@@ -28,6 +29,7 @@ function ListEntityController($scope, dataStorage){
         entityListForm.eventAddNewEntity = this.addNewEntity;
         entityListForm.eventEditEntity = this.editEntity;
         entityListForm.eventDeleteEntity = this.deleteEntity;
+        entityListForm.eventFindEntity = this.findEntity;
 
         entityListForm.openEditForm = this.openEditForm;
         entityListForm.updateViewEntityList = this.updateViewEntityList;
@@ -67,6 +69,14 @@ function ListEntityController($scope, dataStorage){
         });
     };
 
+    this.findEntity = function(searchEx){
+        var self = this;
+        this.appMetadataSet.getEntityList(this.metadataName).findEntity(searchEx, function(data){
+            self.totalItems = self.entities.length;
+            self.eventPageChanged();
+        });
+    };
+
     this.updateViewEntityList = function(){
         var self = this;
         this.appMetadataSet.metadataEvents.publish("ev:entityList:" +this.metadataName+ ":update", function(){
@@ -87,7 +97,7 @@ function ListEntityController($scope, dataStorage){
 
     this.openListForm = function(){
         $scope.$parent.showListForm = true;
-        this.updateViewEntityList();
+        this.entityListForm.updateViewEntityList();
     };
 
     this.updateForm = function(){

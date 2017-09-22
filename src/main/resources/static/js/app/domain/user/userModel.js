@@ -1,4 +1,4 @@
-appInitialization.InitUserModel = function(){
+appInitialization.initUserModel = function(){
 
     var appMetadataSet = appInitialization.metadataSet;
 
