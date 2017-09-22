@@ -24,6 +24,7 @@ public class ServiceTaskSendMailForAuthor extends AbstractServiceTask {
 
     private Set<Task> tasksWithSendMail = new HashSet<>();
 
+    // ToDo
     @Value("#{config['mailSenderService.link_app'] ?: 'http://192.168.0.110:8080'}")
     static private String link_app = "http://192.168.0.110:8080";
 
