@@ -1,7 +1,4 @@
 app
-        .config(['$controllerProvider', function ($controllerProvider) {
-            $controllerProvider.allowGlobals();
-        }])
         .config(['$locationProvider', function ($locationProvider) {
             $locationProvider.hashPrefix('');
         }])
