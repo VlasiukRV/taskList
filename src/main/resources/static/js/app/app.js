@@ -99,41 +99,93 @@ app
 
 // Controllers
 
-app.controller('workPlaceController', ['$window', '$http', '$cookies', '$rootScope', '$scope', '$location', 'dataStorage', 'resourceService', 'dateFilter',
-    workPlaceController($window, $http, $cookies, $rootScope, $scope, $location, dataStorage, resourceService, dateFilter)]);
+app.controller('workPlaceController',
+    [
+        '$window', '$http', '$cookies', '$rootScope', '$scope', '$location', 'dataStorage', 'resourceService', 'dateFilter',
+        workPlaceController
+    ]
+);
 
-app.controller('projectController', ['$scope',
-    projectController($scope)]);
+app.controller('projectController',
+    [
+        '$scope',
+        projectController
+    ]
+);
 
-app.controller('projectListController', ['$scope', 'dataStorage',
-    projectListController($scope, dataStorage)]);
+app.controller('projectListController',
+    [
+        '$scope', 'dataStorage',
+        projectListController
+    ]
+);
 
-app.controller('editProjectController', ['$scope', 'dataStorage',
-    editProjectController($scope, dataStorage)]);
+app.controller('editProjectController',
+    [
+        '$scope', 'dataStorage',
+        editProjectController
+    ]
+);
 
-app.controller('taskController', ['$scope',
-    taskController($scope)]);
+app.controller('taskController',
+    [
+        '$scope',
+        taskController
+    ]
+);
 
-app.controller('taskListController', ['$scope', 'dataStorage',
-    taskListController($scope, dataStorage)]);
+app.controller('taskListController',
+    [
+        '$scope', 'dataStorage',
+        taskListController
+    ]
+);
 
-app.controller('editTaskController', ['$scope', 'dataStorage',
-    editTaskController($scope, dataStorage)]);
+app.controller('editTaskController',
+    [
+        '$scope', 'dataStorage',
+        editTaskController
+    ]
+);
 
-app.controller('userController', ['$scope',
-    userController($scope)]);
+app.controller('userController',
+    [
+        '$scope',
+        userController
+    ]
+);
 
-app.controller('userListController', ['$scope', 'dataStorage',
-    userListController($scope, dataStorage)]);
+app.controller('userListController',
+    [
+        '$scope', 'dataStorage',
+        userListController
+    ]
+);
 
-app.controller('editUserController', ['$scope', 'dataStorage',
-    editUserController($scope, dataStorage)]);
+app.controller('editUserController',
+    [
+        '$scope', 'dataStorage',
+        editUserController
+    ]
+);
 
-app.controller('roleController', ['$scope',
-    roleController($scope)]);
+app.controller('roleController',
+    [
+        '$scope',
+        roleController
+    ]
+);
 
-app.controller('roleListController', ['$scope', 'dataStorage',
-    roleListController($scope, dataStorage)]);
+app.controller('roleListController',
+    [
+        '$scope', 'dataStorage',
+        roleListController
+    ]
+);
 
-app.controller('editRoleController', ['$scope', 'dataStorage',
-    editRoleController($scope, dataStorage)]);
+app.controller('editRoleController',
+    [
+        '$scope', 'dataStorage',
+        editRoleController
+    ]
+);
