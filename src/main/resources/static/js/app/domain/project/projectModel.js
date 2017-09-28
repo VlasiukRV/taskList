@@ -1,61 +1,66 @@
-appInitialization.initProjectModel = function() {
+;
+(function (appInitialization) {
 
-    var appMetadataSet = appInitialization.metadataSet;
+    appInitialization.initProjectModel = function () {
 
-    var Project = appUtils.Class(appModel.Entity);
-    var metadataEntitySpecification_Project = {
-        entityClass: Project,
-        fnGetEntityInstance: function () {
-            return new Project()
-        },
-        metadataName: "project",
-        metadataRepresentation: "Project",
-        metadataDescription: "Project list",
-        entityField: {
-            objectField: {},
-            entityField: {
+        var appMetadataSet = appInitialization.metadataSet;
 
-                // entity field
-                name: {
-                    value: "",
-                    fieldDescription: {
-                        inputType: "text",
-                        label: "name",
-                        availability: true,
-                        entityListService: null
-                    }
-                }
-
+        var Project = appUtils.Class(appInitialization.abstractAppModel.Entity);
+        var metadataEntitySpecification_Project = {
+            entityClass: Project,
+            fnGetEntityInstance: function () {
+                return new Project()
             },
-            defineField: {
+            metadataName: "project",
+            metadataRepresentation: "Project",
+            metadataDescription: "Project list",
+            entityField: {
+                objectField: {},
+                entityField: {
 
-                representation: {
-                    enumerable: true,
-                    get: function () {
-                        return "" + this.name;
+                    // entity field
+                    name: {
+                        value: "",
+                        fieldDescription: {
+                            inputType: "text",
+                            label: "name",
+                            availability: true,
+                            entityListService: null
+                        }
                     }
-                }
 
-            }
-        },
+                },
+                defineField: {
 
-        entityFieldsPlacing: [
-            [
-                {editFieldId: "id", fieldLength: 3},
-                {
-                    editFieldId: [
-                        [{editFieldId: "name", fieldLength: 12}]
-                    ],
-                    fieldLength: 5
+                    representation: {
+                        enumerable: true,
+                        get: function () {
+                            return "" + this.name;
+                        }
+                    }
+
                 }
-            ],
-            [
-                {editFieldId: "description", fieldLength: 12}
+            },
+
+            entityFieldsPlacing: [
+                [
+                    {editFieldId: "id", fieldLength: 3},
+                    {
+                        editFieldId: [
+                            [{editFieldId: "name", fieldLength: 12}]
+                        ],
+                        fieldLength: 5
+                    }
+                ],
+                [
+                    {editFieldId: "description", fieldLength: 12}
+                ]
             ]
-        ]
+        };
+
+        appInitialization.metadataSpecifications.entities.push(metadataEntitySpecification_Project);
+
+        return appInitialization;
     };
 
-    appInitialization.metadataSpecifications.entities.push(metadataEntitySpecification_Project);
-
-    return appInitialization;
-};
+})(appService.appInitialization);

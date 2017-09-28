@@ -10,13 +10,13 @@ projectController = function($scope) {
 };
 
 editProjectController = function($scope, dataStorage) {
-    EditEntityController.apply(this, arguments);
+    appService.formsService.EditEntityController.apply(this, arguments);
     this.metadataName = "project";
     this.initController();
 };
 
 projectListController = function($scope, dataStorage) {
-    ListEntityController.apply(this, arguments);
+    appService.formsService.ListEntityController.apply(this, arguments);
     this.metadataName = "project";
     this.initController();
 };

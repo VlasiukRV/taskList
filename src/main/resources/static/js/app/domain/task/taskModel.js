@@ -1,8 +1,11 @@
-appInitialization.initTaskModel = function(){
+;
+(function (appInitialization) {
+
+    appInitialization.initTaskModel = function(){
 
     var appMetadataSet = appInitialization.metadataSet;
 
-    var Task = appUtils.Class(appModel.Entity);
+    var Task = appUtils.Class(appInitialization.abstractAppModel.Entity);
     var metadataEntitySpecification_Task = {
         entityClass: Task,
         fnGetEntityInstance: function () {
@@ -168,3 +171,5 @@ appInitialization.initTaskModel = function(){
 
     return appInitialization;
 };
+
+})(appService.appInitialization);

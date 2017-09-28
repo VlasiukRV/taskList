@@ -1,11 +1,10 @@
-/*
- ////////////////////////////////////
- // UTILS
- ////////////////////////////////////
- */
 
-var appUtils = Object.create(null);
-(function () {
+;(function (exp) {
+    if (!exp.appUtils) {
+        exp.appUtils = new Object(null);
+    }
+    var appUtils = exp.appUtils;
+
     appUtils.Class = function (Parent) {
 
         // prototype есть только в функции
@@ -231,5 +230,6 @@ var appUtils = Object.create(null);
         var args = jQuery.makeArray(arguments);
         args.unshift("(App:)");
         console.log.apply(console, args);
-    }
-})();
+    };
+
+})(window);

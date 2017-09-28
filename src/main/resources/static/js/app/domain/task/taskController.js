@@ -10,13 +10,13 @@ taskController = function($scope) {
 };
 
 editTaskController = function($scope, dataStorage) {
-    EditEntityController.apply(this, arguments);
+    appService.formsService.EditEntityController.apply(this, arguments);
     this.metadataName = "task";
     this.initController();
 };
 
 taskListController = function($scope, dataStorage) {
-    ListEntityController.apply(this, arguments);
+    appService.formsService.ListEntityController.apply(this, arguments);
     this.metadataName = "task";
     this.initController();
 };
